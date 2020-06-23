@@ -8,6 +8,9 @@ import Drawer from './components/Drawer'
 import Gallery from './components/Gallery'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
+import { Provider } from 'react-redux';
+import store from './redux/store'
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -22,11 +25,13 @@ export default function App() {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
-      <Drawer />
-      <main className={classes.content}>
-        <Gallery />
-      </main>
-    </div>
+    <Provider store={store}>
+      <div className={classes.root}>
+        <Drawer />
+        <main className={classes.content}>
+          <Gallery />
+        </main>
+      </div>
+    </Provider>
   );
 }

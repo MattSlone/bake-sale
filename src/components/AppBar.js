@@ -15,6 +15,15 @@ import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 
+import SignUpContainer from './containers/SignUpContainer'
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link as RouterLink
+} from "react-router-dom";
+
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
@@ -184,7 +193,7 @@ export default function PrimarySearchAppBar(props) {
             <MenuIcon />
           </IconButton>
           <Typography className={classes.title} variant="h6" noWrap>
-            Material-UI
+            Bake.$ale
           </Typography>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -211,16 +220,25 @@ export default function PrimarySearchAppBar(props) {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            <Router>
+              <RouterLink to="/signup">
+                <IconButton
+                  edge="end"
+                  aria-label="account of current user"
+                  aria-controls={menuId}
+                  aria-haspopup="true"
+                  //onClick={handleProfileMenuOpen}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+              </RouterLink>
+              <Switch>
+                <Route path="/signup">
+                  <SignUpContainer />
+                </Route>
+              </Switch>
+            </Router>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
