@@ -5,7 +5,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, '../build')));
 
 app.get('/test', function (req, res) {
- return res.send('Hello World!');
+ console.log("testing")
 });
 
 app.get('/', function (req, res) {
