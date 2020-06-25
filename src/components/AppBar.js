@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   title: {
-    display: 'none',
+    display: 'block',
     [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
@@ -53,12 +53,12 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
+    marginRight: theme.spacing(1),
+    marginLeft: theme.spacing(2),
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       marginLeft: theme.spacing(3),
-      width: 'auto',
+      width: '100%',
     },
   },
   searchIcon: {
@@ -192,7 +192,7 @@ export default function PrimarySearchAppBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6" noWrap>
+          <Typography className={classes.title} variant="h6">
             Bake.$ale
           </Typography>
           <div className={classes.search}>
@@ -220,25 +220,16 @@ export default function PrimarySearchAppBar(props) {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <Router>
-              <RouterLink to="/signup">
-                <IconButton
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-controls={menuId}
-                  aria-haspopup="true"
-                  //onClick={handleProfileMenuOpen}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-              </RouterLink>
-              <Switch>
-                <Route path="/signup">
-                  <SignUpContainer />
-                </Route>
-              </Switch>
-            </Router>
+            <IconButton
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton

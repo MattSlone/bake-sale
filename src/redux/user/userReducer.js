@@ -3,7 +3,7 @@ import { SIGN_UP, LOG_IN, LOG_OUT } from './userTypes'
 const initialState = {
   loggedIn: false,
   registered: false,
-  test: 'testing'
+  test: 'testing redux'
 }
 
 const userReducer = (state = initialState, action) => {

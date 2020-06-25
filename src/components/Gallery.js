@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import { Link as RouterLink } from "react-router-dom";
 
 function Copyright() {
   return (
@@ -57,6 +58,9 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(6),
   },
+  routerLinkButton: {
+    textDecoration: 'none',
+  }
 }));
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -82,9 +86,11 @@ export default function Album() {
             <div className={classes.heroButtons}>
               <Grid container spacing={2} justify="center">
                 <Grid item>
-                  <Button variant="contained" color="primary">
-                    Sign up
-                  </Button>
+                  <RouterLink to='/signin' className={classes.routerLinkButton}>
+                      <Button variant="contained" color="primary">
+                      Sign In
+                    </Button>
+                  </RouterLink>
                 </Grid>
                 <Grid item>
                   <Button variant="outlined" color="primary">
