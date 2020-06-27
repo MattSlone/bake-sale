@@ -43,14 +43,14 @@ export default function App() {
 
   return (
     <Provider store={store}>
+      <Router>
         <div className={classes.root}>
           <Drawer />
           <main className={classes.content}>
-            <Router>
-              <Routes/>
-            </Router>
+            <Routes/>
           </main>
         </div>
+      </Router>
     </Provider>
   );
 }

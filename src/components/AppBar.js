@@ -17,12 +17,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 
 import SignUpContainer from './containers/SignUpContainer'
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link as RouterLink
-} from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -95,6 +90,10 @@ const useStyles = makeStyles((theme) => ({
       display: 'none',
     },
   },
+  routerLinkButton: {
+    color: 'white',
+    textDecoration: 'none'
+  }
 }));
 
 export default function PrimarySearchAppBar(props) {
@@ -192,9 +191,11 @@ export default function PrimarySearchAppBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6">
-            Bake.$ale
-          </Typography>
+          <RouterLink to='/' className={classes.routerLinkButton}>
+            <Typography className={classes.title} variant="h6">
+              Bake.$ale
+            </Typography>
+          </RouterLink>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
