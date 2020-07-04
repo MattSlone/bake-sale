@@ -10,5 +10,6 @@
 6) Navigate to /server and run the command "npx sequelize db:create".
 
 # START
-1) Run "node server/app" to start express server
-2) Run "npm start"
+1) Navigate to /server and run "npx sequelize "
+2) Run "node server/app" to start express server
+3) Run "npm start" "sequelize db:migrate"

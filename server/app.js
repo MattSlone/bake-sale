@@ -1,11 +1,19 @@
 require('dotenv').config()
-const express = require('express');
-const bodyParser = require('body-parser')
-const path = require('path');
-const Sequelize = require('sequelize')
-const app = express();
+const express = require('express'),
+  bodyParser = require('body-parser'),
+  path = require('path');
+  passport = require('passport')
+  session = require('express-session')
+  flash = require('connect-flash')
+  Sequelize = require('sequelize')
+  app = express();
 
-const indexRouter = require('./routes/index.js')
+require('./config/passport')(passport)
+
+var session = require("express-session");
+// initalize sequelize with session store
+var SequelizeStore = require("connect-session-sequelize")(session.Store);
+
 const userRouter = require('./routes/user.js')
 
 /* DATABASE */
@@ -15,14 +23,33 @@ const sequelize = new Sequelize('database_development', 'root', 'root', {
   logging: (...msg) => console.log(msg)
 });
 
-(async () => {
+/*(async () => {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
-})()
+})()*/
+
+/* Session stuff for cookies and passwords */
+var myStore = new SequelizeStore({
+  db: sequelize,
+});
+app.use(
+  session({
+    secret: "keyboard cat",
+    store: myStore,
+    resave: false, // we support the touch method so per the express-session docs this should be set to false
+    proxy: true, // if you do SSL outside of node.,
+    saveUninitialized: false
+  })
+);
+myStore.sync();
+
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(flash())
 
 /* Don't worry about these */
 app.use(express.static(path.join(__dirname, '../build')));
@@ -32,8 +59,7 @@ app.get('/test', function (req, res) {
 });
 
 /* ROUTERS */
-app.use('/', indexRouter);
-app.use('/users', userRouter);
+require('./routes/user')(app, passport)
 
 // Default response for any other request
 app.use(function(req, res) {

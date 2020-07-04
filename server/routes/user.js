@@ -1,25 +1,42 @@
-'use strict';
+'use strict'
 
-let express = require('express');
-let router = express.Router();
+module.exports = (app, passport) => {
+  app.get('/', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+      success: req.flash('success')
+    })
+  })
 
-router.get('/register', (req, res, next) => {
-  res.render('login');
-  next();
-});
+  app.get('/logout', (req, res, next) => {
+    req.logout()
+    req.flash('success', 'Successfully logged out')
+    res.redirect('/api')
+  })
 
-router.post('/register', (req, res, next) => {
-  next();
-});
+  app.post('/login', passport.authenticate('local', {
+    successRedirect: '/api',
+    failureRedirect: '/api',
+    failureFlash: true,
+    successFlash: 'true'
+  }))
 
-router.get('/login', (req, res, next) => {
-  res.render('index');
-  next();
-});
+  app.get('/register', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+      success: req.flash('success')
+    })
+  })
 
-router.post('/login', (req, res, next) => {
-  res.render('index');
-  next();
-});
 
-module.exports = router;
+  app.post('/register', passport.authenticate('local-signup', {
+    successRedirect: '/api/register',
+    failureRedirect: '/api/register',
+    failureFlash: true,
+    successFlash: 'true'
+  }))
+
+  app.get('/uploads/:image', async (req, res, next) => {
+    res.sendFile(`./server/uploads/${req.params.image}`)
+  })
+}
