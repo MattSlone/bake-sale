@@ -8,9 +8,10 @@ import Drawer from './components/Drawer'
 import Gallery from './components/Gallery'
 import SignUpContainer from './components/containers/SignUpContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { PersistGate } from 'redux-persist/integration/react'
 
 import { Provider } from 'react-redux';
-import store from './redux/store'
+import { store, persistor } from './redux/store'
 
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const navItems = [
-  { path: '/signin', component: SignUpContainer },
+  { path: '/signin', component: SignUpContainer},
 ]
 
 const Routes = () => (
@@ -40,17 +41,19 @@ const Routes = () => (
 
 export default function App() {
   const classes = useStyles();
-
+  console.log(store.getState())
   return (
     <Provider store={store}>
-      <Router>
-        <div className={classes.root}>
-          <Drawer />
-          <main className={classes.content}>
-            <Routes/>
-          </main>
-        </div>
-      </Router>
+      <PersistGate loading={null} persistor={persistor}>
+        <Router>
+          <div className={classes.root}>
+            <Drawer />
+            <main className={classes.content}>
+              <Routes/>
+            </main>
+          </div>
+        </Router>
+      </PersistGate>
     </Provider>
   );
 }

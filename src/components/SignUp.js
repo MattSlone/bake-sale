@@ -12,13 +12,14 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { useHistory } from "react-router-dom";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        Bake.$ale
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -48,6 +49,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp({ userSignup, userData }) {
   const classes = useStyles();
+  let history = useHistory();
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -65,7 +68,9 @@ export default function SignUp({ userSignup, userData }) {
     userSignup(formData)
   }
 
-  console.log(userData.user ? userData.user : userData.error)
+  if(userData.loggedIn == true) {
+    history.push('/testroute')
+  }
 
   return (
     <Container component="main" maxWidth="xs">
