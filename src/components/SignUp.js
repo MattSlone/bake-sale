@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -46,9 +46,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp(props) {
-  console.log(props)
+export default function SignUp({ userSignup, userData }) {
   const classes = useStyles();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
+  /*useEffect(() => {
+    userSignup()
+  }, [])*/
+
+  let formData = {
+    username: username,
+    password: password
+  }
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    userSignup(formData)
+  }
+
+  console.log(userData.user ? userData.user : userData.error)
 
   return (
     <Container component="main" maxWidth="xs">
@@ -58,7 +75,7 @@ export default function SignUp(props) {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          {props.test}
+          {userData.user ? "Welcome, " + userData.user.username + "!" : userData.error}
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -69,8 +86,10 @@ export default function SignUp(props) {
             id="email"
             label="Email Address"
             name="email"
+            value={username}
             autoComplete="email"
             autoFocus
+            onChange={e => setUsername(e.target.value)}
           />
           <TextField
             variant="outlined"
@@ -81,7 +100,9 @@ export default function SignUp(props) {
             label="Password"
             type="password"
             id="password"
+            value={password}
             autoComplete="current-password"
+            onChange={e => setPassword(e.target.value)}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -93,6 +114,7 @@ export default function SignUp(props) {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={e => handleSubmit(e)}
           >
             Sign In
           </Button>

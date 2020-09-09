@@ -19,14 +19,15 @@ module.exports = (passport) => {
   });
 
   passport.use('local-signup', new LocalStrategy({
-    passReqToCallback: true,
+    passReqToCallback: true
   },
   async function(req, username, password, done) {
     try {
+      console.log(req.body)
       const [user, created] = await User.findOrCreate({
         where: { username: username },
         defaults: {
-          email: req.email,
+          email: username,
           password: await User.generateHash(password),
         }
       });
@@ -34,7 +35,6 @@ module.exports = (passport) => {
       if (!created) {
         return done(null, false, { message: 'Username taken.' });
       }
-
       return done(null, user);
     } catch(err) {
       return done(err);

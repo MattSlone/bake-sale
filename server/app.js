@@ -14,13 +14,13 @@ var session = require("express-session");
 // initalize sequelize with session store
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
-const userRouter = require('./routes/user.js')
+//const userRouter = require('./routes/user.js')
 
 /* DATABASE */
 const sequelize = new Sequelize('database_development', 'root', 'root', {
   host: '127.0.0.1',
   dialect: 'mysql',
-  logging: (...msg) => console.log(msg)
+  //logging: (...msg) => console.log(msg)
 });
 
 /*(async () => {
@@ -51,6 +51,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
 
+app.use(express.json())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
 /* Don't worry about these */
 app.use(express.static(path.join(__dirname, '../build')));
 
@@ -67,4 +71,4 @@ app.use(function(req, res) {
 });
 
 
-app.listen(process.env.PORT, () => console.log(`App listening at http://localhost:${process.env.PORT}`))
+app.listen(process.env.EXPRESS_PORT, () => console.log(`App listening at http://localhost:${process.env.EXPRESS_PORT}`))

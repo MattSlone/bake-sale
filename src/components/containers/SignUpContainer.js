@@ -1,18 +1,16 @@
 import { connect } from 'react-redux'
 import SignUp from '../SignUp'
-import { signUp, login, logout } from '../../redux'
+import { userSignup } from '../../redux'
 
 const mapStateToProps = state => {
   return {
-    test: state.user.test
+    userData: state.user
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    signUp: () => dispatch(signUp()),
-    login: () => dispatch(login()),
-    logout: () => dispatch(logout())
+    userSignup: (formData) => dispatch(userSignup(formData))
   }
 }
 
