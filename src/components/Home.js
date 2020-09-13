@@ -72,9 +72,11 @@ export default function Home({ userData }) {
   const WelcomeHeader = () => (
     <>
     <Typography variant="h5" align="center" color="textSecondary" paragraph>
-      Something short and leading about the collection below—its contents, the creator, etc.
-      Make it short and sweet, but not too short so folks don&apos;t simply skip over it
-      entirely.
+      Buy and sell baked goods and other food from the comfort of your home!
+      Did you know 49 out of the 50 states
+      have <Link href="https://foodpreneurinstitute.com/cottage-food-law/">cottage food laws</Link> governing
+      the sale of homemade food? We streamlined the process to make it easy
+      for home chefs. All that's left to do is order what looks good!
     </Typography>
     <div className={classes.heroButtons}>
       <Grid container spacing={2} justify="center">
@@ -108,7 +110,7 @@ export default function Home({ userData }) {
             {userData.loggedIn ? null : <WelcomeHeader />}
           </Container>
         </div>
-        <Container className={classes.cardGrid} maxWidth="md">
+        <Container className={classes.cardGrid} maxWidth="lg">
           {/* End hero unit */}
           <Grid container spacing={4}>
             {cards.map((card) => (
@@ -116,7 +118,7 @@ export default function Home({ userData }) {
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}
-                    image="https://source.unsplash.com/random"
+                    image="https://source.unsplash.com/featured/?baked,goods"
                     title="Image title"
                   />
                   <CardContent className={classes.cardContent}>
