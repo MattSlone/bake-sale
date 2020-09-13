@@ -3,43 +3,35 @@ let multer = require('multer');
 let upload = multer();
 
 module.exports = (app, passport) => {
-  app.get('/', (req, res, next) => {
+  app.get('/api/signin', (req, res, next) => {
     res.send({
       error: req.flash('error'),
       success: req.flash('success')
     })
   })
 
-  app.get('/logout', (req, res, next) => {
+  app.get('/api/signup', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+      success: req.flash('success')
+    })
+  })
+
+  app.get('/api/signout', (req, res, next) => {
     req.logout()
-    req.flash('success', 'Successfully logged out')
-    res.redirect('/api')
+    res.json({ message: 'Successfully signed out' });
   })
 
-  app.post('/login', passport.authenticate('local'),
-  function(req, res) {
-    res.json({ id: req.user.id, username: req.user.username });
-  });
-
-  app.get('/register', (req, res, next) => {
-    res.send({
-      error: req.flash('error'),
-      success: req.flash('success')
-    })
-  })
-
-
-  app.post('/register', passport.authenticate('local-signup'), (req, res) => {
-    res.send(req.user)
-  })
+  app.post('/api/signin', passport.authenticate('local', { failureRedirect: '/api/signin', successRedirect: '/api/signin', failureFlash: true}))
+  app.post('/api/signup', passport.authenticate('local-signup', { failureRedirect: '/api/signup', failureFlash: true }))
 
 /* DEBUGGER
-  app.post('/register',
+  app.post('/api/signup',
     // wrap passport.authenticate call in a middleware function
     function (req, res, next) {
       console.log('Request:', req.body)
       // call passport authentication passing the "local" strategy name and a callback function
-      passport.authenticate('local', function (error, user, info) {
+      passport.authenticate('local-signup', function (error, user, info) {
         // this will execute in any case, even if a passport strategy will find an error
         // log everything to console
         console.log(error);
@@ -60,7 +52,8 @@ module.exports = (app, passport) => {
     // function to call once successfully authenticated
     function (req, res) {
       res.status(200).send('logged in!');
-    });
+    }
+  );
 */
 
   app.get('/uploads/:image', async (req, res, next) => {

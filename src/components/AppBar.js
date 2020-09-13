@@ -14,10 +14,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
-
-import SignUpContainer from './containers/SignUpContainer'
-
-import { Link as RouterLink } from "react-router-dom";
+import { Redirect, Link as RouterLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -117,6 +114,11 @@ export default function PrimarySearchAppBar(props) {
     handleMobileMenuClose();
   };
 
+  const handleSignOutButton = () => {
+    handleMenuClose()
+    props.userSignOut()
+  }
+
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
@@ -134,6 +136,7 @@ export default function PrimarySearchAppBar(props) {
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleSignOutButton}>Sign Out</MenuItem>
     </Menu>
   );
 

@@ -5,15 +5,16 @@ import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import ProTip from './ProTip';
 import Drawer from './components/Drawer'
-import Gallery from './components/Gallery'
 import SignUpContainer from './components/containers/SignUpContainer'
+import HomeContainer from './components/containers/HomeContainer'
+import SignInContainer from './components/containers/SignInContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/integration/react'
 
 import { Provider } from 'react-redux';
 import { store, persistor } from './redux/store'
 
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,12 +27,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const navItems = [
-  { path: '/signin', component: SignUpContainer},
+  { path: '/signin', component: SignInContainer},
+  { path: '/signup', component: SignUpContainer},
+  { path: '/signout', component: () => <Redirect to='/' /> }
 ]
 
 const Routes = () => (
   <>
-    {<Route path='/' exact component={Gallery} key='/'/>}
+    {<Route path='/' exact component={HomeContainer} key='/'/>}
     {navItems.map(item =>
       <Route path={item.path} exact component={item.component} key={item.path}/>
     )}
@@ -41,7 +44,6 @@ const Routes = () => (
 
 export default function App() {
   const classes = useStyles();
-  console.log(store.getState())
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

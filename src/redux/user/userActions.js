@@ -4,85 +4,114 @@ import {
   USER_SIGNUP_REQUEST,
   USER_SIGNUP_SUCCESS,
   USER_SIGNUP_FAILURE,
-  USER_LOGIN_REQUEST,
-  USER_LOGIN_SUCCESS,
-  USER_LOGIN_FAILURE,
-  USER_LOGOUT_REQUEST,
-  USER_LOGOUT_SUCCESS,
-  USER_LOGOUT_FAILURE
+  USER_SIGNIN_REQUEST,
+  USER_SIGNIN_SUCCESS,
+  USER_SIGNIN_FAILURE,
+  USER_SIGNOUT_REQUEST,
+  USER_SIGNOUT_SUCCESS,
+  USER_SIGNOUT_FAILURE
  } from './userTypes'
 
-
 // SIGNUP
-export const userSignupRequest = () => {
+export const userSignUpRequest = () => {
   return {
     type: USER_SIGNUP_REQUEST
   }
 }
 
-export const userSignupSuccess = (user) => {
+export const userSignUpSuccess = (user) => {
   return {
     type: USER_SIGNUP_SUCCESS,
     payload: user
   }
 }
 
-export const userSignupFailure = (error) => {
+export const userSignUpFailure = (error) => {
   return {
     type: USER_SIGNUP_FAILURE,
     payload: error
   }
 }
 
-// LOGIN
-export const userLoginRequest = () => {
+// Signin
+export const userSignInRequest = () => {
   return {
-    type: USER_LOGIN_REQUEST
+    type: USER_SIGNIN_REQUEST
   }
 }
 
-export const userLoginSuccess = (user) => {
+export const userSignInSuccess = (user) => {
   return {
-    type: USER_LOGIN_SUCCESS,
+    type: USER_SIGNIN_SUCCESS,
     payload: user
   }
 }
 
-export const userLoginFailure = (error) => {
+export const userSignInFailure = (error) => {
   return {
-    type: USER_LOGIN_FAILURE,
+    type: USER_SIGNIN_FAILURE,
     payload: error
   }
 }
 
-// LOGOUT
-export const userLogoutRequest = () => {
+// SIGNOUT
+export const userSignOutRequest = () => {
   return {
-    type: USER_LOGOUT_REQUEST
+    type: USER_SIGNOUT_REQUEST
   }
 }
 
-export const userLogoutSuccess = () => {
+export const userSignOutSuccess = (message) => {
   return {
-    type: USER_LOGOUT_SUCCESS
+    type: USER_SIGNOUT_SUCCESS,
+    payload: message
   }
 }
 
-export const userLogoutFailure = (error) => {
+export const userSignOutFailure = (error) => {
   return {
-    type: USER_LOGOUT_FAILURE,
+    type: USER_SIGNOUT_FAILURE,
     payload: error
   }
 }
 
-export const userSignup = (formData) => {
+export const userSignUp = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(userSignupRequest)
-      const user = await axios.post('/register', formData)
-      dispatch(userSignupSuccess(user.data))
+      dispatch(userSignUpRequest)
+      const res = await axios.post('/api/signup', formData)
+      dispatch(userSignUpSuccess(res.data))
     } catch(error) {
-      dispatch(userSignupFailure(error.message))
+      dispatch(userSignUpFailure(error.message))
+    }
+  }
+}
+
+export const userSignIn = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(userSignInRequest)
+      const res = await axios.post('/api/signin', formData)
+      if(res.data.error[0]) {
+        dispatch(userSignInFailure(res.data.error[0]))
+      }
+      else {
+        dispatch(userSignInSuccess(res.data))
+      }
+    } catch(error) {
+      dispatch(userSignInFailure(error.message))
+    }
+  }
+}
+
+export const userSignOut = () => {
+  return async (dispatch) => {
+    try {
+      dispatch(userSignOutRequest)
+      const res = await axios.get('/api/signout')
+      dispatch(userSignOutSuccess(res.data))
+    } catch(error) {
+      dispatch(userSignOutFailure(error.message))
     }
   }
 }

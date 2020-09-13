@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import SignUp from '../SignUp'
-import { userSignup } from '../../redux'
+import { userSignUp } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -10,7 +10,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    userSignup: (formData) => dispatch(userSignup(formData))
+    userSignUp: (formData) => dispatch(userSignUp(formData))
   }
 }
 

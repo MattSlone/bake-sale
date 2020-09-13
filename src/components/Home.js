@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import CameraIcon from '@material-ui/icons/PhotoCamera';
@@ -13,14 +13,15 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
-import { Link as RouterLink } from "react-router-dom";
+import { useHistory, Link as RouterLink } from "react-router-dom";
+import { store } from '../redux/store'
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        Bake.$ale
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
   heroContent: {
     backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(8, 0, 6),
+    padding: theme.spacing(8, 0, 0),
   },
   heroButtons: {
     marginTop: theme.spacing(4),
@@ -65,8 +66,34 @@ const useStyles = makeStyles((theme) => ({
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-export default function Album() {
+export default function Home({ userData }) {
   const classes = useStyles();
+
+  const WelcomeHeader = () => (
+    <>
+    <Typography variant="h5" align="center" color="textSecondary" paragraph>
+      Something short and leading about the collection below—its contents, the creator, etc.
+      Make it short and sweet, but not too short so folks don&apos;t simply skip over it
+      entirely.
+    </Typography>
+    <div className={classes.heroButtons}>
+      <Grid container spacing={2} justify="center">
+        <Grid item>
+          <RouterLink to='/signin' className={classes.routerLinkButton}>
+              <Button variant="contained" color="primary">
+              Sign In
+            </Button>
+          </RouterLink>
+        </Grid>
+        <Grid item>
+          <Button variant="outlined" color="primary">
+            How it works
+          </Button>
+        </Grid>
+      </Grid>
+    </div>
+    </>
+  )
 
   return (
     <React.Fragment>
@@ -78,27 +105,7 @@ export default function Album() {
             <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
               Bake.$ale
             </Typography>
-            <Typography variant="h5" align="center" color="textSecondary" paragraph>
-              Something short and leading about the collection below—its contents, the creator, etc.
-              Make it short and sweet, but not too short so folks don&apos;t simply skip over it
-              entirely.
-            </Typography>
-            <div className={classes.heroButtons}>
-              <Grid container spacing={2} justify="center">
-                <Grid item>
-                  <RouterLink to='/signin' className={classes.routerLinkButton}>
-                      <Button variant="contained" color="primary">
-                      Sign In
-                    </Button>
-                  </RouterLink>
-                </Grid>
-                <Grid item>
-                  <Button variant="outlined" color="primary">
-                    How it works
-                  </Button>
-                </Grid>
-              </Grid>
-            </div>
+            {userData.loggedIn ? null : <WelcomeHeader />}
           </Container>
         </div>
         <Container className={classes.cardGrid} maxWidth="md">

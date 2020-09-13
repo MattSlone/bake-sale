@@ -2,12 +2,12 @@ import {
   USER_SIGNUP_REQUEST,
   USER_SIGNUP_SUCCESS,
   USER_SIGNUP_FAILURE,
-  USER_LOGIN_REQUEST,
-  USER_LOGIN_SUCCESS,
-  USER_LOGIN_FAILURE,
-  USER_LOGOUT_REQUEST,
-  USER_LOGOUT_SUCCESS,
-  USER_LOGOUT_FAILURE
+  USER_SIGNIN_REQUEST,
+  USER_SIGNIN_SUCCESS,
+  USER_SIGNIN_FAILURE,
+  USER_SIGNOUT_REQUEST,
+  USER_SIGNOUT_SUCCESS,
+  USER_SIGNOUT_FAILURE
  } from './userTypes'
 
 const initialState = {
@@ -31,32 +31,32 @@ const userReducer = (state = initialState, action) => {
       user: false,
       error: action.payload
     }
-    case USER_LOGIN_REQUEST: return {
+    case USER_SIGNIN_REQUEST: return {
       ...state,
       loading: true
     }
-    case USER_LOGIN_SUCCESS: return {
+    case USER_SIGNIN_SUCCESS: return {
       loggedIn: true,
       user: action.payload,
       error: ''
     }
-    case USER_LOGIN_FAILURE: return {
+    case USER_SIGNIN_FAILURE: return {
       loading: false,
       loggedIn: false,
       user: false,
       error: action.payload
     }
-    case USER_LOGOUT_REQUEST: return {
+    case USER_SIGNOUT_REQUEST: return {
       ...state,
       loading: true
     }
-    case USER_LOGOUT_SUCCESS: return {
+    case USER_SIGNOUT_SUCCESS: return {
       loading: false,
       loggedIn: false,
       user: false,
       error: ''
     }
-    case USER_LOGOUT_FAILURE: return {
+    case USER_SIGNOUT_FAILURE: return {
       ...state,
       loading: false,
       error: action.payload

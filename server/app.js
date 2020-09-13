@@ -10,6 +10,8 @@ const express = require('express'),
 
 require('./config/passport')(passport)
 
+console.log(process.env.EXPRESS_PORT)
+
 var session = require("express-session");
 // initalize sequelize with session store
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
@@ -57,11 +59,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 /* Don't worry about these */
 app.use(express.static(path.join(__dirname, '../build')));
-
-app.get('/test', function (req, res) {
- console.log("testing")
-});
-
 /* ROUTERS */
 require('./routes/user')(app, passport)
 
@@ -69,6 +66,5 @@ require('./routes/user')(app, passport)
 app.use(function(req, res) {
     res.status(404);
 });
-
 
 app.listen(process.env.EXPRESS_PORT, () => console.log(`App listening at http://localhost:${process.env.EXPRESS_PORT}`))

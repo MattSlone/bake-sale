@@ -36,6 +36,8 @@ module.exports = (sequelize, DataTypes) => {
 
   };
   User.init({
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
     username: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING
@@ -43,6 +45,5 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
-  console.log(User)
   return User;
 };

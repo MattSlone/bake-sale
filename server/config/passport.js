@@ -23,10 +23,11 @@ module.exports = (passport) => {
   },
   async function(req, username, password, done) {
     try {
-      console.log(req.body)
       const [user, created] = await User.findOrCreate({
         where: { username: username },
         defaults: {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
           email: username,
           password: await User.generateHash(password),
         }

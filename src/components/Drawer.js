@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import AppBar from './AppBar';
+import AppBarContainer from './containers/AppBarContainer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
@@ -91,7 +91,7 @@ function ResponsiveDrawer(props) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="fixed" drawerWidth="240" handleDrawerToggle={handleDrawerToggle} />
+      <AppBarContainer position="fixed" drawerWidth="240" handleDrawerToggle={handleDrawerToggle} />
       <nav className={classes.drawer} aria-label="mailbox folders">
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Hidden smUp implementation="css">
