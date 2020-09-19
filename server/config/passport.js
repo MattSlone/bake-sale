@@ -28,6 +28,7 @@ module.exports = (passport) => {
         defaults: {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
+          seller: req.body.seller,
           email: username,
           password: await User.generateHash(password),
         }

@@ -8,6 +8,7 @@ import Drawer from './components/Drawer'
 import SignUpContainer from './components/containers/SignUpContainer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
+import Dashboard from './components/dashboard/Dashboard'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/integration/react'
 
@@ -29,7 +30,8 @@ const useStyles = makeStyles((theme) => ({
 const navItems = [
   { path: '/signin', component: SignInContainer},
   { path: '/signup', component: SignUpContainer},
-  { path: '/signout', component: () => <Redirect to='/' /> }
+  { path: '/signout', component: () => <Redirect to='/' /> },
+  { path: '/dashboard', component: Dashboard }
 ]
 
 const Routes = () => (

@@ -80,7 +80,12 @@ export const userSignUp = (formData) => {
     try {
       dispatch(userSignUpRequest)
       const res = await axios.post('/api/signup', formData)
-      dispatch(userSignUpSuccess(res.data))
+      if(res.data.error[0]) {
+        dispatch(userSignInFailure(res.data.error[0]))
+      }
+      else {
+        dispatch(userSignInSuccess(res.data))
+      }
     } catch(error) {
       dispatch(userSignUpFailure(error.message))
     }

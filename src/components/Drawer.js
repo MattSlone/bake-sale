@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AppBarContainer from './containers/AppBarContainer';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,10 +12,14 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import { mainListItems, secondaryListItems } from './dashboard/listItems';
 import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import Icon from '@material-ui/core/Icon';
+import { loadCSS } from 'fg-loadcss';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 const drawerWidth = 240;
@@ -28,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
       width: drawerWidth,
       flexShrink: 0,
     },
+  },
+  listItemText: {
+    marginLeft: theme.spacing(1)
   },
   appBar: {
     [theme.breakpoints.up('sm')]: {
@@ -58,31 +66,56 @@ function ResponsiveDrawer(props) {
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
+  const location = useLocation();
+
+  useEffect(() => {
+    const node = loadCSS(
+      'https://use.fontawesome.com/releases/v5.12.0/css/all.css',
+      document.querySelector('#font-awesome-css'),
+    );
+  })
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const style = {
+    width: '2em',
+    color: 'rgba(0, 0, 0, 0.54)'
+  }
+
+  const DefaultListItems = (
+    <>
+    <List>
+      <ListSubheader inset>Categories</ListSubheader>
+      {[{key: 'bread', class: 'fas fa-bread-slice', text: 'Bread'},
+        {key: 'cakes', class: 'fas fa-birthday-cake', text: 'Cakes'},
+        {key: 'candy', class: 'fas fa-candy-cane', text: 'Candy & Chocolate'},
+        {key: 'gluten-free', class: 'fas fa-cloud', text: 'Gluten Free'},
+        {key: 'pies-tarts', class: 'fas fa-stroopwafel', text: 'Pies & Tarts'},
+        {key: 'vegetarian', class: 'fas fa-leaf', text: 'Vegan / Vegetarian'}].map((item, index) => (
+        <ListItem button key={item.key}>
+          <Icon className={item.class} style={style}/>
+          <ListItemText className={classes.listItemText} primary={item.text} />
+        </ListItem>
+      ))}
+    </List>
+    </>
+  )
+
+  const DashboardListItems = (
+    <>
+    <List>{mainListItems}</List>
+    <Divider />
+    <List>{secondaryListItems}</List>
+    </>
+  )
 
   const drawer = (
     <div>
       <div className={classes.toolbar} />
       <Divider />
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
+      {location.pathname == '/dashboard' ? DashboardListItems : DefaultListItems}
     </div>
   );
 

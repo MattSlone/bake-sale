@@ -6,14 +6,14 @@ module.exports = (app, passport) => {
   app.get('/api/signin', (req, res, next) => {
     res.send({
       error: req.flash('error'),
-      success: req.flash('success')
+      success: req.user
     })
   })
 
   app.get('/api/signup', (req, res, next) => {
     res.send({
       error: req.flash('error'),
-      success: req.flash('success')
+      success: req.user
     })
   })
 
@@ -23,7 +23,7 @@ module.exports = (app, passport) => {
   })
 
   app.post('/api/signin', passport.authenticate('local', { failureRedirect: '/api/signin', successRedirect: '/api/signin', failureFlash: true}))
-  app.post('/api/signup', passport.authenticate('local-signup', { failureRedirect: '/api/signup', failureFlash: true }))
+  app.post('/api/signup', passport.authenticate('local-signup', { failureRedirect: '/api/signup', successRedirect: '/api/signup', failureFlash: true }))
 
 /* DEBUGGER
   app.post('/api/signup',

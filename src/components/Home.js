@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import CameraIcon from '@material-ui/icons/PhotoCamera';
 import Card from '@material-ui/core/Card';
@@ -41,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(4),
   },
   cardGrid: {
-    paddingTop: theme.spacing(8),
+    paddingTop: (userData) => theme.spacing(parseInt(`${userData.loggedIn ? 0 : 8}`)),
     paddingBottom: theme.spacing(8),
   },
   card: {
@@ -67,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function Home({ userData }) {
-  const classes = useStyles();
+  const classes = useStyles(userData);
 
   const WelcomeHeader = () => (
     <>

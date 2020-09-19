@@ -25,6 +25,15 @@ const sequelize = new Sequelize('database_development', 'root', 'root', {
   //logging: (...msg) => console.log(msg)
 });
 
+
+sequelize.getQueryInterface().describeTable('shops').then((tableObj) => {
+    console.log('// Tables in database','==========================');
+    console.log(tableObj);
+})
+.catch((err) => {
+    console.log('showAllSchemas ERROR',err);
+})
+
 /*(async () => {
   try {
     await sequelize.authenticate();

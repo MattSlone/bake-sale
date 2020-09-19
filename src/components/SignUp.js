@@ -58,6 +58,7 @@ export default function SignUp({ userSignUp, userData }) {
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+  const [seller, setSeller] = useState('')
 
   /*useEffect(() => {
     userSignUp()
@@ -67,7 +68,8 @@ export default function SignUp({ userSignUp, userData }) {
     firstName: firstName,
     lastName: lastName,
     username: username,
-    password: password
+    password: password,
+    seller: seller
   }
 
   const handleSubmit = e => {
@@ -149,8 +151,8 @@ export default function SignUp({ userSignUp, userData }) {
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
+                control={<Checkbox value={true} onChange={e => setSeller(e.target.value)} color="primary" />}
+                label="Seller account"
               />
             </Grid>
           </Grid>
