@@ -115,7 +115,7 @@ function ResponsiveDrawer(props) {
     <div>
       <div className={classes.toolbar} />
       <Divider />
-      {location.pathname == '/dashboard' ? DashboardListItems : DefaultListItems}
+      {location.pathname.includes('/dashboard') ? DashboardListItems : DefaultListItems}
     </div>
   );
 
