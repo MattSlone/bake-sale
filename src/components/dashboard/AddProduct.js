@@ -8,7 +8,7 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import AddProductImages from './AddProductImages';
+import AddProductImagesContainer from '../containers/AddProductImagesContainer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,7 +68,7 @@ export default function AddProduct() {
             <StepContent>
             {(() => {
               switch (activeStep) {
-                case 0: return <AddProductImages />
+                case 0: return <AddProductImagesContainer />
                 case 1:
                   return 'Add Listing Details Here';
                 case 2:
