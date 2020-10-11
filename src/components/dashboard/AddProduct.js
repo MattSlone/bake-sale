@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AddProductImagesContainer from '../containers/AddProductImagesContainer';
+import ListingDetails from './ListingDetails'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,8 +36,8 @@ const useStyles = makeStyles((theme) => ({
 function getSteps() {
   return ['Add product images',
           'Listing details',
-          'Inventory and Pricing',
           'Ingredients',
+          'Inventory and Pricing',
           'Packaging',
           'Shipping'];
 }
@@ -70,15 +71,15 @@ export default function AddProduct() {
               switch (activeStep) {
                 case 0: return <AddProductImagesContainer />
                 case 1:
-                  return 'Add Listing Details Here';
+                  return <ListingDetails />;
                 case 2:
-                  return `Inventory and Pricing Information Here`;
+                  return `Ingredients`;
                 case 3:
-                  return `List Ingredients`;
+                  return `Inventory and Pricing`;
                 case 3:
                   return `Select Packaging`;
                 case 3:
-                  return `Shipping Information Here`;
+                  return `Shipping`;
                 default:
                   return 'Unknown step';
               }
