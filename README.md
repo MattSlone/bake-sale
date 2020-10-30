@@ -5,7 +5,7 @@
 # Startup
 
 1) "cd server" and copy the .env.example to .env, update the values
-2) From the project's root directory run "docker-compose -d up" to run the containers in the background, to run in the foreground remove the -d flag
+2) From the project's root directory run "docker-compose up -d" to run the containers in the background, to run in the foreground remove the -d flag
 3) Run "docker exec server yarn create-db" to create the DB, runs migrations, and seed the DB
 
 # Reset DB
@@ -16,7 +16,11 @@
 
 ## Working with MySQL
 
-run "docker exec -it db bash" to get a shell in the MySQL container. From there run "mysql -u root -p root" to access the MySQL CLI
+run "docker exec -it db bash" to get a shell in the MySQL container. From there run "mysql -u root -p" to access the MySQL CLI
+
+## Working with Sequelize
+
+run "docker exec server yarn sequelize db:migrate" to run migrations, likewise you can replace db:migrate with any sequelize command
 
 ## Installing Dependencies
 
