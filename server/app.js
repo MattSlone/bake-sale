@@ -10,8 +10,6 @@ const express = require('express'),
 
 require('./config/passport')(passport)
 
-console.log(process.env.EXPRESS_PORT)
-
 var session = require("express-session");
 // initalize sequelize with session store
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
@@ -20,13 +18,14 @@ var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 /* DATABASE */
 const sequelize = new Sequelize('database_development', 'root', 'root', {
-  host: '127.0.0.1',
+  host: 'db',
   dialect: 'mysql',
   //logging: (...msg) => console.log(msg)
 });
 
 
-sequelize.getQueryInterface().describeTable('shops').then((tableObj) => {
+
+sequelize.getQueryInterface().describeTable('Shops').then((tableObj) => {
     console.log('// Tables in database','==========================');
     console.log(tableObj);
 })

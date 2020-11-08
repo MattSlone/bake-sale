@@ -1,29 +1,19 @@
 {
-  "name": "bake-sale",
+  "name": "bake-sale-client",
   "version": "4.0.0",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "react-scripts test"
   },
   "dependencies": {
     "@material-ui/core": "latest",
     "@material-ui/icons": "^4.9.1",
     "axios": "^0.20.0",
-    "bcrypt": "^5.0.0",
     "clsx": "^1.1.1",
-    "connect-flash": "^0.1.1",
-    "connect-session-sequelize": "^7.0.0",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
     "fg-loadcss": "^3.1.0",
-    "multer": "^1.4.2",
-    "mysql2": "^2.1.0",
-    "passport": "^0.4.1",
-    "passport-local": "^1.0.0",
     "react": "latest",
     "react-dom": "latest",
     "react-redux": "^7.2.0",
@@ -34,8 +24,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.3.0",
-    "sequelize": "^6.2.2"
+    "redux-thunk": "^2.3.0"
   },
   "browserslist": {
     "production": [

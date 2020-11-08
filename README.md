@@ -1,15 +1,33 @@
 # SETUP
 
-1) run "npm install"
-2) run "npm build" (technically unnecessary but just do it for now)
+1) Install Docker
 
-## Until we get vagrant setup
-3) Install Visual C++ Redistributables from https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads (vc_redist.x64.exe or x86)
-4) Install MySQL Server Community Edition https://dev.mysql.com/downloads/file/?id=495322
-5) When prompted to setup root user, set password as "root"
-6) Navigate to /server and run the command "npx sequelize db:create".
+# Startup
 
-# START
-1) Navigate to /server and run "npx sequelize "
-2) Run "node server/app" to start express server
-3) Run "npm start" "sequelize db:migrate"
+1) "cd server" and copy the .env.example to .env, update the values
+2) From the project's root directory run "docker-compose up -d" to run the containers in the background, to run in the foreground remove the -d flag
+3) Run "docker exec server yarn create-db" to create the DB, runs migrations, and seed the DB
+
+# Reset DB
+
+1) Run "docker exec server yarn reset-db"
+
+# Working with containers
+
+## Working with MySQL
+
+run "docker exec -it db bash" to get a shell in the MySQL container. From there run "mysql -u root -p" to access the MySQL CLI
+
+## Working with Sequelize
+
+run "docker exec server yarn sequelize db:migrate" to run migrations, likewise you can replace db:migrate with any sequelize command
+
+## Installing Dependencies
+
+### Client side
+
+run "docker exec client yarn add " followed by the name(s) of your dependencies
+
+### Server side
+
+run "docker exec server yarn add " followed by the name(s) of your dependencies
