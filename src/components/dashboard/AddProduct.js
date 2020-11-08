@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AddProductImagesContainer from '../containers/AddProductImagesContainer';
 import ListingDetails from './ListingDetails'
+import Ingredients from './Ingredients'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -73,7 +74,7 @@ export default function AddProduct() {
                 case 1:
                   return <ListingDetails />;
                 case 2:
-                  return `Ingredients`;
+                  return <Ingredients />;
                 case 3:
                   return `Inventory and Pricing`;
                 case 3:

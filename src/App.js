@@ -18,6 +18,8 @@ import { store, persistor } from './redux/store'
 
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
+var Tesseract = window.Tesseract;
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
