@@ -75,4 +75,4 @@ app.use(function(req, res) {
     res.status(404);
 });
 
-app.listen(process.env.EXPRESS_PORT, () => console.log(`App listening at http://localhost:${process.env.EXPRESS_PORT}`))
+app.listen(process.env.EXPRESS_PORT, () => console.log(`App listening at http://server:${process.env.EXPRESS_PORT}`))
