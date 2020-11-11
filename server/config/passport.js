@@ -46,7 +46,7 @@ module.exports = (passport) => {
   passport.use('local', new LocalStrategy(
   async function(username, password, done) {
     try {
-      let user = await User.findOne({ where: { username: username } });
+      let user = await User.findOne({ where: { email: username } });
       if (!user) {
         return done(null, false, { message: 'User does not exist.' }); // code 4 (user doesn't exist)
       }
