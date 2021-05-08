@@ -22,6 +22,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
   server:
     container_name: server
     build: ./server

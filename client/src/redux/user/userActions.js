@@ -61,10 +61,10 @@ export const userSignOutRequest = () => {
   }
 }
 
-export const userSignOutSuccess = (message) => {
+// SIGNOUT
+export const userSignOutSuccess = () => {
   return {
-    type: USER_SIGNOUT_SUCCESS,
-    payload: message
+    type: USER_SIGNOUT_SUCCESS
   }
 }
 

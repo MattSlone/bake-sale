@@ -23,6 +23,9 @@ import { mainListItems, secondaryListItems } from './listItems';
 import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
+import { useAuth } from '../../hooks/use-auth'
+import { BrowserRouter as Router, Switch, Route, Redirect, useRouteMatch } from "react-router-dom";
+import CreateShopContainer from "../containers/CreateShopContainer"
 
 function Copyright() {
   return (
@@ -119,6 +122,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Dashboard() {
+  const auth = useAuth();
+  const match = useRouteMatch();
+
+  if (!auth.userData.loggedIn) {
+    return (
+      <Redirect to='/signin' />
+    )
+  }
+
+  
+
+  console.log(match.path)
   const classes = useStyles();
   const location = useLocation()
   const [open, setOpen] = React.useState(true);
@@ -130,7 +145,8 @@ export default function Dashboard() {
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
-  return (
+  const defaultDashboard = (
+    <>
     <div className={classes.root}>
       <CssBaseline />
       <main className={classes.content}>
@@ -162,5 +178,19 @@ export default function Dashboard() {
         </Container>
       </main>
     </div>
+    </>
+  )
+
+  return (
+    <Router>
+      <Switch>
+        <Route path={`${match.path}/shop/create`}>
+          <CreateShopContainer />
+        </Route>
+        <Route path={match.path}>
+          {defaultDashboard}
+        </Route>
+      </Switch>
+    </Router>
   );
 }

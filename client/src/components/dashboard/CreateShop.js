@@ -8,12 +8,13 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
-import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import AddProduct from './AddProduct';
 import { stateList } from './stateList';
+import { useAuth } from '../../hooks/use-auth'
+import ShippingAndDeliveryContainer from '../containers/ShippingAndDeliveryContainer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps() {
-  return ['Name your shop', 'Select your state', 'Add product(s)'];
+  return ['Name your shop', 'Select your state', 'Choose Delivery Area', 'Add product(s)'];
 }
 
 function getStepContent(stepIndex) {
@@ -51,22 +52,28 @@ function getStepContent(stepIndex) {
       return 'Choose a name for your shop.';
     case 1:
       return 'Select the state you will be selling in.';
-      case 2:
+    case 2:
+      return 'Choose your delivery area';
+      case 3:
         return 'Add a product to your shop';
     default:
       return 'Unknown stepIndex';
   }
 }
 
-export default function CreateShop() {
+export default function CreateShop({createShop}) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
+  const auth = useAuth();
 
   const [shopName, setShopName] = useState('')
   const [state, setState] = useState('')
-  console.log(state)
-  const handleNext = () => {
+
+  const handleNext = (e) => {
+    if(activeStep === steps.length - 1) {
+      handleCreateShop(e)
+    }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -78,9 +85,15 @@ export default function CreateShop() {
     setActiveStep(0);
   };
 
-  const handleSubmit = e => {
+  let formData = {
+    name: shopName,
+    state: state,
+    userId: auth.userData.user.success.id
+  }
+
+  const handleCreateShop = e => {
     e.preventDefault()
-    //userSignIn(formData)
+    //createShop(formData)
   }
 
   return (
@@ -145,7 +158,8 @@ export default function CreateShop() {
                                     </Select>
                                   </Container>
                                   </>;
-                  case 2: return <AddProduct />
+                  case 2: return <ShippingAndDeliveryContainer/>
+                  case 3: return <AddProduct />
                   default: return "";
                 }
               })()}

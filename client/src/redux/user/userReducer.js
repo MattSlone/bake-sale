@@ -1,3 +1,5 @@
+import { PURGE, REHYDRATE } from 'redux-persist';
+
 import {
   USER_SIGNUP_REQUEST,
   USER_SIGNUP_SUCCESS,
@@ -49,12 +51,6 @@ const userReducer = (state = initialState, action) => {
     case USER_SIGNOUT_REQUEST: return {
       ...state,
       loading: true
-    }
-    case USER_SIGNOUT_SUCCESS: return {
-      loading: false,
-      loggedIn: false,
-      user: false,
-      error: ''
     }
     case USER_SIGNOUT_FAILURE: return {
       ...state,

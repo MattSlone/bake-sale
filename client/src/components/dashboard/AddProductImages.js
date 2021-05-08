@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-export default function AddProductImages(props) {
+export default function AddProductImages({ imageFiles, setProductImagesPreview }) {
   const classes = useStyles();
   const hiddenFileInput = React.useRef([])
 
@@ -54,7 +54,7 @@ export default function AddProductImages(props) {
 
     if (file) {
       reader.onloadend = () => {
-        props.setProductImagesPreview([...props.imageFiles, {
+        setProductImagesPreview([...imageFiles, {
           file: file,
           imagePreviewUrl: reader.result
         }]);
@@ -76,7 +76,7 @@ export default function AddProductImages(props) {
                   <CardActionArea onClick={event => handleClick(event, card)}>
                       <CardMedia
                         className={classes.cardMedia}
-                        image={props.imageFiles[card-1] ? props.imageFiles[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
+                        image={imageFiles[card-1] ? imageFiles[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
                         title="Image title"
                       />
                     <Input type='file' style={{display: 'none'}} inputRef={el => hiddenFileInput.current[card] = el} onChange={handleChange}/>

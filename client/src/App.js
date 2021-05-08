@@ -9,16 +9,10 @@ import SignUpContainer from './components/containers/SignUpContainer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
 import Dashboard from './components/dashboard/Dashboard'
-import CreateShop from './components/dashboard/CreateShop'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { PersistGate } from 'redux-persist/integration/react'
-
-import { Provider } from 'react-redux';
-import { store, persistor } from './redux/store'
 
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
-
-var Tesseract = window.Tesseract;
+import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,34 +28,33 @@ const navItems = [
   { path: '/signin', component: SignInContainer},
   { path: '/signup', component: SignUpContainer},
   { path: '/signout', component: () => <Redirect to='/' /> },
-  { path: '/dashboard', component: Dashboard },
-  { path: '/dashboard/shop/create', component: CreateShop }
+  { path: '/dashboard', component: Dashboard }
 ]
 
-const Routes = () => (
-  <>
-    {<Route path='/' exact component={HomeContainer} key='/'/>}
+function Routes ({userData}) {
+  return (
+    <>
+    <Route path='/' exact component={HomeContainer} key='/'/>
     {navItems.map(item =>
-      <Route path={item.path} exact component={item.component} key={item.path}/>
+      <Route path={item.path} component={item.component} key={item.path}/>
     )}
-  </>
-)
+    </>
+  )
+}
 
 
-export default function App() {
+export default function App({userData}) {
   const classes = useStyles();
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <Router>
-          <div className={classes.root}>
-            <Drawer />
-            <main className={classes.content}>
-              <Routes/>
-            </main>
-          </div>
-        </Router>
-      </PersistGate>
-    </Provider>
+    <ProvideAuthContainer>
+      <Router>
+        <div className={classes.root}>
+          <Drawer />
+          <main className={classes.content}>
+            <Routes userData={userData}/>
+          </main>
+        </div>
+      </Router>
+    </ProvideAuthContainer>
   );
 }

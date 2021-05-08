@@ -14,8 +14,6 @@ var session = require("express-session");
 // initalize sequelize with session store
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
-//const userRouter = require('./routes/user.js')
-
 /* DATABASE */
 const sequelize = new Sequelize('database_development', 'root', 'root', {
   host: 'db',
@@ -23,15 +21,13 @@ const sequelize = new Sequelize('database_development', 'root', 'root', {
   //logging: (...msg) => console.log(msg)
 });
 
-
-
-sequelize.getQueryInterface().describeTable('Shops').then((tableObj) => {
+/*sequelize.getQueryInterface().describeTable('Shops').then((tableObj) => {
     console.log('// Tables in database','==========================');
     console.log(tableObj);
 })
 .catch((err) => {
     console.log('showAllSchemas ERROR',err);
-})
+})*/
 
 /*(async () => {
   try {
@@ -67,8 +63,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 /* Don't worry about these */
 app.use(express.static(path.join(__dirname, '../build')));
+
 /* ROUTERS */
 require('./routes/user')(app, passport)
+require('./routes/shop')(app)
+require('./routes/product')(app)
+require('./routes/ingredient')(app)
 
 // Default response for any other request
 app.use(function(req, res) {

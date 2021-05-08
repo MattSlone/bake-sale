@@ -10,6 +10,8 @@
   "dependencies": {
     "@material-ui/core": "latest",
     "@material-ui/icons": "^4.9.1",
+    "@react-google-maps/api": "^2.1.1",
+    "@react-pdf/renderer": "^2.0.12",
     "axios": "^0.20.0",
     "clsx": "^1.1.1",
     "dotenv": "^8.2.0",

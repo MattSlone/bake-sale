@@ -9,8 +9,11 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AddProductImagesContainer from '../containers/AddProductImagesContainer';
-import ListingDetails from './ListingDetails'
-import Ingredients from './Ingredients'
+import ListingDetailsContainer from '../containers/ListingDetailsContainer'
+import IngredientsContainer from '../containers/IngredientsContainer'
+import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
+import Labeling from './Labeling'
+import { useRouteMatch } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,14 +42,20 @@ function getSteps() {
           'Listing details',
           'Ingredients',
           'Inventory and Pricing',
-          'Packaging',
-          'Shipping'];
+          'Labeling'
+        ];
 }
 
 export default function AddProduct() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
+
+  const match = useRouteMatch()
+
+  const includeButtons = () => {
+    return (activeStep === steps.length - 1) && (!match.path.includes('shop/create')) ? 'Finish' : 'Next'
+  }
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -72,15 +81,13 @@ export default function AddProduct() {
               switch (activeStep) {
                 case 0: return <AddProductImagesContainer />
                 case 1:
-                  return <ListingDetails />;
+                  return <ListingDetailsContainer />;
                 case 2:
-                  return <Ingredients />;
+                  return <IngredientsContainer />;
                 case 3:
-                  return `Inventory and Pricing`;
-                case 3:
-                  return `Select Packaging`;
-                case 3:
-                  return `Shipping`;
+                  return <PricingAndInventoryContainer />;
+                case 4:
+                  return <Labeling />;
                 default:
                   return 'Unknown step';
               }
@@ -94,14 +101,31 @@ export default function AddProduct() {
                   >
                     Back
                   </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    className={classes.button}
-                  >
-                    {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                  </Button>
+                  {(() => {
+                    if (activeStep === steps.length - 1) {
+                      if(match.path.includes('shop/create')) {
+                        return ''
+                      } else {
+                        return <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNext}
+                        className={classes.button}
+                      >
+                        Finish
+                      </Button>
+                      }
+                    } else {
+                      return <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNext}
+                        className={classes.button}
+                      >
+                        Next
+                      </Button>
+                    }
+                  })()}
                 </div>
               </div>
             </StepContent>

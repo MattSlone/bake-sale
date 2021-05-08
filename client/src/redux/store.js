@@ -4,12 +4,23 @@ import logger from 'redux-logger'
 import thunk from 'redux-thunk'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
-
-import rootReducer from './rootReducer'
+import { purgeStoredState } from 'redux-persist'
 
 const persistConfig = {
   key: 'root',
   storage,
+}
+
+import appReducer from './rootReducer'
+
+/* https://github.com/rt2zz/redux-persist/issues/579 */
+const rootReducer = (state, action) => {
+  if (action.type === 'USER_SIGNOUT_SUCCESS') {
+    purgeStoredState(persistConfig)
+    return appReducer(undefined, action)
+  }
+
+  return appReducer(state, action)
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

@@ -26,20 +26,39 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-
-export default function ListingDetails() {
+export default function ListingDetails(props) {
   const classes = useStyles();
 
-  const [age, setAge] = React.useState('');
-  const [state, setState] = React.useState(false)
+  const [name, setName] = React.useState(props.name);
+  const [description, setDescription] = React.useState(props.description);
+  const [category, setCategory] = React.useState(props.category);
+  const [automaticRenewal, setAutomaticRenewal] = React.useState(props.automaticRenewal)
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
+  useEffect(() => {
+    if(name && category) {
+      props.setListingDetails({
+        name: name,
+        description: description,
+        category: category,
+        automaticRenewal: automaticRenewal
+      })
+    }
+  }, [name, description, category, automaticRenewal])
+
+  const handleCategoryChange = (event) => {
+    setCategory(event.target.value);
   };
 
-  const handleCheckboxChange = (event) => {
-    setState(event.target.checked);
+  const handleRenewalCheckboxChange = (event) => {
+    setAutomaticRenewal(event.target.checked);
+  };
+
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const handleDescChange = (event) => {
+    setDescription(event.target.value);
   };
 
   return (
@@ -53,7 +72,7 @@ export default function ListingDetails() {
             </Grid>
             <Grid item xs={12} md={8}>
               <FormControl className={classes.formControl}>
-                <TextField label="Title" />
+                <TextField value={name} label="Title" onChange={handleNameChange}/>
               </FormControl>
             </Grid>
             <Grid container item xs={12} md={4}>
@@ -65,8 +84,8 @@ export default function ListingDetails() {
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  value={age}
-                  onChange={handleChange}
+                  value={category}
+                  onChange={handleCategoryChange}
                 >
                   <MenuItem value={'bread'}>Bread</MenuItem>
                   <MenuItem value={'cakes'}>Cakes</MenuItem>
@@ -85,8 +104,8 @@ export default function ListingDetails() {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={state}
-                      onChange={handleCheckboxChange}
+                      checked={automaticRenewal}
+                      onChange={handleRenewalCheckboxChange}
                       name="checked"
                       color="primary"
                     />
@@ -102,11 +121,13 @@ export default function ListingDetails() {
             <Grid item xs={12} md={8}>
               <FormControl className={classes.formControl}>
                 <TextField
+                  value={description}
                   id="outlined-multiline-static"
                   label="Description"
                   multiline
                   rows={4}
                   variant="outlined"
+                  onChange={handleDescChange}
                 />
               </FormControl>
             </Grid>
