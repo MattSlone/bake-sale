@@ -1,17 +1,17 @@
 import { connect } from 'react-redux'
 import ShippingAndDelivery from '../dashboard/ShippingAndDelivery'
-import { getLatLng, setDeliveryArea } from '../../redux'
+import { getLatLngFromAddress, setDeliveryArea } from '../../redux'
 
 const mapStateToProps = state => {
   return {
-    latlng: state.shop.latlng
+    area: state.shop.area
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
     setDeliveryArea: (formData) => dispatch(setDeliveryArea(formData)),
-    getLatLng: (formData) => dispatch(getLatLng(formData))
+    getLatLngFromAddress: (formData) => dispatch(getLatLngFromAddress(formData))
   }
 }
 

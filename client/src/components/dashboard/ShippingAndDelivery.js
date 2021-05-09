@@ -5,6 +5,8 @@ import { GoogleMap, LoadScript, Circle } from '@react-google-maps/api';
 import { Input, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function ShippingAndDelivery({ latlng, getLatLng, setDeliveryArea }) {
+function ShippingAndDelivery(props) {
   const classes = useStyles();
   const [circle, setCircle] = useState('')
   const [address, setAddress] = useState('')
@@ -26,11 +28,6 @@ function ShippingAndDelivery({ latlng, getLatLng, setDeliveryArea }) {
   const containerStyle = {
     width: '400px',
     height: '400px'
-  };
-  
-  const center = {
-    lat: latlng.lat,
-    lng: latlng.lng
   };
 
   const circleOptions = {
@@ -43,22 +40,23 @@ function ShippingAndDelivery({ latlng, getLatLng, setDeliveryArea }) {
     draggable:false,
     editable: true,
     visible: true,
-    radius: 30000,
+    radius: props.area.radius,
     zIndex: 1
   }
 
-  const handleAreaChange = () => {
+  const handleMapSave = (() => {
     if(circle) {
-      setDeliveryArea({
+      props.setDeliveryArea({
         radius: circle.radius,
         lat: circle.center.lat(),
-        lng: circle.center.lng()
+        lng: circle.center.lng(),
+        address: address
       })
     }
-  }
+  })
 
   const handleButtonClick = (e) => {
-    getLatLng(address)
+    props.getLatLngFromAddress(address)
   }
 
   return (
@@ -79,17 +77,31 @@ function ShippingAndDelivery({ latlng, getLatLng, setDeliveryArea }) {
       <Grid item>
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={center}
+          center={{
+            lat: props.area.lat,
+            lng: props.area.lng
+          }}
           zoom={10}
         >
           <Circle
           onLoad={circle => {setCircle(circle)}}
-          center={center}
-          onCenterChanged={handleAreaChange}
-          onRadiusChanged={handleAreaChange}
+          center={{
+            lat: props.area.lat,
+            lng: props.area.lng
+          }}
           options={circleOptions}
         />
         </GoogleMap>
+      </Grid>
+      <Grid container justify="flex-end" xs={12} md={5}>
+        <Button
+          variant="contained"
+          size="large"
+          color="primary"
+          onClick={() => {handleMapSave()}}
+        >
+          Save
+        </Button>
       </Grid>
     </Grid>
   );

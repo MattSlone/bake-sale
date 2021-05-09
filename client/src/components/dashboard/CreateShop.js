@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -61,14 +61,24 @@ function getStepContent(stepIndex) {
   }
 }
 
-export default function CreateShop({createShop}) {
+export default function CreateShop(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
   const auth = useAuth();
 
-  const [shopName, setShopName] = useState('')
-  const [state, setState] = useState('')
+  const [shopName, setShopName] = useState(props.shop.name)
+  const [state, setState] = useState(props.shop.state)
+
+  // wait for update then set shop
+  useEffect(() => {
+    if(shopName && state) {
+      props.setShop({
+        name: shopName,
+        state: state
+      })
+    }
+  }, [shopName, state])
 
   const handleNext = (e) => {
     if(activeStep === steps.length - 1) {
@@ -88,12 +98,13 @@ export default function CreateShop({createShop}) {
   let formData = {
     name: shopName,
     state: state,
-    userId: auth.userData.user.success.id
+    product: props.product,
+    user: auth.userData.user.success
   }
 
   const handleCreateShop = e => {
     e.preventDefault()
-    //createShop(formData)
+    props.createShop(formData)
   }
 
   return (
@@ -158,7 +169,7 @@ export default function CreateShop({createShop}) {
                                     </Select>
                                   </Container>
                                   </>;
-                  case 2: return <ShippingAndDeliveryContainer/>
+                  case 2: return <ShippingAndDeliveryContainer />
                   case 3: return <AddProduct />
                   default: return "";
                 }

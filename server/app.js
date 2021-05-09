@@ -70,6 +70,7 @@ require('./routes/shop')(app)
 require('./routes/product')(app)
 require('./routes/ingredient')(app)
 
+
 // Default response for any other request
 app.use(function(req, res) {
     res.status(404);

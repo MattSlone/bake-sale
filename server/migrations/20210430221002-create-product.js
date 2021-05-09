@@ -14,13 +14,13 @@ module.exports = {
       category: {
         type: Sequelize.STRING
       },
-      category: {
+      description: {
         type: Sequelize.STRING
       },
       automaticRenewal: {
         type: Sequelize.BOOLEAN
       },
-      stock: {
+      inventory: {
         type: Sequelize.INTEGER
       },
       price: {

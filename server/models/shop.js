@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.User)
-      this.hasMany(models.Product)
+      this.Product = this.hasMany(models.Product)
     }
   };
   Shop.init({

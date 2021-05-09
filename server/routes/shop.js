@@ -2,7 +2,9 @@
 
 const UserController = require('../controllers/user'),
   MakeShopController = require('../controllers/shop'),
-  ShopController = new MakeShopController()
+  ShopController = new MakeShopController(),
+  MakeProductController = require('../controllers/product'),
+  ProductController = new MakeProductController()
 
 module.exports = (app) => {
   /*app.get('/tenant', UserController.isLoggedIn, (req, res, next) => {
@@ -11,10 +13,11 @@ module.exports = (app) => {
 
   app.post('/api/shop/create', async (req, res, next) => {
     try {
-        let response = await ShopController.create(req, res, next)
+        let shop = await ShopController.create(req, res, next)
+        //let product = await ProductController.create(req, res, shop)
         res.send({
             error: req.flash('error'),
-            success: response
+            success: shop
         })
     }
     catch (err) {

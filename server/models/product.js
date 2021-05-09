@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
         this.belongsTo(models.Shop)
-        this.belongsToMany(models.Ingredient, {through: models.ProductIngredient})
+        this.Ingredient = this.belongsToMany(models.Ingredient, { through: "product_ingredient" })
     }
   };
   Product.init({
@@ -19,11 +19,12 @@ module.exports = (sequelize, DataTypes) => {
     category: DataTypes.STRING,
     description: DataTypes.TEXT,
     automaticRenewal: DataTypes.BOOLEAN,
-    stock: DataTypes.INTEGER,
+    inventory: DataTypes.INTEGER,
     price: DataTypes.FLOAT,
   }, {
     sequelize,
     modelName: 'Product',
   });
+
   return Product;
 };

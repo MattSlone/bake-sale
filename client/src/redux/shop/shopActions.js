@@ -5,6 +5,7 @@ import {
     CREATE_SHOP_SUCCESS,
     CREATE_SHOP_FAILURE,
     SET_DELIVERY_AREA,
+    SET_SHOP,
     GET_LAT_LNG_REQUEST,
     GET_LAT_LNG_SUCCESS,
     GET_LAT_LNG_FAILURE,
@@ -14,6 +15,13 @@ export const setDeliveryArea = (area) => {
   return {
     type: SET_DELIVERY_AREA,
     payload: area
+  }
+}
+
+export const setShop = (shop) => {
+  return {
+    type: SET_SHOP,
+    payload: shop
   }
 }
 
@@ -75,7 +83,7 @@ export const createShop = (formData) => {
   }
 }
 
-export const getLatLng = (formData) => {
+export const getLatLngFromAddress = (formData) => {
   return async (dispatch) => {
     try {
       dispatch(getLatLngRequest)

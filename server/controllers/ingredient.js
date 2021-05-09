@@ -14,8 +14,6 @@ module.exports = class IngredientController {
                 })
             })
 
-            console.log('body', req.body)
-
             const ingredients = await db.Ingredient.bulkCreate(ingredientsList, { returning: true });
             return ingredients
         }

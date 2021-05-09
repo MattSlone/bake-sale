@@ -3,20 +3,19 @@ import {
     CREATE_SHOP_SUCCESS,
     CREATE_SHOP_FAILURE,
     SET_DELIVERY_AREA,
+    SET_SHOP,
     GET_LAT_LNG_REQUEST,
     GET_LAT_LNG_SUCCESS,
     GET_LAT_LNG_FAILURE,
    } from './shopTypes'
   
   const initialState = {
-    shop: '',
+    name: '',
+    state: '',
     loading: false,
     area: {
+      address: '',
       radius: 30000,
-      lat: -3.745,
-      lng: -38.523
-    },
-    latlng: {
       lat: -3.745,
       lng: -38.523
     }
@@ -29,16 +28,31 @@ import {
         loading: true
       }
       case GET_LAT_LNG_SUCCESS: return {
-        latlng: action.payload,
+        ...state,
+        area:{
+          ...state.area,
+          lat: action.payload.lat,
+          lng: action.payload.lng
+        },
         error: ''
       }
       case GET_LAT_LNG_FAILURE: return {
-        latlng: '',
+        ...state,
+        area:{
+          ...state.area,
+          lat: '',
+          lng: ''
+        },
         error: action.payload
       }
       case SET_DELIVERY_AREA: return {
         ...state,
         area: action.payload
+      }
+      case SET_SHOP: return {
+        ...state,
+        name: action.payload.name,
+        state: action.payload.state
       }
       case CREATE_SHOP_REQUEST: return {
         ...state,
