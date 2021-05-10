@@ -13,6 +13,7 @@ import {
     name: '',
     state: '',
     loading: false,
+    created: false,
     area: {
       address: '',
       radius: 30000,
@@ -59,7 +60,18 @@ import {
         loading: true
       }
       case CREATE_SHOP_SUCCESS: return {
-        shop: action.payload,
+        id: action.payload.success.id,
+        name: action.payload.success.name,
+        state: action.payload.success.state,
+        loading: false,
+        created: false,
+        area: {
+          address: action.payload.success.address,
+          radius: action.payload.success.radius,
+          lat: action.payload.success.lat,
+          lng: action.payload.success.lng
+        },
+        created: true,
         error: ''
       }
       case CREATE_SHOP_FAILURE: return {

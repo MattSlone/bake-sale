@@ -18,6 +18,10 @@ module.exports = class ShopController {
       const shop = await db.Shop.create({
           name: req.body.name,
           state: req.body.state,
+          address: req.body.area.address,
+          radius: req.body.area.radius,
+          lat: req.body.area.lat,
+          lng: req.body.area.lng,
           UserId: req.body.userId,
           Products: [
             {
@@ -35,6 +39,24 @@ module.exports = class ShopController {
           association: db.Shop.Product,
           include: [ db.Product.Ingredient ]
         }]
+      });
+
+      return shop
+    }
+    catch (err) {
+      return next(err)
+    }
+  }
+
+  async update (req, res, next) {
+    try {
+      const shop = await db.Shop.upsert({
+          name: req.body.name,
+          state: req.body.state,
+          address: req.body.area.address,
+          radius: req.body.area.radius,
+          lat: req.body.area.lat,
+          lng: req.body.area.lng,
       });
 
       return shop

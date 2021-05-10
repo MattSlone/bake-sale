@@ -12,8 +12,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import AddProduct from './AddProduct';
+import Grid from '@material-ui/core/Grid';
 import { stateList } from './stateList';
 import { useAuth } from '../../hooks/use-auth'
+import { useHistory, Redirect, Link, useRouteMatch } from "react-router-dom";
 import ShippingAndDeliveryContainer from '../containers/ShippingAndDeliveryContainer';
 
 const useStyles = makeStyles((theme) => ({
@@ -42,8 +44,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function getSteps() {
-  return ['Name your shop', 'Select your state', 'Choose Delivery Area', 'Add product(s)'];
+function getSteps(edit) {
+  let steps = ['Name your shop', 'Select your state', 'Choose Delivery Area', 'Add product(s)'];
+  if(edit) {
+    steps.pop()
+  }
+  return steps
 }
 
 function getStepContent(stepIndex) {
@@ -62,13 +68,17 @@ function getStepContent(stepIndex) {
 }
 
 export default function CreateShop(props) {
+  const match = useRouteMatch();
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const steps = getSteps();
   const auth = useAuth();
+  const history = useHistory();
 
+  let edit = match.path.includes('edit')
+
+  const steps = getSteps(edit);
   const [shopName, setShopName] = useState(props.shop.name)
   const [state, setState] = useState(props.shop.state)
+  const [activeStep, setActiveStep] = React.useState(0);
 
   // wait for update then set shop
   useEffect(() => {
@@ -79,6 +89,13 @@ export default function CreateShop(props) {
       })
     }
   }, [shopName, state])
+
+  useEffect(() => {
+  }, [props.shop.created])
+
+  if(edit && !props.shop.created) {
+    history.push("/dashboard/shop/create");
+  }
 
   const handleNext = (e) => {
     if(activeStep === steps.length - 1) {
@@ -98,6 +115,7 @@ export default function CreateShop(props) {
   let formData = {
     name: shopName,
     state: state,
+    area: props.shop.area,
     product: props.product,
     user: auth.userData.user.success
   }
@@ -123,70 +141,84 @@ export default function CreateShop(props) {
           {activeStep === steps.length ? (
             <div>
               <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-                Create your shop
+                {props.shop.created ? "Shop Created!" : "Create your shop"}
               </Typography>
-              <Typography className={classes.instructions}>All steps completed</Typography>
-              <Button onClick={handleReset}>Reset</Button>
+              {props.shop.created ? (
+                <Grid container alignContent="center" direction="column">
+                  <Link to="/dashboard">
+                    <Button variant="contained" color="primary">Go to dashboard</Button>
+                  </Link>
+                </Grid>
+              ) : (
+                <div>
+                  <Typography className={classes.instructions}>All steps completed</Typography>
+                  <Button onClick={handleReset}>Reset</Button>
+                </div>
+              )}
             </div>
           ) : (
             <form className={classes.form} noValidate>
-              <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-                Create your shop
-              </Typography>
-              {(() => {
-                switch (activeStep) {
-                  case 0: return <>
-                                  <Container component="main" maxWidth="xs">
-                                    <TextField
-                                    variant="outlined"
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="name"
-                                    label="Shop Name"
-                                    name="name"
-                                    value={shopName}
-                                    autoFocus
-                                    onChange={e => setShopName(e.target.value)}
-                                   />
-                                  </Container>
-                                </>;
-                   case 1: return <>
-                                  <Container component="main" maxWidth="xs">
-                                    <InputLabel id="state-select-label">State</InputLabel>
-                                    <Select
-                                      labelId="state-select-label"
-                                      id="state-select"
-                                      value={state}
-                                      displayEmpty
-                                      required
-                                      fullWidth
-                                      onChange={e => setState(e.target.value)}
-                                    >
-                                      {stateList.map((item) => (
-                                        <MenuItem key={item.Code} value={item.Code}>{item.State}</MenuItem>
-                                      ))}
-                                    </Select>
-                                  </Container>
-                                  </>;
-                  case 2: return <ShippingAndDeliveryContainer />
-                  case 3: return <AddProduct />
-                  default: return "";
-                }
-              })()}
-              <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
-              <div>
-                <Button
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  className={classes.backButton}
-                >
-                  Back
-                </Button>
-                <Button variant="contained" color="primary" onClick={handleNext}>
-                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                </Button>
-              </div>
+              {(!match.path.includes('edit') && props.shop.created) ? (<Redirect to="/dashboard"/>) : (
+                <div>
+                  <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
+                    {match.path.includes('edit') ? 'Edit your shop' : 'Create your shop'}
+                  </Typography>
+                  {(() => {
+                    switch (activeStep) {
+                      case 0: return <>
+                                      <Container component="main" maxWidth="xs">
+                                        <TextField
+                                        variant="outlined"
+                                        margin="normal"
+                                        required
+                                        fullWidth
+                                        id="name"
+                                        label="Shop Name"
+                                        name="name"
+                                        value={shopName}
+                                        autoFocus
+                                        onChange={e => setShopName(e.target.value)}
+                                      />
+                                      </Container>
+                                    </>;
+                      case 1: return <>
+                                      <Container component="main" maxWidth="xs">
+                                        <InputLabel id="state-select-label">State</InputLabel>
+                                        <Select
+                                          labelId="state-select-label"
+                                          id="state-select"
+                                          value={state}
+                                          displayEmpty
+                                          required
+                                          fullWidth
+                                          onChange={e => setState(e.target.value)}
+                                        >
+                                          {stateList.map((item) => (
+                                            <MenuItem key={item.Code} value={item.Code}>{item.State}</MenuItem>
+                                          ))}
+                                        </Select>
+                                      </Container>
+                                      </>;
+                      case 2: return <ShippingAndDeliveryContainer />
+                      case 3: return <AddProduct />
+                      default: return "";
+                    }
+                  })()}
+                  <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
+                  <div>
+                    <Button
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      className={classes.backButton}
+                    >
+                      Back
+                    </Button>
+                    <Button variant="contained" color="primary" onClick={handleNext}>
+                      {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </form>
           )}
         </div>

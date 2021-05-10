@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   };
   Shop.init({
     name: DataTypes.STRING,
-    state: DataTypes.STRING
+    state: DataTypes.STRING,
+    address: DataTypes.STRING,
+    radius: DataTypes.INTEGER,
+    lat: DataTypes.FLOAT,
+    lng: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'Shop',

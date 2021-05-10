@@ -14,7 +14,19 @@ module.exports = (app) => {
   app.post('/api/shop/create', async (req, res, next) => {
     try {
         let shop = await ShopController.create(req, res, next)
-        //let product = await ProductController.create(req, res, shop)
+        res.send({
+            error: req.flash('error'),
+            success: shop
+        })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
+
+  app.post('/api/shop/update', async (req, res, next) => {
+    try {
+        let shop = await ShopController.update(req, res, next)
         res.send({
             error: req.flash('error'),
             success: shop

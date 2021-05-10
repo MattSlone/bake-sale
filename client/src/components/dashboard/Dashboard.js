@@ -3,29 +3,19 @@ import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import { useLocation } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Drawer from '@material-ui/core/Drawer';
 import Box from '@material-ui/core/Box';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
 import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
 import { useAuth } from '../../hooks/use-auth'
-import { BrowserRouter as Router, Switch, Route, Redirect, useRouteMatch } from "react-router-dom";
+import { Switch, Route, Redirect, useRouteMatch } from "react-router-dom";
 import CreateShopContainer from "../containers/CreateShopContainer"
+import Products from "./Products"
 
 function Copyright() {
   return (
@@ -118,32 +108,20 @@ const useStyles = makeStyles((theme) => ({
   },
   fixedHeight: {
     height: 240,
-  },
+  }
 }));
 
 export default function Dashboard() {
   const auth = useAuth();
   const match = useRouteMatch();
+  const classes = useStyles();
+  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   if (!auth.userData.loggedIn) {
     return (
       <Redirect to='/signin' />
     )
   }
-
-  
-
-  console.log(match.path)
-  const classes = useStyles();
-  const location = useLocation()
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   const defaultDashboard = (
     <>
@@ -182,15 +160,19 @@ export default function Dashboard() {
   )
 
   return (
-    <Router>
-      <Switch>
-        <Route path={`${match.path}/shop/create`}>
-          <CreateShopContainer />
-        </Route>
-        <Route path={match.path}>
-          {defaultDashboard}
-        </Route>
-      </Switch>
-    </Router>
+    <Switch>
+      <Route path={`${match.path}/shop/create`}>
+        <CreateShopContainer />
+      </Route>
+      <Route path={`${match.path}/shop/edit`}>
+        <CreateShopContainer />
+      </Route>
+      <Route path={`${match.path}/products`}>
+        <Products />
+      </Route>
+      <Route path={match.path}>
+        {defaultDashboard}
+      </Route>
+    </Switch>
   );
 }
