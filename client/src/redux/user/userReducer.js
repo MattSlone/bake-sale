@@ -27,6 +27,7 @@ const userReducer = (state = initialState, action) => {
     case USER_SIGNUP_SUCCESS: return {
       loggedIn: true,
       user: action.payload,
+      shopId: action.payload.success.shopId,
       error: ''
     }
     case USER_SIGNUP_FAILURE: return {
