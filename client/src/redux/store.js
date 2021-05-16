@@ -19,6 +19,21 @@ const rootReducer = (state, action) => {
     purgeStoredState(persistConfig)
     return appReducer(undefined, action)
   }
+  if (action.type === 'CREATE_SHOP_SUCCESS') {
+    purgeStoredState(persistConfig)
+    return appReducer({
+      shop: state.shop,
+      user: state.user
+    }, action)
+  }
+
+  if (action.type === 'CREATE_PRODUCT_SUCCESS') {
+    purgeStoredState(persistConfig)
+    return appReducer({
+      shop: state.shop,
+      user: state.user
+    }, action)
+  }
 
   return appReducer(state, action)
 }

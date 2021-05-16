@@ -14,16 +14,17 @@ import IngredientsContainer from '../containers/IngredientsContainer'
 import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
 import Labeling from './Labeling'
 import { useRouteMatch } from "react-router-dom";
+import { setProductImagesPreview } from '../../redux';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: '100%',
   },
   desktop: {
-    padding: theme.spacing(5),
+    padding: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
   },
   mobile: {
-    padding: theme.spacing(0),
+    padding: useRouteMatch().path.includes('add') ? theme.spacing(7) : theme.spacing(0),
   },
   button: {
     marginTop: theme.spacing(1),
@@ -46,12 +47,13 @@ function getSteps() {
         ];
 }
 
-export default function AddProduct() {
+export default function AddProduct(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
 
   const match = useRouteMatch()
+  
 
   const includeButtons = () => {
     return (activeStep === steps.length - 1) && (!match.path.includes('shop/create')) ? 'Finish' : 'Next'
@@ -59,6 +61,16 @@ export default function AddProduct() {
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const formData = {
+    product: props.product,
+    shopId: props.shop.id
+  }
+
+  const handleFinish = () => {
+    handleNext()
+    props.createProduct(formData)
   };
 
   const handleBack = () => {
@@ -109,7 +121,7 @@ export default function AddProduct() {
                         return <Button
                         variant="contained"
                         color="primary"
-                        onClick={handleNext}
+                        onClick={handleFinish}
                         className={classes.button}
                       >
                         Finish

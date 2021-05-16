@@ -44,6 +44,8 @@ export default function AddProductImages({ imageFiles, setProductImagesPreview }
   const classes = useStyles();
   const hiddenFileInput = React.useRef([])
 
+  console.log(imageFiles)
+
   const handleClick = (event, index) => {
     hiddenFileInput.current[index].click();
   };

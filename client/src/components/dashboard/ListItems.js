@@ -24,12 +24,14 @@ export default function MainListItems() {
 
   return (
     <div>
-      <ListItem button>
-        <ListItemIcon>
-          <DashboardIcon />
-        </ListItemIcon>
-        <ListItemText primary="Dashboard" />
-      </ListItem>
+      <Link className={classes.routerLink} to="/dashboard">
+        <ListItem button>
+          <ListItemIcon>
+            <DashboardIcon />
+          </ListItemIcon>
+          <ListItemText primary="Dashboard" />
+        </ListItem>
+      </Link>
       <Link className={classes.routerLink} to="/dashboard/shop/edit">
         <ListItem button>
           <ListItemIcon>

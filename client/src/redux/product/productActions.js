@@ -7,7 +7,10 @@ import {
   SET_PRICING_INVENTORY,
   CREATE_PRODUCT_REQUEST,
   CREATE_PRODUCT_SUCCESS,
-  CREATE_PRODUCT_FAILURE
+  CREATE_PRODUCT_FAILURE,
+  GET_PRODUCTS_REQUEST,
+  GET_PRODUCTS_SUCCESS,
+  GET_PRODUCTS_FAILURE
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
@@ -59,7 +62,28 @@ export const createProductFailure = (error) => {
   }
 }
 
+export const getProductsRequest = () => {
+  return {
+    type: GET_PRODUCTS_REQUEST
+  }
+}
+
+export const getProductsSuccess = (products) => {
+  return {
+    type: GET_PRODUCTS_SUCCESS,
+    payload: products.success
+  }
+}
+
+export const getProductsFailure = (error) => {
+  return {
+    type: GET_PRODUCTS_FAILURE,
+    payload: error
+  }
+}
+
 export const createProduct = (formData) => {
+  console.log('createprod', formData)
   return async (dispatch) => {
     try {
       dispatch(createProductRequest)
@@ -69,9 +93,29 @@ export const createProduct = (formData) => {
       }
       else {
         dispatch(createProductSuccess(res.data))
+        dispatch(getProducts({shop: formData.shopId}))
       }
     } catch(error) {
       dispatch(createProductFailure(error.message))
+    }
+  }
+}
+
+export const getProducts = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(getProductsRequest)
+      const res = await axios.get('/api/products', {
+        params: formData
+      })
+      if(res.data.error[0]) {
+        dispatch(getProductsFailure(res.data.error[0]))
+      }
+      else {
+        dispatch(getProductsSuccess(res.data))
+      }
+    } catch(error) {
+      dispatch(getProductsFailure(error.message))
     }
   }
 }

@@ -21,4 +21,17 @@ module.exports = (app) => {
       next(err)
     }
   })
+
+  app.get('/api/products', async (req, res, next) => {
+    try {
+        let response = await ProductController.list(req, res, next)
+        res.send({
+            error: req.flash('error'),
+            success: response
+        })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
 }

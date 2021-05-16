@@ -2,14 +2,21 @@ import {
     CREATE_SHOP_REQUEST,
     CREATE_SHOP_SUCCESS,
     CREATE_SHOP_FAILURE,
+    EDIT_SHOP_REQUEST,
+    EDIT_SHOP_SUCCESS,
+    EDIT_SHOP_FAILURE,
     SET_DELIVERY_AREA,
     SET_SHOP,
     GET_LAT_LNG_REQUEST,
     GET_LAT_LNG_SUCCESS,
     GET_LAT_LNG_FAILURE,
+    GET_SHOP_REQUEST,
+    GET_SHOP_SUCCESS,
+    GET_SHOP_FAILURE
    } from './shopTypes'
   
   const initialState = {
+    id: 0,
     name: '',
     state: '',
     loading: false,
@@ -75,6 +82,52 @@ import {
         error: ''
       }
       case CREATE_SHOP_FAILURE: return {
+        shop: '',
+        error: action.payload
+      }
+      case GET_SHOP_REQUEST: return {
+        ...state,
+        loading: true
+      }
+      case GET_SHOP_SUCCESS: return {
+        id: action.payload.success.id,
+        name: action.payload.success.name,
+        state: action.payload.success.state,
+        loading: false,
+        created: false,
+        area: {
+          address: action.payload.success.address,
+          radius: action.payload.success.radius,
+          lat: action.payload.success.lat,
+          lng: action.payload.success.lng
+        },
+        created: true,
+        error: ''
+      }
+      case GET_SHOP_FAILURE: return {
+        shop: '',
+        error: action.payload
+      }
+      case EDIT_SHOP_REQUEST: return {
+        ...state,
+        loading: true
+      }
+      case EDIT_SHOP_SUCCESS: return {
+        id: action.payload.success.id,
+        name: action.payload.success.name,
+        state: action.payload.success.state,
+        loading: false,
+        created: false,
+        area: {
+          address: action.payload.success.address,
+          radius: action.payload.success.radius,
+          lat: action.payload.success.lat,
+          lng: action.payload.success.lng
+        },
+        created: true,
+        error: ''
+      }
+      case EDIT_SHOP_FAILURE: return {
         shop: '',
         error: action.payload
       }

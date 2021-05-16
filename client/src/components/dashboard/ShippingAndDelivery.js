@@ -93,7 +93,7 @@ function ShippingAndDelivery(props) {
         />
         </GoogleMap>
       </Grid>
-      <Grid container justify="flex-end" xs={12} md={5}>
+      <Grid container justify="flex-end">
         <Button
           variant="contained"
           size="large"

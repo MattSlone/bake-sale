@@ -12,6 +12,8 @@ import {
   USER_SIGNOUT_FAILURE
  } from './userTypes'
 
+ import { getShop } from '../shop/shopActions'
+
 // SIGNUP
 export const userSignUpRequest = () => {
   return {
@@ -101,6 +103,7 @@ export const userSignIn = (formData) => {
         dispatch(userSignInFailure(res.data.error[0]))
       }
       else {
+        dispatch(getShop({ id: res.data.success.id }))
         dispatch(userSignInSuccess(res.data))
       }
     } catch(error) {

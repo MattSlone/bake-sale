@@ -15,7 +15,8 @@ import Orders from './Orders';
 import { useAuth } from '../../hooks/use-auth'
 import { Switch, Route, Redirect, useRouteMatch } from "react-router-dom";
 import CreateShopContainer from "../containers/CreateShopContainer"
-import Products from "./Products"
+import ProductsContainer from "../containers/ProductsContainer"
+import AddProductContainer from '../containers/AddProductContainer';
 
 function Copyright() {
   return (
@@ -167,8 +168,11 @@ export default function Dashboard() {
       <Route path={`${match.path}/shop/edit`}>
         <CreateShopContainer />
       </Route>
+      <Route path={`${match.path}/products/add`}>
+        <AddProductContainer />
+      </Route>
       <Route path={`${match.path}/products`}>
-        <Products />
+        <ProductsContainer />
       </Route>
       <Route path={match.path}>
         {defaultDashboard}

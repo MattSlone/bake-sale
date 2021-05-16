@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import CreateShop from '../dashboard/CreateShop'
-import { createShop, setShop } from '../../redux'
+import { createShop, editShop, setShop } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -14,6 +14,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     createShop: (formData) => dispatch(createShop(formData)),
+    editShop: (formData) => dispatch(editShop(formData)),
     setShop: (formData) => dispatch(setShop(formData))
   }
 }

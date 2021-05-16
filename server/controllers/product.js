@@ -3,7 +3,7 @@
 const db = require('../models/index')
 
 module.exports = class ProductController {
-    async create (req, res, shop) {
+    async create (req, res, next) {
         try {
 
             let ingredients = []
@@ -21,8 +21,8 @@ module.exports = class ProductController {
                 automaticRenewal: req.body.product.automaticRenewal,
                 inventory: req.body.product.inventory,
                 price: req.body.product.price,
-                Ingredients: [ingredients],
-                ShopId: shop.id
+                Ingredients: ingredients,
+                ShopId: req.body.shopId
               }, {
                 include: [db.Ingredient]
               });
@@ -30,6 +30,21 @@ module.exports = class ProductController {
             return product
         }
         catch (err) {
+            return next(err)
+        }
+    }
+
+    async list(req, res, next) {
+        try {
+            const products = db.Product.findAll({
+                where: {
+                    ShopId: req.query.shop
+                }
+            });
+            
+            return products
+        }
+        catch(err) {
             return err
         }
     }

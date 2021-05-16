@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -13,7 +13,7 @@ import { useHistory, Link as RouterLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
-    paddingTop: (userData) => theme.spacing(parseInt(`${userData.loggedIn ? 0 : 8}`)),
+    paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
   },
   card: {
@@ -23,6 +23,11 @@ const useStyles = makeStyles((theme) => ({
   },
   cardMedia: {
     paddingTop: '56.25%', // 16:9
+  },
+  cardMediaAdd: {
+    paddingTop: '56.25%', // 16:9
+    height: '100%',
+    cursor: 'pointer'
   },
   cardContent: {
     flexGrow: 1,
@@ -34,14 +39,29 @@ const useStyles = makeStyles((theme) => ({
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-export default function Home({ userData }) {
-  const classes = useStyles(userData);
+export default function Products(props) {
+  console.log(props)
+  const classes = useStyles();
+  const [products, setProducts] = useState(props.product.products)
+  const history = useHistory()
+
+  useEffect(() => {
+    props.getProducts({
+      shop: props.shop.id
+    })
+
+    setProducts(props.product.products)
+  }, [])
+
+  const handleAddProduct = () => {
+    history.push('/dashboard/products/add')
+  }
 
   return (
     <Container spacing={2} className={classes.cardGrid} maxWidth="lg">
       <Grid container spacing={4}>
-        {cards.map((card) => (
-          <Grid item key={card} xs={12} sm={6} md={4}>
+        {products.map((product) => (
+          <Grid item key={product.id} xs={12} sm={6} md={4}>
             <Card className={classes.card}>
               <CardMedia
                 className={classes.cardMedia}
@@ -50,10 +70,11 @@ export default function Home({ userData }) {
               />
               <CardContent className={classes.cardContent}>
                 <Typography gutterBottom variant="h5" component="h2">
-                  Heading
+                  {product.name}
                 </Typography>
                 <Typography>
-                  This is a media card. You can use this section to describe the content.
+                  {product.description}
+                  {product.price}
                 </Typography>
               </CardContent>
               <CardActions>
@@ -67,6 +88,15 @@ export default function Home({ userData }) {
             </Card>
           </Grid>
         ))}
+        <Grid item key={products[products.length - 1].id} xs={12} sm={6} md={4}>
+          <Card className={classes.card} onClick={handleAddProduct}>
+            <CardMedia
+              className={classes.cardMediaAdd}
+              image="/assets/images/add-icon.png"
+              title="Image title"
+            />
+          </Card>
+        </Grid>
       </Grid>
     </Container>
   );

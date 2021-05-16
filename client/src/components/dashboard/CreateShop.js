@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  routerLink: {
+    textDecoration: 'none'
+  }
 }));
 
 function getSteps(edit) {
@@ -98,8 +101,14 @@ export default function CreateShop(props) {
   }
 
   const handleNext = (e) => {
+    console.log(edit)
     if(activeStep === steps.length - 1) {
-      handleCreateShop(e)
+      console.log(edit)
+      if(edit) {
+        handleEditShop(e)
+      } else {
+        handleCreateShop(e)
+      }
     }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -113,6 +122,7 @@ export default function CreateShop(props) {
   };
 
   let formData = {
+    id: props.shop.id,
     name: shopName,
     state: state,
     area: props.shop.area,
@@ -123,6 +133,11 @@ export default function CreateShop(props) {
   const handleCreateShop = e => {
     e.preventDefault()
     props.createShop(formData)
+  }
+
+  const handleEditShop = e => {
+    e.preventDefault()
+    props.editShop(formData)
   }
 
   return (
@@ -141,11 +156,11 @@ export default function CreateShop(props) {
           {activeStep === steps.length ? (
             <div>
               <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-                {props.shop.created ? "Shop Created!" : "Create your shop"}
+                {props.shop.created ? (edit ? "Edits Saved!" : "Shop Created!") : "Create your shop"}
               </Typography>
               {props.shop.created ? (
                 <Grid container alignContent="center" direction="column">
-                  <Link to="/dashboard">
+                  <Link className={classes.routerLink} to="/dashboard">
                     <Button variant="contained" color="primary">Go to dashboard</Button>
                   </Link>
                 </Grid>

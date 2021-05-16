@@ -48,17 +48,38 @@ module.exports = class ShopController {
     }
   }
 
+  async read(req, res, next) {
+    try {
+      const shop = await db.Shop.findByPk(req.query.id);
+
+      if (shop === null) {
+        throw "Shop not found!"
+      }
+
+      return shop
+    }
+    catch (err) {
+      return next(err)
+    }
+  }
+
   async update (req, res, next) {
     try {
-      const shop = await db.Shop.upsert({
-          name: req.body.name,
-          state: req.body.state,
-          address: req.body.area.address,
-          radius: req.body.area.radius,
-          lat: req.body.area.lat,
-          lng: req.body.area.lng,
-      });
+      const shop = await db.Shop.findByPk(req.body.id);
 
+      if (shop === null) {
+        throw "Shop not found!"
+      }
+
+      shop.name = req.body.name
+      shop.state = req.body.state
+      shop.address = req.body.area.address
+      shop.radius = req.body.area.radius
+      shop.lat = req.body.area.lat
+      shop.lng = req.body.area.lng
+
+      await shop.save();
+      
       return shop
     }
     catch (err) {

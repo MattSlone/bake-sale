@@ -2,14 +2,22 @@
 
 const UserController = require('../controllers/user'),
   MakeShopController = require('../controllers/shop'),
-  ShopController = new MakeShopController(),
-  MakeProductController = require('../controllers/product'),
-  ProductController = new MakeProductController()
+  ShopController = new MakeShopController()
 
 module.exports = (app) => {
-  /*app.get('/tenant', UserController.isLoggedIn, (req, res, next) => {
-    res.send({ user: req.user })
-  })*/
+
+  app.get('/api/shop', async (req, res, next) => {
+    try {
+        let response = await ShopController.read(req, res, next)
+        res.send({
+            error: req.flash('error'),
+            success: response
+        })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
 
   app.post('/api/shop/create', async (req, res, next) => {
     try {

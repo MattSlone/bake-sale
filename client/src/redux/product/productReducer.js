@@ -5,7 +5,10 @@ import {
   SET_LISTING_DETAILS,
   CREATE_PRODUCT_REQUEST,
   CREATE_PRODUCT_SUCCESS,
-  CREATE_PRODUCT_FAILURE
+  CREATE_PRODUCT_FAILURE,
+  GET_PRODUCTS_REQUEST,
+  GET_PRODUCTS_SUCCESS,
+  GET_PRODUCTS_FAILURE
 } from './productTypes'
 
 const initialState = {
@@ -17,7 +20,8 @@ const initialState = {
   price: 0.00,
   inventory: 0,
   imageFiles: [],
-  loading: false
+  loading: false,
+  products: []
 }
 
 const productReducer = (state = initialState, action) => {
@@ -47,11 +51,24 @@ const productReducer = (state = initialState, action) => {
       loading: true
     }
     case CREATE_PRODUCT_SUCCESS: return {
-      product: action.payload,
+      ...state,
       error: ''
     }
     case CREATE_PRODUCT_FAILURE: return {
-      product: '',
+      ...state,
+      error: action.payload
+    }
+    case GET_PRODUCTS_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case GET_PRODUCTS_SUCCESS: return {
+      ...state,
+      products: action.payload,
+      error: ''
+    }
+    case GET_PRODUCTS_FAILURE: return {
+      products: '',
       error: action.payload
     }
     default: return state

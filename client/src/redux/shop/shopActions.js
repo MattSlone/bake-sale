@@ -4,12 +4,20 @@ import {
     CREATE_SHOP_REQUEST,
     CREATE_SHOP_SUCCESS,
     CREATE_SHOP_FAILURE,
+    EDIT_SHOP_REQUEST,
+    EDIT_SHOP_SUCCESS,
+    EDIT_SHOP_FAILURE,
     SET_DELIVERY_AREA,
     SET_SHOP,
     GET_LAT_LNG_REQUEST,
     GET_LAT_LNG_SUCCESS,
     GET_LAT_LNG_FAILURE,
+    GET_SHOP_REQUEST,
+    GET_SHOP_SUCCESS,
+    GET_SHOP_FAILURE
  } from './shopTypes'
+
+ import { getProducts } from '../product/productActions'
 
 export const setDeliveryArea = (area) => {
   return {
@@ -79,6 +87,84 @@ export const createShop = (formData) => {
       }
     } catch(error) {
       dispatch(createShopFailure(error.message))
+    }
+  }
+}
+
+// EDIT
+export const editShopRequest = () => {
+  return {
+    type: EDIT_SHOP_REQUEST
+  }
+}
+
+export const editShopSuccess = (shop) => {
+  return {
+    type: EDIT_SHOP_SUCCESS,
+    payload: shop
+  }
+}
+
+export const editShopFailure = (error) => {
+  return {
+    type: EDIT_SHOP_FAILURE,
+    payload: error
+  }
+}
+
+export const editShop = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(editShopRequest)
+      const res = await axios.post('/api/shop/update', formData)
+      if(res.data.error[0]) {
+        dispatch(editShopFailure(res.data.error[0]))
+      }
+      else {
+        dispatch(editShopSuccess(res.data))
+      }
+    } catch(error) {
+      dispatch(editShopFailure(error.message))
+    }
+  }
+}
+
+export const getShopRequest = () => {
+  return {
+    type: GET_SHOP_REQUEST
+  }
+}
+
+export const getShopSuccess = (shop) => {
+  return {
+    type: GET_SHOP_SUCCESS,
+    payload: shop
+  }
+}
+
+export const getShopFailure = (error) => {
+  return {
+    type: GET_SHOP_FAILURE,
+    payload: error
+  }
+}
+
+export const getShop = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(getShopRequest)
+      const res = await axios.get('/api/shop', {
+        params: formData
+      })
+      if(res.data.error[0]) {
+        dispatch(getShopFailure(res.data.error[0]))
+      }
+      else {
+        dispatch(getShopSuccess(res.data))
+        dispatch(getProducts({shop: res.data.success.id}))
+      }
+    } catch(error) {
+      dispatch(getShopFailure(error.message))
     }
   }
 }
