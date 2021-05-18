@@ -78,12 +78,16 @@ export default function Products(props) {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" color="primary">
-                  View
-                </Button>
-                <Button size="small" color="primary">
-                  Edit
-                </Button>
+                <RouterLink to={`/product/${product.id}`}>
+                  <Button size="small" color="primary">
+                    View
+                  </Button>
+                </RouterLink>
+                <RouterLink to={`/product/${product.id}/edit`}>
+                  <Button size="small" color="primary">
+                    Edit
+                  </Button>
+                </RouterLink>
               </CardActions>
             </Card>
           </Grid>

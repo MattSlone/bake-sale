@@ -9,9 +9,10 @@ import SignUpContainer from './components/containers/SignUpContainer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
 import Dashboard from './components/dashboard/Dashboard'
+import ProductContainer from './components//containers/ProductContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
 
 const useStyles = makeStyles((theme) => ({
@@ -24,11 +25,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const navItems = [
+/*const navItems = [
   { path: '/signin', component: SignInContainer},
   { path: '/signup', component: SignUpContainer},
   { path: '/signout', component: () => <Redirect to='/' /> },
-  { path: '/dashboard', component: Dashboard }
+  { path: '/dashboard', component: Dashboard },
+
 ]
 
 function Routes ({userData}) {
@@ -40,10 +42,10 @@ function Routes ({userData}) {
     )}
     </>
   )
-}
+}*/
 
 
-export default function App({userData}) {
+export default function App() {
   const classes = useStyles();
   return (
     <ProvideAuthContainer>
@@ -51,10 +53,19 @@ export default function App({userData}) {
         <div className={classes.root}>
           <Drawer />
           <main className={classes.content}>
-            <Routes userData={userData}/>
+            <Switch>
+              <Route path='/' exact component={HomeContainer} key='/'/>
+              <Route path='/signin' component={SignInContainer} key='/signin'/>
+              <Route path='/signup' component={<Redirect to='/' />}/>
+              <Route path='/signout' component={HomeContainer} key='/'/>
+              <Route path='/dashboard' component={Dashboard} key='/'/>
+              <Route path='/product/:id' children={<ProductContainer />} />
+            </Switch>
           </main>
         </div>
       </Router>
     </ProvideAuthContainer>
   );
 }
+
+// <Routes userData={userData}/>
