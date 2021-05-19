@@ -3,6 +3,7 @@ import Product from '../Product'
 
 const mapStateToProps = state => {
   return {
+    shop: state.shop,
     product: state.product
   }
 }
