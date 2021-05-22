@@ -12,7 +12,8 @@ import {
     GET_LAT_LNG_FAILURE,
     GET_SHOP_REQUEST,
     GET_SHOP_SUCCESS,
-    GET_SHOP_FAILURE
+    GET_SHOP_FAILURE,
+    GET_SHOP_FAILURE_NOT_FOUND
    } from './shopTypes'
   
   const initialState = {
@@ -107,6 +108,9 @@ import {
       case GET_SHOP_FAILURE: return {
         shop: '',
         error: action.payload
+      }
+      case GET_SHOP_FAILURE_NOT_FOUND: return {
+        ...state
       }
       case EDIT_SHOP_REQUEST: return {
         ...state,

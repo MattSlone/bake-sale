@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
@@ -16,8 +17,8 @@ import FormControl from '@material-ui/core/FormControl';
 
 const useStyles = makeStyles((theme) => ({
   product: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
+    padding: theme.spacing(8),
+    marginTop: theme.spacing(8)
   },
   card: {
     height: '100%',
@@ -69,7 +70,7 @@ export default function Product(props)
   ]
 
   return (
-    <Container className={classes.product}>
+    <Paper className={classes.product}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}> 
           <Carousel
@@ -94,7 +95,7 @@ export default function Product(props)
             </Grid>
             <Grid item className={classes.addToCart}>
               <Typography gutterBottom variant="h4" component="h1">
-                ${product.price}
+                ${product.Varieties[0].price}
               </Typography>
             </Grid>
             <Grid item>
@@ -110,9 +111,11 @@ export default function Product(props)
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      <MenuItem value={10}>Ten</MenuItem>
-                      <MenuItem value={20}>Twenty</MenuItem>
-                      <MenuItem value={30}>Thirty</MenuItem>
+                      {
+                        product.Varieties.map( 
+                          (variety, i) => <MenuItem key={i} value={variety.quantity}>{`Package of ${variety.quantity}, $${variety.price}`}</MenuItem> 
+                        )
+                      }
                     </Select>
                   </FormControl>
                 </Grid>
@@ -139,7 +142,7 @@ export default function Product(props)
         </Typography>
       </Grid>
       
-    </Container>
+    </Paper>
   )
 }
 

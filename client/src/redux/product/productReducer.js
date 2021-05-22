@@ -17,7 +17,7 @@ const initialState = {
   category: '',
   automaticRenewal: true,
   ingredients: [],
-  price: 0.00,
+  varieties: [],
   inventory: 0,
   imageFiles: [],
   loading: false,
@@ -43,7 +43,7 @@ const productReducer = (state = initialState, action) => {
     }
     case SET_PRICING_INVENTORY: return {
       ...state,
-      price: action.payload.price,
+      varieties: action.payload.varieties,
       inventory: action.payload.inventory,
     }
     case CREATE_PRODUCT_REQUEST: return {

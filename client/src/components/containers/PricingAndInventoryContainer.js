@@ -4,7 +4,7 @@ import { setPricingAndInventory } from '../../redux'
 
 const mapStateToProps = state => {
   return {
-    price: state.product.price,
+    varieties: state.product.varieties,
     inventory: state.product.inventory
   }
 }

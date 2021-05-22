@@ -14,7 +14,8 @@ import {
     GET_LAT_LNG_FAILURE,
     GET_SHOP_REQUEST,
     GET_SHOP_SUCCESS,
-    GET_SHOP_FAILURE
+    GET_SHOP_FAILURE,
+    GET_SHOP_FAILURE_NOT_FOUND
  } from './shopTypes'
 
  import { getProducts } from '../product/productActions'
@@ -84,6 +85,7 @@ export const createShop = (formData) => {
       }
       else {
         dispatch(createShopSuccess(res.data))
+        dispatch(getProducts({shop: res.data.success.id}))
       }
     } catch(error) {
       dispatch(createShopFailure(error.message))
@@ -149,6 +151,13 @@ export const getShopFailure = (error) => {
   }
 }
 
+export const getShopFailureNotFound = () => {
+  return {
+    type: GET_SHOP_FAILURE_NOT_FOUND,
+    payload: ''
+  }
+}
+
 export const getShop = (formData) => {
   return async (dispatch) => {
     try {
@@ -158,6 +167,9 @@ export const getShop = (formData) => {
       })
       if(res.data.error[0]) {
         dispatch(getShopFailure(res.data.error[0]))
+      }
+      else if(res.data.success == null) {
+        dispatch(getShopFailureNotFound())
       }
       else {
         dispatch(getShopSuccess(res.data))

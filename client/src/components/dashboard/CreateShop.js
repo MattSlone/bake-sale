@@ -11,7 +11,7 @@ import Container from '@material-ui/core/Container';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import AddProduct from './AddProduct';
+import AddProductContainer from '../containers/AddProductContainer';
 import Grid from '@material-ui/core/Grid';
 import { stateList } from './stateList';
 import { useAuth } from '../../hooks/use-auth'
@@ -215,7 +215,7 @@ export default function CreateShop(props) {
                                       </Container>
                                       </>;
                       case 2: return <ShippingAndDeliveryContainer />
-                      case 3: return <AddProduct />
+                      case 3: return <AddProductContainer />
                       default: return "";
                     }
                   })()}

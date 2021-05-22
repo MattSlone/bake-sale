@@ -20,11 +20,14 @@ module.exports = class ProductController {
                 description: req.body.product.description,
                 automaticRenewal: req.body.product.automaticRenewal,
                 inventory: req.body.product.inventory,
-                price: req.body.product.price,
+                Varieties: req.body.product.varieties,
                 Ingredients: ingredients,
                 ShopId: req.body.shopId
               }, {
-                include: [db.Ingredient]
+                include: [
+                    db.Ingredient,
+                    db.Variety
+                ]
               });
 
             return product
@@ -39,7 +42,8 @@ module.exports = class ProductController {
             const products = db.Product.findAll({
                 where: {
                     ShopId: req.query.shop
-                }
+                },
+                include: db.Variety
             });
             
             return products

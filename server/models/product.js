@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
         this.belongsTo(models.Shop)
         this.Ingredient = this.belongsToMany(models.Ingredient, { through: "product_ingredient" })
+        this.Variety = this.hasMany(models.Variety)
     }
   };
   Product.init({
@@ -20,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT,
     automaticRenewal: DataTypes.BOOLEAN,
     inventory: DataTypes.INTEGER,
-    price: DataTypes.FLOAT,
   }, {
     sequelize,
     modelName: 'Product',

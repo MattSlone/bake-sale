@@ -30,14 +30,17 @@ module.exports = class ShopController {
               description: req.body.product.description,
               automaticRenewal: req.body.product.automaticRenewal,
               inventory: req.body.product.inventory,
-              price: req.body.product.price,
+              Varieties: req.body.product.varieties,
               Ingredients: ingredients
             }
           ]
       }, {
         include: [{
           association: db.Shop.Product,
-          include: [ db.Product.Ingredient ]
+          include: [ 
+            db.Product.Ingredient,
+            db.Product.Variety
+          ]
         }]
       });
 
@@ -51,10 +54,6 @@ module.exports = class ShopController {
   async read(req, res, next) {
     try {
       const shop = await db.Shop.findByPk(req.query.id);
-
-      if (shop === null) {
-        throw "Shop not found!"
-      }
 
       return shop
     }
