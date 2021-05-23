@@ -11,14 +11,18 @@ import Menu from '@material-ui/core/Menu';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import MailIcon from '@material-ui/icons/Mail';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import Popover from '@material-ui/core/Popover';
 import { Redirect, Link as RouterLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(1),
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -98,6 +102,19 @@ export default function PrimarySearchAppBar(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
+  const [cartAnchorEl, setCartAnchorEl] = React.useState(null);
+
+  const handleCartPopoverOpen = (event) => {
+    setCartAnchorEl(event.currentTarget);
+  };
+
+  const handleCartPopoverClose = () => {
+    setCartAnchorEl(null);
+  };
+
+  const cartOpen = Boolean(cartAnchorEl);
+
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -156,11 +173,11 @@ export default function PrimarySearchAppBar(props) {
     >
       <MenuItem>
         <IconButton aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <MailIcon />
+          <Badge badgeContent={props.cart.products.length} color="secondary">
+            <ShoppingCartIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>Cart</p>
       </MenuItem>
       <MenuItem>
         <IconButton aria-label="show 11 new notifications" color="inherit">
@@ -217,9 +234,11 @@ export default function PrimarySearchAppBar(props) {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <MailIcon />
+            <IconButton aria-label="show 4 new mails" color="inherit"
+              onClick={handleCartPopoverOpen}
+            >
+              <Badge badgeContent={props.cart.products.length} color="secondary">
+                <ShoppingCartIcon />
               </Badge>
             </IconButton>
             <IconButton aria-label="show 17 new notifications" color="inherit">
@@ -251,6 +270,28 @@ export default function PrimarySearchAppBar(props) {
           </div>
         </Toolbar>
       </AppBar>
+      <Popover
+        id="mouse-over-popover"
+        className={classes.popover}
+        classes={{
+          paper: classes.paper,
+        }}
+        open={cartOpen}
+        anchorEl={cartAnchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        onClose={handleCartPopoverClose}
+        disableRestoreFocus
+      >
+        <Typography>I use Popover.</Typography>
+      </Popover>
+      
       {renderMobileMenu}
       {renderMenu}
     </div>

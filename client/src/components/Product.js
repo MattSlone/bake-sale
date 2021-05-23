@@ -57,6 +57,18 @@ export default function Product(props)
   const classes = useStyles()
   let { id } = useParams()
   const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
+  const [variation, setVariation] = useState(0)
+
+  const handleAddToCart = () => {
+    props.addToCart({
+      product: product,
+      variation: variation
+    })
+  }
+
+  const handleSelectVariation = (e) => {
+    setVariation(e.target.value)
+  }
 
   var items = [
     {
@@ -82,9 +94,9 @@ export default function Product(props)
           </Carousel>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Grid container direction="column"  justifyContent="space-between" className={classes.productAttributes}>
+          <Grid container direction="column"  justify="space-between" className={classes.productAttributes}>
             <Grid item>
-              <Typography gutterBottom variant="h7" component="h4">
+              <Typography gutterBottom variant="h6" component="h4">
                 {props.shop.name}
               </Typography>
             </Grid>
@@ -107,13 +119,12 @@ export default function Product(props)
                       labelId="variation-label"
                       id="variation-select"
                       label="Select an option"
+                      value={variation}
+                      onChange={handleSelectVariation}
                     >
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
                       {
                         product.Varieties.map( 
-                          (variety, i) => <MenuItem key={i} value={variety.quantity}>{`Package of ${variety.quantity}, $${variety.price}`}</MenuItem> 
+                          (variety, i) => <MenuItem key={i} value={i}>{`Package of ${variety.quantity}, $${variety.price}`}</MenuItem> 
                         )
                       }
                     </Select>
@@ -124,6 +135,7 @@ export default function Product(props)
                   className={classes.addToCartButton}
                   variant="contained"
                   color="primary"
+                  onClick={handleAddToCart}
                   >
                     Add to Cart
                   </Button>

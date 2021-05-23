@@ -4,7 +4,8 @@ import { userSignOut } from '../../redux'
 
 const mapStateToProps = state => {
   return {
-    userData: state.user
+    userData: state.user,
+    cart: state.cart
   }
 }
 
