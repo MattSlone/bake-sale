@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import AppBar from '../AppBar'
-import { userSignOut } from '../../redux'
+import { userSignOut, editQuantity, removeFromCart } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -11,7 +11,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    userSignOut: () => dispatch(userSignOut())
+    userSignOut: () => dispatch(userSignOut()),
+    editQuantity: (product) => dispatch(editQuantity(product)),
+    removeFromCart: (cartIndex) => dispatch(removeFromCart(cartIndex))
   }
 }
 

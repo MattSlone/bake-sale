@@ -20,6 +20,9 @@ module.exports = {
       secondaryShipping: {
         type: Sequelize.FLOAT
       },
+      deliveryFeeType: {
+        type: Sequelize.STRING
+      },
       delivery: {
         type: Sequelize.FLOAT
       },

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Products', {
+    await queryInterface.createTable('Addons', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,23 +11,11 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      category: {
-        type: Sequelize.STRING
+      price: {
+        type: Sequelize.FLOAT
       },
-      processingTime: {
-        type: Sequelize.INTEGER
-      },
-      description: {
-        type: Sequelize.TEXT
-      },
-      automaticRenewal: {
-        type: Sequelize.BOOLEAN
-      },
-      inventory: {
-        type: Sequelize.INTEGER
-      },
-      personalizationPrompt: {
-        type: Sequelize.TEXT
+      secondaryPrice: {
+        type: Sequelize.FLOAT
       },
       createdAt: {
         allowNull: false,
@@ -40,6 +28,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Products');
+    await queryInterface.dropTable('Addons');
   }
 };

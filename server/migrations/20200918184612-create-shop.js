@@ -14,7 +14,7 @@ module.exports = {
       state: {
         type: Sequelize.STRING
       },
-      address: {
+      location: {
         type: Sequelize.STRING
       },
       radius: {
@@ -25,6 +25,9 @@ module.exports = {
       },
       lng: {
         type: Sequelize.FLOAT
+      },
+      allowPickups: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,

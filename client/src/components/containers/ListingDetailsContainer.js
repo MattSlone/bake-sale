@@ -7,6 +7,7 @@ const mapStateToProps = state => {
     name: state.product.name,
     description: state.product.description,
     category: state.product.category,
+    processingTime: state.product.processingTime,
     automaticRenewal: state.product.automaticRenewal
   }
 }

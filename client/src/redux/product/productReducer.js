@@ -3,21 +3,27 @@ import {
   SET_INGREDIENTS,
   SET_PRICING_INVENTORY,
   SET_LISTING_DETAILS,
+  SET_ADDONS,
+  SET_PERSONALIZATIONS,
   CREATE_PRODUCT_REQUEST,
   CREATE_PRODUCT_SUCCESS,
   CREATE_PRODUCT_FAILURE,
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
-  GET_PRODUCTS_FAILURE
+  GET_PRODUCTS_FAILURE,
+  SET_PRODUCT_EDIT
 } from './productTypes'
 
 const initialState = {
   name: '',
   description: '',
   category: '',
+  processingTime: 1,
   automaticRenewal: true,
   ingredients: [],
   varieties: [],
+  addons: [],
+  personalizationPrompt: '',
   inventory: 0,
   imageFiles: [],
   loading: false,
@@ -39,12 +45,21 @@ const productReducer = (state = initialState, action) => {
       name: action.payload.name,
       description: action.payload.description,
       category: action.payload.category,
+      processingTime: action.payload.processingTime,
       automaticRenewal: action.payload.automaticRenewal
     }
     case SET_PRICING_INVENTORY: return {
       ...state,
       varieties: action.payload.varieties,
       inventory: action.payload.inventory,
+    }
+    case SET_ADDONS: return {
+      ...state,
+      addons: action.payload
+    }
+    case SET_PERSONALIZATIONS: return {
+      ...state,
+      personalizationPrompt: action.payload
     }
     case CREATE_PRODUCT_REQUEST: return {
       ...state,
@@ -70,6 +85,19 @@ const productReducer = (state = initialState, action) => {
     case GET_PRODUCTS_FAILURE: return {
       products: '',
       error: action.payload
+    }
+    case SET_PRODUCT_EDIT: return {
+      ...state,
+      name: action.payload.name,
+      description: action.payload.description,
+      category: action.payload.category,
+      processingTime: action.payload.processingTime,
+      automaticRenewal: action.payload.automaticRenewal,
+      ingredients: action.payload.ingredients,
+      varieties: action.payload.varieties,
+      inventory: action.payload.inventory,
+      addons: action.payload.addons,
+      personalizationPrompt: action.payload.personalizationPrompt
     }
     default: return state
   }

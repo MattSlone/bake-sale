@@ -8,7 +8,7 @@ import Drawer from './components/Drawer'
 import SignUpContainer from './components/containers/SignUpContainer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
-import Dashboard from './components/dashboard/Dashboard'
+import DashboardContainer from './components/containers/DashboardContainer'
 import ProductContainer from './components//containers/ProductContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
@@ -58,8 +58,8 @@ export default function App() {
               <Route path='/signin' component={SignInContainer} key='/signin'/>
               <Route path='/signup' component={<Redirect to='/' />}/>
               <Route path='/signout' component={HomeContainer} key='/'/>
-              <Route path='/dashboard' component={Dashboard} key='/'/>
-              <Route path='/product/:id' children={<ProductContainer />} />
+              <Route path='/dashboard' component={DashboardContainer} key='/'/>
+              <Route path='/products/:id' children={<ProductContainer />} />
             </Switch>
           </main>
         </div>

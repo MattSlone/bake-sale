@@ -14,6 +14,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchIcon from '@material-ui/icons/Search';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import IconButton from '@material-ui/core/IconButton';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
   },
   cardHeaderEmpty: {
     height: 48,
+    padding: theme.spacing(1, 2),
   },
   flexGrow: {
     flex: 1
@@ -60,9 +62,21 @@ function intersection(a, b) {
 export default function Ingredients({ ingredients, setIngredients }) {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([]);
-  const [left, setLeft] = React.useState(['google', 'amazon', 'amazing', 'microsoft', 'netflix']);
   const [right, setRight] = React.useState(ingredients);
+  const [left, setLeft] = React.useState(['google', 'amazon', 'amazing', 'microsoft', 'netflix'].filter(
+    leftIngredient => !right.includes(leftIngredient)
+  ));
   const [newIngredient, setNewIngredient] = React.useState('');
+  /*const [allergens, setAllergens] = React.useState({
+    milk: false,
+    eggs: false,
+    wheat: false,
+    peanuts: false,
+    soybeans: false,
+    fish: false,
+    treenuts: false
+  });*/
+
 
   // wait for setRight to update then create ingredients
   useEffect(() => {
@@ -77,6 +91,8 @@ export default function Ingredients({ ingredients, setIngredients }) {
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
+
+    
 
     if (currentIndex === -1) {
       newChecked.push(value);
@@ -153,7 +169,13 @@ export default function Ingredients({ ingredients, setIngredients }) {
       </div>
       
       ) : (
-        <div className={classes.cardHeader, classes.cardHeaderEmpty} />
+        <Grid alignContent="center" container className={classes.cardHeader, classes.cardHeaderEmpty}>
+          <Grid item>
+            <Typography>
+              Product Ingredients
+            </Typography>
+          </Grid>
+        </Grid>
       )
       }
       <Divider />
@@ -171,7 +193,7 @@ export default function Ingredients({ ingredients, setIngredients }) {
                   inputProps={{ 'aria-labelledby': labelId }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={`List item ${value + 1}`} />
+              <ListItemText id={labelId} primary={value} />
             </ListItem>
           );
         })}
@@ -181,33 +203,65 @@ export default function Ingredients({ ingredients, setIngredients }) {
   );
 
   return (
-    <Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
-      <Grid className={classes.flexGrow2} item>{customList('left', left)}</Grid>
-      <Grid className={classes.flexGrow} item>
-        <Grid container direction="column" alignItems="center">
-          <Button
-            variant="outlined"
-            size="small"
-            className={classes.button}
-            onClick={handleCheckedRight}
-            disabled={leftChecked.length === 0}
-            aria-label="move selected right"
-          >
-            &gt;
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            className={classes.button}
-            onClick={handleCheckedLeft}
-            disabled={rightChecked.length === 0}
-            aria-label="move selected left"
-          >
-            &lt;
-          </Button>
+    <Grid container spacing={2} direction="column" className={classes.root}>
+      <Grid item>
+        Please review all <a href="https://www.fdacs.gov/content/download/70108/file/Cottage-Food-Operations.pdf" target="_blank">labeling requirements (page 4)</a>. 
+        If your product contains an allergen from the any of the following food groups: (milk, eggs, wheat, peanuts, soybeans, fish 
+        (including shellfish, crab, lobster or shrimp) and tree nuts (such as almonds, pecans or walnuts),
+        you must include the particular allergen in your ingredient list:
+
+      </Grid>
+      <Grid item>
+        <Grid container spacing={2} justify="center" alignItems="center">
+          <Grid className={classes.flexGrow2} item>{customList('left', left)}</Grid>
+          <Grid className={classes.flexGrow} item>
+            <Grid container direction="column" alignItems="center">
+              <Button
+                variant="outlined"
+                size="small"
+                className={classes.button}
+                onClick={handleCheckedRight}
+                disabled={leftChecked.length === 0}
+                aria-label="move selected right"
+              >
+                &gt;
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                className={classes.button}
+                onClick={handleCheckedLeft}
+                disabled={rightChecked.length === 0}
+                aria-label="move selected left"
+              >
+                &lt;
+              </Button>
+            </Grid>
+          </Grid>
+          <Grid className={classes.flexGrow2} item>{customList('Chosen', right)}</Grid>
         </Grid>
       </Grid>
-      <Grid className={classes.flexGrow2} item>{customList('Chosen', right)}</Grid>
+      <Grid item>
+        {/*<Grid container>
+          <Grid item>
+
+          </Grid>
+          <Grid item>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+              />
+            }
+            label="Primary"
+          />
+          </Grid>
+        </Grid>*/}
+      </Grid>
     </Grid>
   );
 }

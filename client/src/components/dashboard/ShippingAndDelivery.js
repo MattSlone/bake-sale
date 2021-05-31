@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { GoogleMap, LoadScript, Circle } from '@react-google-maps/api';
-import { Input, TextField } from '@material-ui/core';
+import { Input, TextField, Typography } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -15,6 +16,10 @@ const useStyles = makeStyles((theme) => ({
   addressField: {
     width: '100%'
   },
+  pickupAddress: {
+    width: '100%',
+    alignSelf: 'stretch'
+  },
   flexGrow: {
     flex: 1
   }
@@ -23,11 +28,16 @@ const useStyles = makeStyles((theme) => ({
 function ShippingAndDelivery(props) {
   const classes = useStyles();
   const [circle, setCircle] = useState('')
-  const [address, setAddress] = useState('')
+  const [location, setLocation] = useState(props.shop.area.location)
+  const [street, setStreet] = useState(props.shop.pickupAddress.street)
+  const [city, setCity] = useState(props.shop.pickupAddress.city)
+  const [state, setState] = useState('FL')
+  const [zipcode, setZipcode] = useState(props.shop.pickupAddress.zipcode)
+  const [pickup, setPickup] = useState(street ? true : false)
 
   const containerStyle = {
-    width: '400px',
-    height: '400px'
+    width: '290px',
+    height: '290px'
   };
 
   const circleOptions = {
@@ -40,7 +50,7 @@ function ShippingAndDelivery(props) {
     draggable:false,
     editable: true,
     visible: true,
-    radius: props.area.radius,
+    radius: props.shop.area.radius,
     zIndex: 1
   }
 
@@ -50,50 +60,122 @@ function ShippingAndDelivery(props) {
         radius: circle.radius,
         lat: circle.center.lat(),
         lng: circle.center.lng(),
-        address: address
+        location: location,
       })
     }
   })
 
   const handleButtonClick = (e) => {
-    props.getLatLngFromAddress(address)
+    props.getLatLngFromAddress(location)
   }
 
+  useEffect(() => {
+    props.setPickupAddress({
+      street: street,
+      city: city,
+      state: 'FL',
+      zipcode: zipcode,
+      allowPickups: pickup
+    })
+  }, [pickup, street, city, zipcode])
+
+  const handlePickupCheckboxChange = (event) => {
+    setPickup(event.target.checked);
+  };
+
   return (
-    <Grid container spacing={2} className={classes.root} direction="column">
-      <Grid item xs={12} md={5}>
-        <Grid container>
-          <Grid item className={classes.flexGrow}>
-            < TextField className={classes.addressField}
-              placeholder="Enter Your Home Address"
-              onChange={(e) => {setAddress(e.target.value)}}
-            />
-          </Grid>
-          <Grid item>
-          <IconButton color="primary" size="medium" onClick={handleButtonClick}><SearchIcon /></IconButton>
-          </Grid>
+    <Grid alignItems="center" container spacing={2} className={classes.root} direction="column">
+      <Grid item xs={12} md={8}>
+        <Typography>
+          Enter the address of your home/kitchen. This should be the location at which customers can pickup orders (if you allow pickups). 
+          It will not be published to customers until an order is confirmed and paid for. It will also be used in the calculation of "By the mile" 
+          delivery fees for your products, should you choose that fee structure when creating a product. You can edit this in the future.
+        </Typography>
+      </Grid>
+      <Grid spacing={1} container item xs={12} md={8}>
+        <Grid item>
+          <TextField
+            className={classes.addressField}
+            value={street}
+            id="outlined"
+            label="Street"
+            variant="outlined"
+            onChange={(e) => {setStreet(e.target.value)}}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            className={classes.addressField}
+            value={city}
+            id="outlined"
+            label="City"
+            variant="outlined"
+            onChange={(e) => {setCity(e.target.value)}}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            className={classes.addressField}
+            id="outlined"
+            label="State"
+            value='FL'
+            disabled
+            variant="outlined"
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            className={classes.addressField}
+            value={zipcode}
+            id="outlined"
+            label="Zipcode"
+            variant="outlined"
+            onChange={(e) => {setZipcode(e.target.value)}}
+          />
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid item xs={12} md={8}>
+        <Typography>
+          Would you like to offer a pickup option to your customers? You cannot charge a fee for pickups. 
+          Delivery and shipping pricing are configurable upon creating a product.
+          <Checkbox
+            checked={pickup}
+            onChange={handlePickupCheckboxChange}
+            name="checked"
+            color="primary"
+          />
+        </Typography>
+      </Grid>
+      <Grid item container style={{width: '300px'}}>
+        <Grid item className={classes.flexGrow}>
+          <TextField className={classes.addressField}
+            placeholder="Enter a delivery area"
+            value={location}
+            onChange={(e) => {setLocation(e.target.value)}}
+          />
+        </Grid>
+        <Grid item>
+          <IconButton color="primary" size="medium" onClick={handleButtonClick}><SearchIcon /></IconButton>
+        </Grid>
+      </Grid>
+      <Grid container item direction="column" alignContent="center">
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={{
-            lat: props.area.lat,
-            lng: props.area.lng
+            lat: props.shop.area.lat,
+            lng: props.shop.area.lng
           }}
           zoom={10}
         >
           <Circle
           onLoad={circle => {setCircle(circle)}}
           center={{
-            lat: props.area.lat,
-            lng: props.area.lng
+            lat: props.shop.area.lat,
+            lng: props.shop.area.lng
           }}
           options={circleOptions}
         />
         </GoogleMap>
-      </Grid>
-      <Grid container justify="flex-end">
         <Button
           variant="contained"
           size="large"
@@ -102,6 +184,9 @@ function ShippingAndDelivery(props) {
         >
           Save
         </Button>
+      </Grid>
+      <Grid item xs={12} md={6} lg={4} container justify="flex-end">
+        
       </Grid>
     </Grid>
   );

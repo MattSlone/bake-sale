@@ -17,6 +17,7 @@ import { stateList } from './stateList';
 import { useAuth } from '../../hooks/use-auth'
 import { useHistory, Redirect, Link, useRouteMatch } from "react-router-dom";
 import ShippingAndDeliveryContainer from '../containers/ShippingAndDeliveryContainer';
+import PickupAndDeliveryOptionsContainer from '../containers/PickupAndDeliveryOptionsContainer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps(edit) {
-  let steps = ['Name your shop', 'Select your state', 'Choose Delivery Area', 'Add product(s)'];
+  let steps = ['Name your shop', 'Select your state', 'Pickup/Delivery Options', 'Add product(s)'];
   if(edit) {
     steps.pop()
   }
@@ -62,7 +63,7 @@ function getStepContent(stepIndex) {
     case 1:
       return 'Select the state you will be selling in.';
     case 2:
-      return 'Choose your delivery area';
+      return 'Configure your pickup and delivery preferences';
       case 3:
         return 'Add a product to your shop';
     default:
@@ -125,9 +126,10 @@ export default function CreateShop(props) {
     id: props.shop.id,
     name: shopName,
     state: state,
+    pickupAddress: props.shop.pickupAddress,
     area: props.shop.area,
     product: props.product,
-    user: auth.userData.user.success
+    user: auth.userData.user.success.id
   }
 
   const handleCreateShop = e => {
@@ -214,7 +216,7 @@ export default function CreateShop(props) {
                                         </Select>
                                       </Container>
                                       </>;
-                      case 2: return <ShippingAndDeliveryContainer />
+                      case 2: return <PickupAndDeliveryOptionsContainer />
                       case 3: return <AddProductContainer />
                       default: return "";
                     }

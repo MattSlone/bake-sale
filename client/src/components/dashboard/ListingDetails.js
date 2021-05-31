@@ -32,18 +32,20 @@ export default function ListingDetails(props) {
   const [name, setName] = React.useState(props.name);
   const [description, setDescription] = React.useState(props.description);
   const [category, setCategory] = React.useState(props.category);
+  const [processingTime, setProcessingTime] = React.useState(props.processingTime);
   const [automaticRenewal, setAutomaticRenewal] = React.useState(props.automaticRenewal)
 
   useEffect(() => {
-    if(name && category) {
+    if(name && category && processingTime) {
       props.setListingDetails({
         name: name,
         description: description,
         category: category,
+        processingTime: processingTime,
         automaticRenewal: automaticRenewal
       })
     }
-  }, [name, description, category, automaticRenewal])
+  }, [name, description, category, processingTime, automaticRenewal])
 
   const handleCategoryChange = (event) => {
     setCategory(event.target.value);
@@ -59,6 +61,10 @@ export default function ListingDetails(props) {
 
   const handleDescChange = (event) => {
     setDescription(event.target.value);
+  };
+
+  const handleProcessingTimeChange = (event) => {
+    setProcessingTime(event.target.value);
   };
 
   return (
@@ -94,6 +100,19 @@ export default function ListingDetails(props) {
                   <MenuItem value={'pies,tarts'}>Pies & Tarts</MenuItem>
                   <MenuItem value={'vegan,vegetarian'}>Vegan / Vegetarian</MenuItem>
                 </Select>
+              </FormControl>
+            </Grid>
+            <Grid container item xs={12} md={4}>
+              Processing Time: Let your customers know when they can expect their order to be ready.
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <FormControl className={classes.formControl}>
+                <TextField 
+                type="number"
+                inputProps={{min: 1}} 
+                value={processingTime} 
+                label="Days" 
+                onChange={handleProcessingTimeChange}/>
               </FormControl>
             </Grid>
             <Grid container item xs={12} md={4}>

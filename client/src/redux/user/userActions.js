@@ -103,7 +103,7 @@ export const userSignIn = (formData) => {
         dispatch(userSignInFailure(res.data.error[0]))
       }
       else {
-        dispatch(getShop({ id: res.data.success.id }))
+        dispatch(getShop({ UserId: res.data.success.id }))
         dispatch(userSignInSuccess(res.data))
       }
     } catch(error) {

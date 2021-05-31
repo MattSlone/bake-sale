@@ -5,12 +5,15 @@ import {
   SET_INGREDIENTS,
   SET_LISTING_DETAILS,
   SET_PRICING_INVENTORY,
+  SET_ADDONS,
+  SET_PERSONALIZATIONS,
   CREATE_PRODUCT_REQUEST,
   CREATE_PRODUCT_SUCCESS,
   CREATE_PRODUCT_FAILURE,
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
-  GET_PRODUCTS_FAILURE
+  GET_PRODUCTS_FAILURE,
+  SET_PRODUCT_EDIT
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
@@ -31,6 +34,20 @@ export const setListingDetails = (listingDetails) => {
   return {
     type: SET_LISTING_DETAILS,
     payload: listingDetails
+  }
+}
+
+export const setAddons = (addons) => {
+  return {
+    type: SET_ADDONS,
+    payload: addons
+  }
+}
+
+export const setPersonalizationPrompt = (personalizationPrompt) => {
+  return {
+    type: SET_PERSONALIZATIONS,
+    payload: personalizationPrompt
   }
 }
 
@@ -79,6 +96,13 @@ export const getProductsFailure = (error) => {
   return {
     type: GET_PRODUCTS_FAILURE,
     payload: error
+  }
+}
+
+export const setProductEdit = (product) => {
+  return {
+    type: SET_PRODUCT_EDIT,
+    payload: product
   }
 }
 

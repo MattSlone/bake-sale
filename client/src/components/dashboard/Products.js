@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
-import { useHistory, Link as RouterLink } from "react-router-dom";
+import { useHistory, Link as RouterLink, Redirect } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
@@ -40,10 +40,13 @@ const useStyles = makeStyles((theme) => ({
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function Products(props) {
-  console.log(props)
   const classes = useStyles();
   const [products, setProducts] = useState(props.product.products)
   const history = useHistory()
+
+  if(!props.shop.id) {
+    return <Redirect to="/dashboard/shop/create" />
+  }
 
   useEffect(() => {
     props.getProducts({
@@ -78,12 +81,12 @@ export default function Products(props) {
                 </Typography>
               </CardContent>
               <CardActions>
-                <RouterLink to={`/product/${product.id}`}>
+                <RouterLink to={`/products/${product.id}`}>
                   <Button size="small" color="primary">
                     View
                   </Button>
                 </RouterLink>
-                <RouterLink to={`/product/${product.id}/edit`}>
+                <RouterLink to={`/dashboard/products/${product.id}/edit`}>
                   <Button size="small" color="primary">
                     Edit
                   </Button>

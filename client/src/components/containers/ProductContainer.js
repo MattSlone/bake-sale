@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import Product from '../Product'
-import { addToCart } from '../../redux'
+import { addToCart, getShop } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -11,7 +11,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    addToCart: (formData) => dispatch(addToCart(formData))
+    addToCart: (formData) => dispatch(addToCart(formData)),
+    getShop: (id) => dispatch(getShop(id))
   }
 }
 

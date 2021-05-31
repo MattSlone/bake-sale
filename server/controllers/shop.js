@@ -18,30 +18,43 @@ module.exports = class ShopController {
       const shop = await db.Shop.create({
           name: req.body.name,
           state: req.body.state,
-          address: req.body.area.address,
+          location: req.body.area.location,
+          allowPickups: req.body.allowPickups,
           radius: req.body.area.radius,
           lat: req.body.area.lat,
           lng: req.body.area.lng,
-          UserId: req.body.userId,
+          UserId: req.body.user,
+          PickupAddress: req.body.pickupAddress,
+          PickupSchedule: req.body.pickupSchedule,
+          ShopContact: req.body.contact,
           Products: [
             {
               name: req.body.product.name,
               category: req.body.product.category,
+              processingTime: req.body.product.processingTime,
               description: req.body.product.description,
               automaticRenewal: req.body.product.automaticRenewal,
               inventory: req.body.product.inventory,
+              personalizationPrompt: req.body.product.personalizationPrompt,
               Varieties: req.body.product.varieties,
+              Addons: req.body.product.addons,
               Ingredients: ingredients
             }
           ]
       }, {
-        include: [{
-          association: db.Shop.Product,
-          include: [ 
-            db.Product.Ingredient,
-            db.Product.Variety
-          ]
-        }]
+        include: [
+          db.PickupAddress,
+          db.PickupSchedule,
+          db.ShopContact,
+          {
+            association: db.Shop.Product,
+            include: [ 
+              db.Product.Ingredient,
+              db.Product.Variety,
+              db.Product.Addon,
+            ]
+          }
+        ]
       });
 
       return shop
@@ -53,8 +66,16 @@ module.exports = class ShopController {
 
   async read(req, res, next) {
     try {
-      const shop = await db.Shop.findByPk(req.query.id);
-
+      if(req.query.UserId) {
+        const shop = await db.Shop.findOne({ 
+          where: { UserId:  req.query.UserId},
+          include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
+        });
+        return shop
+      }
+      const shop = await db.Shop.findByPk(req.query.id, {
+        include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
+      });
       return shop
     }
     catch (err) {
@@ -72,10 +93,15 @@ module.exports = class ShopController {
 
       shop.name = req.body.name
       shop.state = req.body.state
-      shop.address = req.body.area.address
+      shop.allowPickups = req.body.allowPickups
+      shop.location = req.body.area.location
       shop.radius = req.body.area.radius
       shop.lat = req.body.area.lat
       shop.lng = req.body.area.lng
+
+      shop.setPickupAddress(req.body.pickupAddress)
+      shop.setPickupSchedule(req.body.pickupSchedule)
+      shop.setShopContact(req.body.contact)
 
       await shop.save();
       

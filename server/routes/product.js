@@ -34,4 +34,17 @@ module.exports = (app) => {
       next(err)
     }
   })
+
+  app.post('/api/product/update', async (req, res, next) => {
+    try {
+        let product = await ProductController.update(req, res, next)
+        res.send({
+            error: req.flash('error'),
+            success: product
+        })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import { useLocation } from 'react-router-dom';
@@ -112,7 +112,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Dashboard() {
+export default function Dashboard(props) {
   const auth = useAuth();
   const match = useRouteMatch();
   const classes = useStyles();
@@ -123,6 +123,11 @@ export default function Dashboard() {
       <Redirect to='/signin' />
     )
   }
+
+  useEffect(() => {
+    const UserId = auth.userData.user.success.id
+    props.getShop({UserId: UserId})
+  })
 
   const defaultDashboard = (
     <>
@@ -169,6 +174,9 @@ export default function Dashboard() {
         <CreateShopContainer />
       </Route>
       <Route path={`${match.path}/products/add`}>
+        <AddProductContainer />
+      </Route>
+      <Route path={`${match.path}/products/:id/edit`}>
         <AddProductContainer />
       </Route>
       <Route path={`${match.path}/products`}>

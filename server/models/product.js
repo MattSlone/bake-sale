@@ -13,14 +13,17 @@ module.exports = (sequelize, DataTypes) => {
         this.belongsTo(models.Shop)
         this.Ingredient = this.belongsToMany(models.Ingredient, { through: "product_ingredient" })
         this.Variety = this.hasMany(models.Variety)
+        this.Addon = this.hasMany(models.Addon)
     }
   };
   Product.init({
     name: DataTypes.STRING,
     category: DataTypes.STRING,
     description: DataTypes.TEXT,
+    processingTime: DataTypes.INTEGER,
     automaticRenewal: DataTypes.BOOLEAN,
     inventory: DataTypes.INTEGER,
+    personalizationPrompt: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'Product',

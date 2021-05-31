@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -13,18 +13,25 @@ import ListingDetailsContainer from '../containers/ListingDetailsContainer'
 import IngredientsContainer from '../containers/IngredientsContainer'
 import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
 import Labeling from './Labeling'
-import { useRouteMatch } from "react-router-dom";
+import AddonsContainer from '../containers/AddonsContainer'
+import PersonalizationContainer from '../containers/PersonalizationsContainer'
+import { useRouteMatch, useParams } from "react-router-dom";
 import { setProductImagesPreview } from '../../redux';
+import Personalization from './Personalization';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: '100%',
   },
   desktop: {
-    padding: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
+    paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
+    paddingLeft: 0,
+    paddingRight: 0
   },
   mobile: {
-    padding: useRouteMatch().path.includes('add') ? theme.spacing(7) : theme.spacing(0),
+    paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(7) : theme.spacing(0),
+    paddingLeft: 0,
+    paddingRight: 0
   },
   button: {
     marginTop: theme.spacing(1),
@@ -43,7 +50,9 @@ function getSteps() {
           'Listing details',
           'Ingredients',
           'Inventory and Pricing',
-          'Labeling'
+          'Labeling',
+          'Add-ons',
+          'Personalization'
         ];
 }
 
@@ -51,9 +60,21 @@ export default function AddProduct(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
+  let { id } = useParams()
 
   const match = useRouteMatch()
-  
+
+  useEffect(() => {
+    if(match.path.includes('edit')) {
+      let product = props.product.products.find(product => product.id == id)
+      props.setProductEdit({
+        ...product,
+        varieties: product.Varieties,
+        ingredients: product.Ingredients.map(ingredient => ingredient.name),
+        addons: product.Addons
+      })
+    }
+  }, [])
 
   const includeButtons = () => {
     return (activeStep === steps.length - 1) && (!match.path.includes('shop/create')) ? 'Finish' : 'Next'
@@ -70,7 +91,11 @@ export default function AddProduct(props) {
 
   const handleFinish = () => {
     handleNext()
-    props.createProduct(formData)
+    if(match.path.includes('edit')) {
+      props.editProduct(formData)
+    } else {
+      props.createProduct(formData)
+    }
   };
 
   const handleBack = () => {
@@ -100,6 +125,10 @@ export default function AddProduct(props) {
                   return <PricingAndInventoryContainer />;
                 case 4:
                   return <Labeling />;
+                case 5:
+                  return <AddonsContainer />;
+                case 6:
+                  return <PersonalizationContainer />;
                 default:
                   return 'Unknown step';
               }

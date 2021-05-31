@@ -13,17 +13,40 @@ import {
     GET_SHOP_REQUEST,
     GET_SHOP_SUCCESS,
     GET_SHOP_FAILURE,
-    GET_SHOP_FAILURE_NOT_FOUND
+    GET_SHOP_FAILURE_NOT_FOUND,
+    SET_PICKUP_ADDRESS,
+    SET_PICKUP_SCHEDULE,
+    SET_CONTACT
    } from './shopTypes'
   
   const initialState = {
     id: 0,
     name: '',
     state: '',
+    allowPickups: true,
+    pickupAddress: {
+      street: '',
+      city: '',
+      state: 'FL',
+      zipcode: '',
+    },
+    contact: {
+      phone: '',
+      email: ''
+    },
+    pickupSchedule: [
+      {day: 'Sunday', start: "12:00", end: "12:00"},
+      {day: 'Monday', start: "12:00", end: "12:00"},
+      {day: 'Tuesday', start: "12:00", end: "12:00"},
+      {day: 'Wednesday', start: "12:00", end: "12:00"},
+      {day: 'Thursday', start: "12:00", end: "12:00"},
+      {day: 'Friday', start: "12:00", end: "12:00"},
+      {day: 'Saturday', start: "12:00", end: "12:00"}
+    ],
     loading: false,
     created: false,
     area: {
-      address: '',
+      location: '',
       radius: 30000,
       lat: -3.745,
       lng: -38.523
@@ -58,6 +81,28 @@ import {
         ...state,
         area: action.payload
       }
+      case SET_CONTACT: return {
+        ...state,
+        contact: action.payload
+      }
+      case SET_PICKUP_ADDRESS: return {
+        ...state,
+        allowPickups: action.payload.allowPickups,
+        pickupAddress: {
+          street: action.payload.street,
+          city: action.payload.city,
+          state: action.payload.state,
+          zipcode: action.payload.zipcode
+        }
+      }
+      case SET_PICKUP_SCHEDULE: return {
+        ...state,
+        pickupSchedule: action.payload
+      }
+      case SET_PICKUP_SCHEDULE: return {
+        ...state,
+        contact: action.payload
+      }
       case SET_SHOP: return {
         ...state,
         name: action.payload.name,
@@ -68,22 +113,26 @@ import {
         loading: true
       }
       case CREATE_SHOP_SUCCESS: return {
+        ...state,
         id: action.payload.success.id,
         name: action.payload.success.name,
         state: action.payload.success.state,
+        allowPickups: action.payload.success.allowPickups,
+        pickupAddress: action.payload.success.PickupAddress,
         loading: false,
-        created: false,
         area: {
-          address: action.payload.success.address,
+          location: action.payload.success.location,
           radius: action.payload.success.radius,
           lat: action.payload.success.lat,
           lng: action.payload.success.lng
         },
+        pickupSchedule: action.payload.success.PickupSchedule,
+        contact: action.payload.success.ShopContact,
         created: true,
         error: ''
       }
       case CREATE_SHOP_FAILURE: return {
-        shop: '',
+        ...state,
         error: action.payload
       }
       case GET_SHOP_REQUEST: return {
@@ -91,17 +140,22 @@ import {
         loading: true
       }
       case GET_SHOP_SUCCESS: return {
+        ...state,
         id: action.payload.success.id,
         name: action.payload.success.name,
         state: action.payload.success.state,
+        allowPickups: action.payload.success.allowPickups,
+        pickupAddress: action.payload.success.PickupAddress,
         loading: false,
         created: false,
         area: {
-          address: action.payload.success.address,
+          location: action.payload.success.location,
           radius: action.payload.success.radius,
           lat: action.payload.success.lat,
           lng: action.payload.success.lng
         },
+        pickupSchedule: action.payload.success.PickupSchedule,
+        contact: action.payload.success.ShopContact,
         created: true,
         error: ''
       }
@@ -117,17 +171,22 @@ import {
         loading: true
       }
       case EDIT_SHOP_SUCCESS: return {
+        ...state,
         id: action.payload.success.id,
         name: action.payload.success.name,
         state: action.payload.success.state,
+        allowPickups: action.payload.success.allowPickups,
+        pickupAddress: action.payload.success.PickupAddress,
         loading: false,
         created: false,
         area: {
-          address: action.payload.success.address,
+          location: action.payload.success.location,
           radius: action.payload.success.radius,
           lat: action.payload.success.lat,
           lng: action.payload.success.lng
         },
+        pickupSchedule: action.payload.success.PickupSchedule,
+        contact: action.payload.success.ShopContact,
         created: true,
         error: ''
       }

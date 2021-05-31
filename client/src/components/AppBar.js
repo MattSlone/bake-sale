@@ -16,13 +16,26 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Popover from '@material-ui/core/Popover';
 import { Redirect, Link as RouterLink } from "react-router-dom";
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Grid from '@material-ui/core/Grid';
+import DeleteIcon from '@material-ui/icons/Delete';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
   },
+  quantityInput: {
+    width: 45
+  },
   paper: {
     padding: theme.spacing(1),
+  },
+  paddingLeft: {
+    paddingLeft: theme.spacing(1)
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -104,15 +117,19 @@ export default function PrimarySearchAppBar(props) {
 
   const [cartAnchorEl, setCartAnchorEl] = React.useState(null);
 
+  const fulfillment = ['pickup', 'delivery', 'shipping']
+
   const handleCartPopoverOpen = (event) => {
-    setCartAnchorEl(event.currentTarget);
+    if (props.cart.products.length > 0) {
+      setCartAnchorEl(event.currentTarget);
+    }
   };
 
   const handleCartPopoverClose = () => {
     setCartAnchorEl(null);
   };
 
-  const cartOpen = Boolean(cartAnchorEl);
+  const cartOpen = Boolean(cartAnchorEl && props.cart.products.length > 0);
 
 
   const isMenuOpen = Boolean(anchorEl);
@@ -139,6 +156,17 @@ export default function PrimarySearchAppBar(props) {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+
+  const handleQuantityChange = (quantity, index) => {
+    props.editQuantity({
+      quantity: quantity,
+      cartIndex: index
+    })
+  }
+
+  const handleRemoveFromCart = (index) => {
+    props.removeFromCart(index)
+  }
 
   const renderSignOutButton = (
     <MenuItem onClick={handleSignOutButton}>Sign Out</MenuItem>
@@ -289,7 +317,53 @@ export default function PrimarySearchAppBar(props) {
         onClose={handleCartPopoverClose}
         disableRestoreFocus
       >
-        <Typography>I use Popover.</Typography>
+        <Grid item xs={12}>
+          <div>
+            <List>
+              {props.cart.products.map((product, i) => (
+                <ListItem key={i}>
+                  <ListItemText>
+                    <TextField
+                      className={classes.quantityInput}
+                      inputProps={{min: 1, style: { textAlign: 'center' }}} 
+                      id="quantity"
+                      type="number"
+                      value={product.quantity}
+                      onChange={(e) => {handleQuantityChange(e.target.value, i)}}
+                    />
+                  </ListItemText>
+                  <ListItemText 
+                  secondary={
+                    `package of ${product.product.Varieties.find(
+                      variation => variation.quantity == product.variation
+                      ).quantity}`
+                    }
+                    className={classes.paddingLeft}
+                  >
+                    {product.product.name}
+                  </ListItemText>
+                  <ListItemText 
+                  secondary={product.quantity > 1 
+                    ? `$${Number.parseFloat(product.clientSidePrice).toFixed(2)} ea` 
+                    : ""}
+                  className={classes.paddingLeft}
+                  >
+                    ${Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}
+                  </ListItemText>
+                  <ListItemSecondaryAction>
+                    <IconButton 
+                      edge="end" 
+                      aria-label="delete"
+                      onClick={() => {handleRemoveFromCart(i)}}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        </Grid>
       </Popover>
       
       {renderMobileMenu}

@@ -1,33 +1,21 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Products', {
+    await queryInterface.createTable('PickupSchedules', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
+      day: {
         type: Sequelize.STRING
       },
-      category: {
+      start: {
         type: Sequelize.STRING
       },
-      processingTime: {
-        type: Sequelize.INTEGER
-      },
-      description: {
-        type: Sequelize.TEXT
-      },
-      automaticRenewal: {
-        type: Sequelize.BOOLEAN
-      },
-      inventory: {
-        type: Sequelize.INTEGER
-      },
-      personalizationPrompt: {
-        type: Sequelize.TEXT
+      end: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -40,6 +28,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Products');
+    await queryInterface.dropTable('PickupSchedules');
   }
 };

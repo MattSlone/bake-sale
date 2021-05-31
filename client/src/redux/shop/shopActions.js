@@ -15,7 +15,10 @@ import {
     GET_SHOP_REQUEST,
     GET_SHOP_SUCCESS,
     GET_SHOP_FAILURE,
-    GET_SHOP_FAILURE_NOT_FOUND
+    GET_SHOP_FAILURE_NOT_FOUND,
+    SET_PICKUP_ADDRESS,
+    SET_PICKUP_SCHEDULE,
+    SET_CONTACT
  } from './shopTypes'
 
  import { getProducts } from '../product/productActions'
@@ -24,6 +27,27 @@ export const setDeliveryArea = (area) => {
   return {
     type: SET_DELIVERY_AREA,
     payload: area
+  }
+}
+
+export const setPickupAddress = (address) => {
+  return {
+    type: SET_PICKUP_ADDRESS,
+    payload: address
+  }
+}
+
+export const setPickupSchedule = (schedule) => {
+  return {
+    type: SET_PICKUP_SCHEDULE,
+    payload: schedule
+  }
+}
+
+export const setContact = (contact) => {
+  return {
+    type: SET_CONTACT,
+    payload: contact
   }
 }
 
