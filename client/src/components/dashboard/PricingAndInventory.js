@@ -36,13 +36,13 @@ export default function PricingAndInventory(props) {
 
   const [inventory, setInventory] = React.useState(props.inventory);
   const [varieties, setVarieties] = useState(props.varieties)
-  const [price, setPrice] = useState('')
+  const [price, setPrice] = useState(null)
   const [quantity, setQuantity] = useState('')
   const [deliveryFeeType, setDeliveryFeeType] = useState('flat')
-  const [shipping, setShipping] = useState('')
-  const [secondaryShipping, setSecondaryShipping] = useState('')
-  const [delivery, setDelivery] = useState('')
-  const [secondaryDelivery, setSecondaryDelivery] = useState('')
+  const [shipping, setShipping] = useState(null)
+  const [secondaryShipping, setSecondaryShipping] = useState(null)
+  const [delivery, setDelivery] = useState(null)
+  const [secondaryDelivery, setSecondaryDelivery] = useState(null)
 
   // wait for setRight to update then create ingredients
   useEffect(() => {
@@ -66,16 +66,16 @@ export default function PricingAndInventory(props) {
     let newVarieties = [...varieties]
     
     newVarieties.push({
-      quantity: Number(quantity),
-      price: Number(price),
-      shipping: Number(shipping),
-      secondaryShipping: Number.parseFloat(secondaryShipping),
+      quantity: quantity,
+      price: price,
+      shipping: shipping,
+      secondaryShipping: secondaryShipping,
       deliveryFeeType: deliveryFeeType,
-      delivery: Number(delivery),
-      secondaryDelivery: Number.parseFloat(secondaryDelivery)
+      delivery: delivery,
+      secondaryDelivery: secondaryDelivery
     })
 
-    if (varieties.length < 5 && !isNaN(price) && price > 0 && quantity > 0 && (shipping > 0 || delivery > 0)) {
+    if (varieties.length < 5 && price !== null && quantity > 0 && (shipping !== null || delivery !== null)) {
       setVarieties(newVarieties)
     }
     
@@ -86,6 +86,7 @@ export default function PricingAndInventory(props) {
 
     setVarieties(newVarieties)
   }
+
 
   return (
     <Grid container spacing={2} direction="column">
@@ -119,22 +120,22 @@ export default function PricingAndInventory(props) {
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Shipping:</b> {!isNaN(variety.shipping) > 0 ? `$${variety.shipping.toFixed(2)}`: "NA"}
+                  <b>Shipping:</b> {(typeof variety.shipping === 'number') ? `$${variety.shipping.toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Secondary Shipping:</b> {(variety.shipping instanceof Number) && (variety.secondaryShipping instanceof Number) ? `$${variety.secondaryShipping.toFixed(2)}`: "NA"}
+                  <b>Secondary Shipping:</b> {(typeof variety.shipping === 'number') && (typeof variety.secondaryShipping === 'number') ? `$${variety.secondaryShipping.toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Delivery:</b> {!isNaN(variety.delivery) ? `$${(variety.deliveryFeeType == 'mile') ? `${variety.delivery.toFixed(2)}/mi` : variety.delivery.toFixed(2)}`: "NA"}
+                  <b>Delivery:</b> {(typeof variety.delivery === 'number') ? `$${(variety.deliveryFeeType == 'mile') ? `${variety.delivery.toFixed(2)}/mi` : variety.delivery.toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Secondary Delivery:</b> {(variety.delivery instanceof Number) && (variety.secondaryDelivery instanceof Number) ? `$${(variety.deliveryFeeType == 'mile') ? `${variety.secondaryDelivery.toFixed(2)}/mi` : variety.secondaryDelivery.toFixed(2)}`: "NA"}
+                  <b>Secondary Delivery:</b> {(typeof variety.delivery === 'number') && (typeof variety.secondaryDelivery === 'number') ? `$${(variety.deliveryFeeType == 'mile') ? `${variety.secondaryDelivery.toFixed(2)}/mi` : variety.secondaryDelivery.toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>
@@ -157,7 +158,7 @@ export default function PricingAndInventory(props) {
               label="Quantity"
               type="number"
               placeholder="0"
-              onChange={(e) => setQuantity(e.target.value)}
+              onChange={(e) => {setQuantity(Number(e.target.value))}}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -169,7 +170,7 @@ export default function PricingAndInventory(props) {
               id="price"
               label="Price"
               placeholder="$0.00"
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => {setPrice(Number(e.target.value))}}
               type="number"
               InputLabelProps={{
                 shrink: true,
@@ -183,7 +184,7 @@ export default function PricingAndInventory(props) {
                 id="shipping"
                 label="Shipping Cost"
                 placeholder="$0.00"
-                onChange={(e) => setShipping(e.target.value)}
+                onChange={(e) => {setShipping(Number(e.target.value))}}
                 type="number"
                 InputLabelProps={{
                   shrink: true,
@@ -199,7 +200,7 @@ export default function PricingAndInventory(props) {
                 id="secondary-shipping"
                 label="Secondary Shipping"
                 placeholder="$0.00"
-                onChange={(e) => setSecondaryShipping(e.target.value)}
+                onChange={(e) => {setSecondaryShipping(Number(e.target.value))}}
                 type="number"
                 InputLabelProps={{
                   shrink: true,
@@ -232,7 +233,7 @@ export default function PricingAndInventory(props) {
                 id="delivery"
                 label="Delivery Cost"
                 placeholder="$0.00"
-                onChange={(e) => setDelivery(e.target.value)}
+                onChange={(e) => {setDelivery(Number(e.target.value))}}
                 type="number"
                 InputLabelProps={{
                   shrink: true,
@@ -248,7 +249,7 @@ export default function PricingAndInventory(props) {
                 id="secondary-delivery"
                 label="Secondary Delivery"
                 placeholder="$0.00"
-                onChange={(e) => setSecondaryDelivery(e.target.value)}
+                onChange={(e) => {setSecondaryDelivery(Number(e.target.value))}}
                 type="number"
                 InputLabelProps={{
                   shrink: true,
