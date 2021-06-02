@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 export default function PricingAndInventory(props) {
   const classes = useStyles();
 
-  const [inventory, setInventory] = React.useState(props.inventory);
+  const [inventory, setInventory] = useState(props.inventory);
   const [varieties, setVarieties] = useState(props.varieties)
   const [price, setPrice] = useState(null)
   const [quantity, setQuantity] = useState('')
@@ -96,6 +96,7 @@ export default function PricingAndInventory(props) {
         </Typography>
         <TextField
           placeholder="0"
+          value={inventory}
           onChange={handleInventoryChange}
         />
       </Grid>

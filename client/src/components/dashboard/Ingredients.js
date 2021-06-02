@@ -63,20 +63,8 @@ export default function Ingredients({ ingredients, setIngredients }) {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([]);
   const [right, setRight] = React.useState(ingredients);
-  const [left, setLeft] = React.useState(['google', 'amazon', 'amazing', 'microsoft', 'netflix'].filter(
-    leftIngredient => !right.includes(leftIngredient)
-  ));
+  const [left, setLeft] = React.useState([]);
   const [newIngredient, setNewIngredient] = React.useState('');
-  /*const [allergens, setAllergens] = React.useState({
-    milk: false,
-    eggs: false,
-    wheat: false,
-    peanuts: false,
-    soybeans: false,
-    fish: false,
-    treenuts: false
-  });*/
-
 
   // wait for setRight to update then create ingredients
   useEffect(() => {
@@ -91,8 +79,6 @@ export default function Ingredients({ ingredients, setIngredients }) {
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
-
-    
 
     if (currentIndex === -1) {
       newChecked.push(value);
@@ -117,20 +103,20 @@ export default function Ingredients({ ingredients, setIngredients }) {
 
   const searchIngredients = (e) => {
     const searchText = e.target.value
-    const matched = left.filter(item => searchText.length > 0 && item.includes(searchText))
+    const matched = left.filter(item => searchText.length > 0 && item.name.includes(searchText))
     const notMatched = left.filter(item => !matched.includes(item))
     reorderList(matched, notMatched)
     handleChecked(matched)
 
     if(matched.length === 0) {
-      setNewIngredient(searchText)
+      setNewIngredient({name: searchText, allergen: false})
     } else {
       setNewIngredient('')
     }
   }
 
   const addIngredient = () => {
-    if (newIngredient.length > 0) {
+    if (newIngredient.name.length > 0) {
       const newLeft = [...left]
       newLeft.unshift(newIngredient)
       setLeft(newLeft)
@@ -180,20 +166,20 @@ export default function Ingredients({ ingredients, setIngredients }) {
       }
       <Divider />
       <List className={classes.list} dense component="div" role="list">
-        {items.map((value) => {
-          const labelId = `transfer-list-all-item-${value}-label`;
+        {items.map((item) => {
+          const labelId = `transfer-list-all-item-${item.name}-label`;
 
           return (
-            <ListItem key={value} role="listitem" button onClick={handleToggle(value, 3)}>
+            <ListItem key={item.name} role="listitem" button onClick={handleToggle(item, 3)}>
               <ListItemIcon>
                 <Checkbox
-                  checked={checked.indexOf(value) !== -1}
+                  checked={checked.indexOf(item) !== -1}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ 'aria-labelledby': labelId }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={value} />
+              <ListItemText id={labelId} primary={item.name} />
             </ListItem>
           );
         })}

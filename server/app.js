@@ -5,8 +5,9 @@ const express = require('express'),
   passport = require('passport')
   session = require('express-session')
   flash = require('connect-flash')
-  Sequelize = require('sequelize')
   app = express();
+
+const { Sequelize, Transaction } = require('sequelize')
 
 require('./config/passport')(passport)
 
@@ -18,6 +19,7 @@ var SequelizeStore = require("connect-session-sequelize")(session.Store);
 const sequelize = new Sequelize('database_development', 'root', 'root', {
   host: 'db',
   dialect: 'mysql',
+  //isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
   //logging: (...msg) => console.log(msg)
 });
 

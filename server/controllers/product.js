@@ -60,37 +60,63 @@ module.exports = class ProductController {
     async update (req, res, next) {
         try {
 
-            let ingredients = []
+            /*let ingredientsList = []
             req.body.product.ingredients.forEach((name) => {
-                ingredients.push({
+                ingredientsList.push({
                     name: name,
                     allergen: false
                 })
+            })*/
+
+            db.Product.update(req.body.product,
+                {
+                    where: {id: req.body.product.id},
+                }
+            );
+
+            let product = await db.Product.findByPk(req.body.product.id, 
+                {
+                    include: [db.Variety, db.Addon, db.Ingredient]
+                }
+            );
+
+            let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
+            await product.setVarieties(varieties.map(variety => variety.id))
+            db.Variety.destroy({
+                where: { ProductId: null }
             })
 
-            const product = await db.Product.findByPk(req.body.id);
-        
-            if (product === null) {
-                throw "Product not found!"
-            }
+            let addons = await this.upsertAssociation(product, db.Addon, req.body.product.addons)
+            await product.setAddons(addons.map(addon => addon.id))
 
-            product.name = req.body.product.name,
-            product.category = req.body.product.category,
-            product.processingTime = req.body.product.processingTime,
-            product.description = req.body.product.description,
-            product.automaticRenewal = req.body.product.automaticRenewal,
-            product.inventory = req.body.product.inventory,
-            product.personalizationPrompt = req.body.product.personalizationPrompt,
-            product.setVarieties(req.body.product.varieties)
-            product.setAddons(req.body.product.addons)
-            product.setIngredients(ingredients)
+            db.Addon.destroy({
+                where: { ProductId: null }
+            })
+
+            let ingredients = await this.upsertAssociation(product, db.Ingredient, req.body.product.ingredients, true)
+            await product.setIngredients(ingredients.map(ingredient => ingredient.id))
         
             await product.save();
-            
+
             return product
         }
         catch (err) {
             return next(err)
         }
+      }
+
+      async upsertAssociation(product, model, data, hasMany = false) {
+        let associatedInstances = await Promise.all(data.map(async values => {
+            const [instance, created] = await model.upsert(hasMany ? {...values} : {
+                ...values,
+                ProductId: product.id
+            }, {
+                include: hasMany ? [db.Product] : []
+            });
+
+            return instance
+        }))
+
+        return associatedInstances
       }
 }

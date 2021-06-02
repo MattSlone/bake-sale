@@ -11,10 +11,15 @@ import {
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
   GET_PRODUCTS_FAILURE,
-  SET_PRODUCT_EDIT
+  SET_PRODUCT_EDIT,
+  EDIT_PRODUCT_REQUEST,
+  EDIT_PRODUCT_SUCCESS,
+  EDIT_PRODUCT_FAILURE,
+  RESET_PRODUCT
 } from './productTypes'
 
 const initialState = {
+  id: 0,
   name: '',
   description: '',
   category: '',
@@ -86,8 +91,10 @@ const productReducer = (state = initialState, action) => {
       products: '',
       error: action.payload
     }
-    case SET_PRODUCT_EDIT: return {
+    case SET_PRODUCT_EDIT: 
+    return {
       ...state,
+      id: action.payload.id,
       name: action.payload.name,
       description: action.payload.description,
       category: action.payload.category,
@@ -98,6 +105,45 @@ const productReducer = (state = initialState, action) => {
       inventory: action.payload.inventory,
       addons: action.payload.addons,
       personalizationPrompt: action.payload.personalizationPrompt
+    }
+    case EDIT_PRODUCT_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case EDIT_PRODUCT_SUCCESS: return {
+      ...state,
+      id: action.payload.id,
+      name: action.payload.name,
+      description: action.payload.description,
+      category: action.payload.category,
+      processingTime: action.payload.processingTime,
+      automaticRenewal: action.payload.automaticRenewal,
+      ingredients: action.payload.Ingredients,
+      varieties: action.payload.Varieties,
+      addons: action.payload.Addons,
+      personalizationPrompt: action.payload.personalizationPrompt,
+      inventory: action.payload.inventory,
+      error: ''
+    }
+    case EDIT_PRODUCT_FAILURE: return {
+      ...state,
+      error: action.payload
+    }
+    case RESET_PRODUCT: return {
+      ...state,
+      id: 0,
+      name: '',
+      description: '',
+      category: '',
+      processingTime: 1,
+      automaticRenewal: true,
+      ingredients: [],
+      varieties: [],
+      addons: [],
+      personalizationPrompt: '',
+      inventory: 0,
+      imageFiles: [],
+      loading: false,
     }
     default: return state
   }

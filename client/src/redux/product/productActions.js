@@ -13,7 +13,11 @@ import {
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
   GET_PRODUCTS_FAILURE,
-  SET_PRODUCT_EDIT
+  EDIT_PRODUCT_REQUEST,
+  EDIT_PRODUCT_SUCCESS,
+  EDIT_PRODUCT_FAILURE,
+  SET_PRODUCT_EDIT,
+  RESET_PRODUCT
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
@@ -107,7 +111,6 @@ export const setProductEdit = (product) => {
 }
 
 export const createProduct = (formData) => {
-  console.log('createprod', formData)
   return async (dispatch) => {
     try {
       dispatch(createProductRequest)
@@ -140,6 +143,52 @@ export const getProducts = (formData) => {
       }
     } catch(error) {
       dispatch(getProductsFailure(error.message))
+    }
+  }
+}
+
+// EDIT
+export const editProductRequest = () => {
+  return {
+    type: EDIT_PRODUCT_REQUEST
+  }
+}
+
+export const editProductSuccess = (product) => {
+  return {
+    type: EDIT_PRODUCT_SUCCESS,
+    payload: product.success
+  }
+}
+
+export const editProductFailure = (error) => {
+  return {
+    type: EDIT_PRODUCT_FAILURE,
+    payload: error
+  }
+}
+
+export const resetProduct = () => {
+  return {
+    type: RESET_PRODUCT
+  }
+}
+
+export const editProduct = (formData) => {
+  console.log('before', formData)
+  return async (dispatch) => {
+    try {
+      dispatch(editProductRequest)
+      const res = await axios.post('/api/product/update', formData)
+      if(res.data.error[0]) {
+        dispatch(editProductFailure(res.data.error[0]))
+      }
+      else {
+        console.log(res.data)
+        dispatch(editProductSuccess(res.data))
+      }
+    } catch(error) {
+      dispatch(editProductFailure(error.message))
     }
   }
 }

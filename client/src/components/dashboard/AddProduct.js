@@ -67,12 +67,16 @@ export default function AddProduct(props) {
   useEffect(() => {
     if(match.path.includes('edit')) {
       let product = props.product.products.find(product => product.id == id)
+
       props.setProductEdit({
         ...product,
+        id: product.id,
         varieties: product.Varieties,
-        ingredients: product.Ingredients.map(ingredient => ingredient.name),
+        ingredients: product.Ingredients,
         addons: product.Addons
       })
+    } else {
+      props.resetProduct()
     }
   }, [])
 
