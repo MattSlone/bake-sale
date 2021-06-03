@@ -126,7 +126,7 @@ import {
           lat: action.payload.success.lat,
           lng: action.payload.success.lng
         },
-        pickupSchedule: action.payload.success.PickupSchedule,
+        pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
         created: true,
         error: ''
@@ -154,7 +154,7 @@ import {
           lat: action.payload.success.lat,
           lng: action.payload.success.lng
         },
-        pickupSchedule: action.payload.success.PickupSchedule,
+        pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
         created: true,
         error: ''
@@ -185,7 +185,7 @@ import {
           lat: action.payload.success.lat,
           lng: action.payload.success.lng
         },
-        pickupSchedule: action.payload.success.PickupSchedule,
+        pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
         created: true,
         error: ''

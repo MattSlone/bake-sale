@@ -79,17 +79,18 @@ export default function PickupAndDeliveryOptions(props) {
   const [pickupSchedule, setPickupSchedule] = useState(props.shop.pickupSchedule);
 
   const [pickupScheduleChecked, setPickupScheduleChecked] = useState({
-    Monday: false,
-    Tuesday: false,
-    Wednesday: false,
-    Thursday: false,
-    Friday: false,
-    Saturday: false,
-    Sunday: false
+    Monday: Boolean(pickupSchedule.find(day => day.day == 'Monday' && day.start !== day.end)),
+    Tuesday: Boolean(pickupSchedule.find(day => day.day == 'Tuesday' && day.start !== day.end)),
+    Wednesday: Boolean(pickupSchedule.find(day => day.day == 'Wednesday' && day.start !== day.end)),
+    Thursday: Boolean(pickupSchedule.find(day => day.day == 'Thursday' && day.start !== day.end)),
+    Friday: Boolean(pickupSchedule.find(day => day.day == 'Friday' && day.start !== day.end)),
+    Saturday: Boolean(pickupSchedule.find(day => day.day == 'Saturday' && day.start !== day.end)),
+    Sunday: Boolean(pickupSchedule.find(day => day.day == 'Sunday' && day.start !== day.end))
   })
 
   useEffect(() => {
     props.setPickupAddress({
+      ...props.shop.pickupAddress,
       street: street,
       city: city,
       state: 'FL',
@@ -104,6 +105,7 @@ export default function PickupAndDeliveryOptions(props) {
 
   useEffect(() => {
     props.setContact({
+      ...props.shop.contact,
       phone: phone,
       email: email
     })
@@ -119,7 +121,7 @@ export default function PickupAndDeliveryOptions(props) {
     } else {
       setContactType('none')
     }
-  })
+  }, [])
 
   const handlePickupScheduleCheckedChange = (event) => {
     setPickupScheduleChecked({ ...pickupScheduleChecked, [event.target.name]: event.target.checked});

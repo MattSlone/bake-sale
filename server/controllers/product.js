@@ -60,21 +60,13 @@ module.exports = class ProductController {
     async update (req, res, next) {
         try {
 
-            /*let ingredientsList = []
-            req.body.product.ingredients.forEach((name) => {
-                ingredientsList.push({
-                    name: name,
-                    allergen: false
-                })
-            })*/
-
-            db.Product.update(req.body.product,
+            let product = await db.Product.update(req.body.product,
                 {
                     where: {id: req.body.product.id},
                 }
             );
 
-            let product = await db.Product.findByPk(req.body.product.id, 
+            product = await db.Product.findByPk(req.body.product.id, 
                 {
                     include: [db.Variety, db.Addon, db.Ingredient]
                 }
@@ -82,21 +74,24 @@ module.exports = class ProductController {
 
             let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
             await product.setVarieties(varieties.map(variety => variety.id))
-            db.Variety.destroy({
+            await db.Variety.destroy({
                 where: { ProductId: null }
             })
 
             let addons = await this.upsertAssociation(product, db.Addon, req.body.product.addons)
             await product.setAddons(addons.map(addon => addon.id))
-
-            db.Addon.destroy({
+            await db.Addon.destroy({
                 where: { ProductId: null }
             })
 
             let ingredients = await this.upsertAssociation(product, db.Ingredient, req.body.product.ingredients, true)
             await product.setIngredients(ingredients.map(ingredient => ingredient.id))
-        
-            await product.save();
+
+            product = await db.Product.findByPk(req.body.product.id, 
+                {
+                    include: [db.Variety, db.Addon, db.Ingredient]
+                }
+            );
 
             return product
         }

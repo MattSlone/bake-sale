@@ -127,6 +127,9 @@ export default function CreateShop(props) {
     name: shopName,
     state: state,
     pickupAddress: props.shop.pickupAddress,
+    pickupSchedule: props.shop.pickupSchedule,
+    allowPickups: props.shop.allowPickups,
+    contact: props.shop.contact,
     area: props.shop.area,
     product: props.product,
     user: auth.userData.user.success.id

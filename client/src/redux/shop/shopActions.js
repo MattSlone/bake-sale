@@ -102,6 +102,7 @@ export const createShopFailure = (error) => {
 export const createShop = (formData) => {
   return async (dispatch) => {
     try {
+      console.log('before', formData)
       dispatch(createShopRequest)
       const res = await axios.post('/api/shop/create', formData)
       if(res.data.error[0]) {
