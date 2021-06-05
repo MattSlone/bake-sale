@@ -9,11 +9,12 @@ import SignUpContainer from './components/containers/SignUpContainer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
 import DashboardContainer from './components/containers/DashboardContainer'
-import ProductContainer from './components//containers/ProductContainer'
+import ProductContainer from './components/containers/ProductContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
+import AddCustomProduct from './components/dashboard/AddCustomProduct';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,10 +57,11 @@ export default function App() {
             <Switch>
               <Route path='/' exact component={HomeContainer} key='/'/>
               <Route path='/signin' component={SignInContainer} key='/signin'/>
-              <Route path='/signup' component={<Redirect to='/' />}/>
+              <Route path='/signup' component={HomeContainer}/>
               <Route path='/signout' component={HomeContainer} key='/'/>
               <Route path='/dashboard' component={DashboardContainer} key='/'/>
               <Route path='/products/:id' children={<ProductContainer />} />
+              <Route path='/custom' component={AddCustomProduct} />
             </Switch>
           </main>
         </div>
