@@ -1,21 +1,22 @@
-import React, { useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import StepContent from '@material-ui/core/StepContent';
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import AddProductImagesContainer from '../containers/AddProductImagesContainer';
-import { useRouteMatch, useParams } from "react-router-dom";
-import { setProductImagesPreview } from '../../redux';
-import FormGenerator from './FormGenerator';
+import React, { useEffect, useState } from 'react'
+import { makeStyles } from '@material-ui/core/styles'
+import Stepper from '@material-ui/core/Stepper'
+import Step from '@material-ui/core/Step'
+import StepLabel from '@material-ui/core/StepLabel'
+import StepContent from '@material-ui/core/StepContent'
+import Button from '@material-ui/core/Button'
+import Paper from '@material-ui/core/Paper'
+import Typography from '@material-ui/core/Typography'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import AddProductImagesContainer from '../containers/AddProductImagesContainer'
+import { useRouteMatch, useParams } from 'react-router-dom'
+// import { setProductImagesPreview } from '../../redux'
+import FormGeneratorContainer from '../containers/FormGeneratorContainer'
+import ListingDetailsContainer from '../containers/ListingDetailsContainer'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    maxWidth: '100%',
+    maxWidth: '100%'
   },
   desktop: {
     paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
@@ -29,65 +30,87 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
+    marginRight: theme.spacing(1)
   },
   actionsContainer: {
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   },
   resetContainer: {
-    padding: theme.spacing(3),
-  },
-}));
+    padding: theme.spacing(3)
+  }
+}))
 
-function getSteps() {
+function getSteps () {
   return ['Add product images',
-          'Listing details',
-          'Create Custom Form'
-        ];
+    'Listing details',
+    'Create Custom Form'
+  ]
 }
 
-export default function AddCustomProduct() {
-  const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const steps = getSteps();
+export default function AddCustomProduct (props) {
+  const classes = useStyles()
+  const [activeStep, setActiveStep] = React.useState(0)
+  const steps = getSteps()
   let { id } = useParams()
   const match = useRouteMatch()
+  const matches = useMediaQuery('(min-width:600px)')
+  const [product, setProduct] = useState(props.product.products.find(product => product.id === Number(id)))
+
+  useEffect(() => {
+    if (match.path.includes('edit')) {
+      props.setProductEdit({
+        ...product,
+        id: product.id
+      })
+    } else {
+      props.resetProduct()
+    }
+  }, [])
+
+  const formData = {
+    product: props.product,
+    shopId: props.shop.id
+  }
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
+  }
 
   const handleFinish = () => {
     handleNext()
-  };
+    if (match.path.includes('edit')) {
+      props.editProduct(formData)
+    } else {
+      props.createProduct(formData)
+    }
+  }
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  }
 
   const handleReset = () => {
-    setActiveStep(0);
-  };
-  const matches = useMediaQuery('(min-width:600px)');
+    setActiveStep(0)
+  }
 
   return (
     <div className={classes.root}>
-      <Stepper classes={matches ? {root: classes.desktop} : {root: classes.mobile}} activeStep={activeStep} orientation="vertical">
+      <Stepper classes={matches ? { root: classes.desktop } : { root: classes.mobile }} activeStep={activeStep} orientation='vertical'>
         {steps.map((label, index) => (
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-            {(() => {
-              switch (activeStep) {
-                case 0: return <AddProductImagesContainer />
-                case 1:
-                  return 'Listing Details and Information';
-                case 2:
-                  return <FormGenerator />;
-                default:
-                  return 'Unknown step';
-              }
-            })()}
+              {(() => {
+                switch (activeStep) {
+                  case 0: return <AddProductImagesContainer />
+                  case 1:
+                    return <ListingDetailsContainer />
+                  case 2:
+                    return <FormGeneratorContainer />
+                  default:
+                    return 'Unknown step'
+                }
+              })()}
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
@@ -99,17 +122,19 @@ export default function AddCustomProduct() {
                   </Button>
                   {(() => {
                     if (activeStep === steps.length - 1) {
-                      if(match.path.includes('shop/create')) {
+                      if (match.path.includes('shop/create')) {
                         return ''
                       } else {
-                        return <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleFinish}
-                        className={classes.button}
-                      >
-                        Finish
-                      </Button>
+                        return (
+                          <Button
+                            variant='contained'
+                            color='primary'
+                            onClick={handleFinish}
+                            className={classes.button}
+                          >
+                            Finish
+                          </Button>
+                        )
                       }
                     } else {
                       return <Button

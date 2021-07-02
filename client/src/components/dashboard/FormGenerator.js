@@ -31,9 +31,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function FormGenerator() {
+export default function FormGenerator(props) {
   const classes = useStyles();
-  const [fields, setFields] = useState([])
+  const [fields, setFields] = useState(props.fields)
   const [name, setName] = useState('')
   const [type, setType] = useState('')
   const [prompt, setPrompt] = useState('')
@@ -43,7 +43,10 @@ export default function FormGenerator() {
 
   useEffect(() => {
     console.log(fields)
+    props.setCustomForm(fields)
   }, [fields])
+
+  
 
   const handleCreateField = () => {
     let newFields = [...fields]
@@ -51,7 +54,7 @@ export default function FormGenerator() {
       name: name,
       type: type,
       prompt: prompt,
-      value: (type == 'multiselect') ? [] : '',
+      value: (type == 'multiselect') ? [] : (type == 'date') ? Date.now() : '',
       options: options,
       constraints: constraints
     })
@@ -139,6 +142,7 @@ export default function FormGenerator() {
                 <MenuItem value={'text'}>Text</MenuItem>
                 <MenuItem value={'paragraph'}>Paragraph</MenuItem>
                 <MenuItem value={'number'}>Number</MenuItem>
+                <MenuItem value={'date'}>Date</MenuItem>
                 <MenuItem value={'select'}>Select</MenuItem>
                 <MenuItem value={'multiselect'}>Select Multiple</MenuItem>
               </Select>

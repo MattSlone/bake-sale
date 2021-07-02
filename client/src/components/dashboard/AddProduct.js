@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -14,8 +14,9 @@ import IngredientsContainer from '../containers/IngredientsContainer'
 import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
 import Labeling from './Labeling'
 import AddonsContainer from '../containers/AddonsContainer'
+import AddCustomProductContainer from '../containers/AddCustomProductContainer'
 import PersonalizationContainer from '../containers/PersonalizationsContainer'
-import { useRouteMatch, useParams } from "react-router-dom";
+import { useRouteMatch, useParams, Redirect } from "react-router-dom";
 import { setProductImagesPreview } from '../../redux';
 import Personalization from './Personalization';
 
@@ -61,13 +62,19 @@ export default function AddProduct(props) {
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
   let { id } = useParams()
+  const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
+  
 
   const match = useRouteMatch()
 
+  if(match.path.includes('edit')) {
+    if(product.fields) {
+      return <AddCustomProductContainer />
+    }
+  }
+
   useEffect(() => {
     if(match.path.includes('edit')) {
-      let product = props.product.products.find(product => product.id == id)
-
       props.setProductEdit({
         ...product,
         id: product.id,
@@ -89,7 +96,10 @@ export default function AddProduct(props) {
   };
 
   const formData = {
-    product: props.product,
+    product: {
+      ...props.product,
+      fields: JSON.stringify(props.product.fields)
+    },
     shopId: props.shop.id
   }
 

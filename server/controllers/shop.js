@@ -26,6 +26,7 @@ module.exports = class ShopController {
               description: req.body.product.description,
               automaticRenewal: req.body.product.automaticRenewal,
               inventory: req.body.product.inventory,
+              fields: req.body.product.fields,
               personalizationPrompt: req.body.product.personalizationPrompt,
               Varieties: req.body.product.varieties,
               Addons: req.body.product.addons,

@@ -131,7 +131,10 @@ export default function CreateShop(props) {
     allowPickups: props.shop.allowPickups,
     contact: props.shop.contact,
     area: props.shop.area,
-    product: props.product,
+    product: {
+      ...props.product,
+      fields: JSON.stringify(props.product.fields)
+    },
     user: auth.userData.user.success.id
   }
 

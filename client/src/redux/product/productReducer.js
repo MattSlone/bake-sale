@@ -15,7 +15,8 @@ import {
   EDIT_PRODUCT_REQUEST,
   EDIT_PRODUCT_SUCCESS,
   EDIT_PRODUCT_FAILURE,
-  RESET_PRODUCT
+  RESET_PRODUCT,
+  SET_CUSTOM_FORM
 } from './productTypes'
 
 const initialState = {
@@ -32,18 +33,23 @@ const initialState = {
   inventory: 0,
   imageFiles: [],
   loading: false,
-  products: []
+  products: [],
+  fields: []
 }
 
 const productReducer = (state = initialState, action) => {
-  switch(action.type) {
+  switch (action.type) {
     case SET_PRODUCT_IMAGES_PREVIEW: return {
       ...state,
-      imageFiles: action.payload,
+      imageFiles: action.payload
     }
     case SET_INGREDIENTS: return {
       ...state,
-      ingredients: action.payload,
+      ingredients: action.payload
+    }
+    case SET_CUSTOM_FORM: return {
+      ...state,
+      fields: action.payload
     }
     case SET_LISTING_DETAILS: return {
       ...state,
@@ -56,7 +62,7 @@ const productReducer = (state = initialState, action) => {
     case SET_PRICING_INVENTORY: return {
       ...state,
       varieties: action.payload.varieties,
-      inventory: action.payload.inventory,
+      inventory: action.payload.inventory
     }
     case SET_ADDONS: return {
       ...state,
@@ -91,21 +97,22 @@ const productReducer = (state = initialState, action) => {
       products: '',
       error: action.payload
     }
-    case SET_PRODUCT_EDIT: 
-    return {
-      ...state,
-      id: action.payload.id,
-      name: action.payload.name,
-      description: action.payload.description,
-      category: action.payload.category,
-      processingTime: action.payload.processingTime,
-      automaticRenewal: action.payload.automaticRenewal,
-      ingredients: action.payload.ingredients,
-      varieties: action.payload.varieties,
-      inventory: action.payload.inventory,
-      addons: action.payload.addons,
-      personalizationPrompt: action.payload.personalizationPrompt
-    }
+    case SET_PRODUCT_EDIT:
+      return {
+        ...state,
+        id: action.payload.id,
+        name: action.payload.name,
+        description: action.payload.description,
+        category: action.payload.category,
+        processingTime: action.payload.processingTime,
+        automaticRenewal: action.payload.automaticRenewal,
+        ingredients: action.payload.ingredients,
+        varieties: action.payload.varieties,
+        inventory: action.payload.inventory,
+        addons: action.payload.addons,
+        fields: action.payload.fields,
+        personalizationPrompt: action.payload.personalizationPrompt
+      }
     case EDIT_PRODUCT_REQUEST: return {
       ...state,
       loading: true
@@ -140,10 +147,11 @@ const productReducer = (state = initialState, action) => {
       ingredients: [],
       varieties: [],
       addons: [],
+      fields: [],
       personalizationPrompt: '',
       inventory: 0,
       imageFiles: [],
-      loading: false,
+      loading: false
     }
     default: return state
   }

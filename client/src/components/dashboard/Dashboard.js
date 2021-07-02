@@ -17,6 +17,7 @@ import { Switch, Route, Redirect, useRouteMatch } from "react-router-dom";
 import CreateShopContainer from "../containers/CreateShopContainer"
 import ProductsContainer from "../containers/ProductsContainer"
 import AddProductContainer from '../containers/AddProductContainer';
+import AddCustomProductContainer from '../containers/AddCustomProductContainer';
 
 function Copyright() {
   return (
@@ -175,6 +176,9 @@ export default function Dashboard(props) {
       </Route>
       <Route path={`${match.path}/products/add`}>
         <AddProductContainer />
+      </Route>
+      <Route path={`${match.path}/products/add-custom`}>
+        <AddCustomProductContainer />
       </Route>
       <Route path={`${match.path}/products/:id/edit`}>
         <AddProductContainer />

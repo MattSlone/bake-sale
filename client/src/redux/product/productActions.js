@@ -17,7 +17,8 @@ import {
   EDIT_PRODUCT_SUCCESS,
   EDIT_PRODUCT_FAILURE,
   SET_PRODUCT_EDIT,
-  RESET_PRODUCT
+  RESET_PRODUCT,
+  SET_CUSTOM_FORM
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
@@ -31,6 +32,13 @@ export const setIngredients = (ingredients) => {
   return {
     type: SET_INGREDIENTS,
     payload: ingredients
+  }
+}
+
+export const setCustomForm = (fields) => {
+  return {
+    type: SET_CUSTOM_FORM,
+    payload: fields
   }
 }
 
@@ -90,9 +98,36 @@ export const getProductsRequest = () => {
 }
 
 export const getProductsSuccess = (products) => {
-  return {
-    type: GET_PRODUCTS_SUCCESS,
-    payload: products.success
+  try {
+    products.success = products.success.map(product => {
+      if (product.Form) {
+        return {
+          ...product,
+          fields: product.Form.Fields.map(field => {
+            return {
+              name: field.name,
+              type: field.type,
+              options: field.Options ? field.Options.map(option => option.name) : [],
+              constraints: field.Constraints
+                ? field.Constraints.map(constraint => {
+                    return { [constraint.name]: constraint.value }
+                  })
+                : [],
+              value: field.Value
+                ? field.Value.value
+                : (field.ParagraphValue ? field.ParagraphValue.value : '')
+            }
+          })
+        }
+      }
+      return product
+    })
+    return {
+      type: GET_PRODUCTS_SUCCESS,
+      payload: products.success
+    }
+  } catch (e) {
+    console.log(e)
   }
 }
 
@@ -111,18 +146,25 @@ export const setProductEdit = (product) => {
 }
 
 export const createProduct = (formData) => {
+  formData = {
+    ...formData,
+    product: {
+      ...formData.product,
+      fields: mapFields(formData.product.fields)
+    }
+  }
+  console.log('before', formData)
   return async (dispatch) => {
     try {
       dispatch(createProductRequest)
       const res = await axios.post('/api/product/create', formData)
-      if(res.data.error[0]) {
+      if (res.data.error[0]) {
         dispatch(createProductFailure(res.data.error[0]))
-      }
-      else {
+      } else {
         dispatch(createProductSuccess(res.data))
-        dispatch(getProducts({shop: formData.shopId}))
+        dispatch(getProducts({ shop: formData.shopId }))
       }
-    } catch(error) {
+    } catch (error) {
       dispatch(createProductFailure(error.message))
     }
   }
@@ -135,13 +177,12 @@ export const getProducts = (formData) => {
       const res = await axios.get('/api/products', {
         params: formData
       })
-      if(res.data.error[0]) {
+      if (res.data.error[0]) {
         dispatch(getProductsFailure(res.data.error[0]))
-      }
-      else {
+      } else {
         dispatch(getProductsSuccess(res.data))
       }
-    } catch(error) {
+    } catch (error) {
       dispatch(getProductsFailure(error.message))
     }
   }
@@ -175,20 +216,58 @@ export const resetProduct = () => {
 }
 
 export const editProduct = (formData) => {
-  console.log('before', formData)
+  formData = {
+    ...formData,
+    product: {
+      ...formData.product,
+      fields: mapFields(formData.product.fields)
+    }
+  }
+  console.log('before edit', formData)
   return async (dispatch) => {
     try {
       dispatch(editProductRequest)
       const res = await axios.post('/api/product/update', formData)
-      if(res.data.error[0]) {
+      if (res.data.error[0]) {
         dispatch(editProductFailure(res.data.error[0]))
-      }
-      else {
+      } else {
         console.log(res.data)
         dispatch(editProductSuccess(res.data))
       }
-    } catch(error) {
+    } catch (error) {
       dispatch(editProductFailure(error.message))
     }
   }
+}
+
+const mapFields = (fields) => {
+  fields.map((field) => {
+    let mappedField = {
+      name: field.name,
+      prompt: field.prompt,
+      type: field.type,
+      Options: field.options.map(option => {
+        return { name: option }
+      }),
+      Constraints: Object.entries(field.constraints).map((key, value) => {
+        return {
+          name: key,
+          value: value
+        }
+      }),
+      Value: { value: field.value }
+    }
+
+    if (mappedField.type === 'paragraph') {
+      mappedField = {
+        ...mappedField,
+        ParagraphValue: mappedField.Value
+      }
+
+      delete mappedField.Value
+    }
+
+    return mappedField
+  })
+  return fields
 }

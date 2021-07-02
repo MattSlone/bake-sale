@@ -60,9 +60,31 @@ export default function Products(props) {
     history.push('/dashboard/products/add')
   }
 
+  const handleAddCustomProduct = () => {
+    history.push('/dashboard/products/add-custom')
+  }
+
   return (
     <Container spacing={2} className={classes.cardGrid} maxWidth="lg">
       <Grid container spacing={4}>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className={classes.card} onClick={handleAddProduct}>
+            <CardMedia
+              className={classes.cardMediaAdd}
+              image="/assets/images/add-icon.png"
+              title="Image title"
+            />
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className={classes.card} onClick={handleAddCustomProduct}>
+            <CardMedia
+              className={classes.cardMediaAdd}
+              image="/assets/images/add-custom.png"
+              title="Image title"
+            />
+          </Card>
+        </Grid>
         {products.map((product) => (
           <Grid item key={product.id} xs={12} sm={6} md={4}>
             <Card className={classes.card}>
@@ -95,15 +117,6 @@ export default function Products(props) {
             </Card>
           </Grid>
         ))}
-        <Grid item key={products[products.length - 1].id} xs={12} sm={6} md={4}>
-          <Card className={classes.card} onClick={handleAddProduct}>
-            <CardMedia
-              className={classes.cardMediaAdd}
-              image="/assets/images/add-icon.png"
-              title="Image title"
-            />
-          </Card>
-        </Grid>
       </Grid>
     </Container>
   );

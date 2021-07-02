@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         this.Ingredient = this.belongsToMany(models.Ingredient, { through: "product_ingredient" })
         this.Variety = this.hasMany(models.Variety)
         this.Addon = this.hasMany(models.Addon)
+        this.Form = this.hasOne(models.Form)
     }
   };
   Product.init({

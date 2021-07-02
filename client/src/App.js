@@ -61,7 +61,6 @@ export default function App() {
               <Route path='/signout' component={HomeContainer} key='/'/>
               <Route path='/dashboard' component={DashboardContainer} key='/'/>
               <Route path='/products/:id' children={<ProductContainer />} />
-              <Route path='/custom' component={AddCustomProduct} />
             </Switch>
           </main>
         </div>

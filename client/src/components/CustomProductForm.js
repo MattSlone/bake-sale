@@ -14,6 +14,12 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -168,6 +174,37 @@ export default function CustomProductForm({fields, setFields}) {
             </Grid>
           </Card>
         )
+        case 'date':
+          return (
+            <Card className={classes.card}>
+              <CardContent className={classes.cardContent}>
+                <Typography gutterBottom>
+                  {field.prompt}
+                </Typography>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  margin="normal"
+                  label={field.name}
+                  format="MM/dd/yyyy"
+                  value={field.value}
+                  onChange={(e, newValue) => handleValueChange(newValue, index)}
+                  KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                  }}
+                />
+                </MuiPickersUtilsProvider>
+              </CardContent>
+              <Grid container justify="flex-end">
+                <IconButton
+                  edge="start" 
+                  aria-label="delete"
+                  onClick={() => {handleDeleteField(index)}}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Grid>
+            </Card>
+          )
       default: 
         return
     }

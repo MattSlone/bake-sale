@@ -6,14 +6,6 @@ module.exports = class ProductController {
     async create (req, res, next) {
         try {
 
-            let ingredients = []
-            req.body.product.ingredients.forEach((name) => {
-                ingredients.push({
-                    name: name,
-                    allergen: false
-                })
-            })
-
             const product = await db.Product.create({
                 name: req.body.product.name,
                 category: req.body.product.category,
@@ -24,13 +16,31 @@ module.exports = class ProductController {
                 personalizationPrompt: req.body.product.personalizationPrompt,
                 Varieties: req.body.product.varieties,
                 Addons: req.body.product.addons,
-                Ingredients: ingredients,
-                ShopId: req.body.shopId
+                Ingredients: req.body.product.ingredients,
+                ShopId: req.body.shopId,
+                Form: {
+                    name: req.body.product.name,
+                    Fields: req.body.product.fields
+                },
               }, {
                 include: [
                     db.Ingredient,
                     db.Variety,
-                    db.Addon
+                    db.Addon,
+                    {
+                        association: db.Product.Form,
+                        include: [ 
+                            {
+                                association: db.Form.Field,
+                                include: [ 
+                                    db.Option,
+                                    db.Constraint,
+                                    db.Value,
+                                    db.ParagraphValue
+                                ]
+                            }
+                        ]
+                    }
                 ]
               });
 
@@ -47,7 +57,25 @@ module.exports = class ProductController {
                 where: {
                     ShopId: req.query.shop
                 },
-                include: [db.Variety, db.Addon, db.Ingredient]
+                include: [
+                    db.Ingredient,
+                    db.Variety,
+                    db.Addon,
+                    {
+                        association: db.Product.Form,
+                        include: [ 
+                            {
+                                association: db.Form.Field,
+                                include: [ 
+                                    db.Option,
+                                    db.Constraint,
+                                    db.Value,
+                                    db.ParagraphValue
+                                ]
+                            }
+                        ]
+                    }
+                ]
             });
             
             return products
