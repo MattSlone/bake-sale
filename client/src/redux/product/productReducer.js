@@ -21,6 +21,7 @@ import {
 
 const initialState = {
   id: 0,
+  custom: false,
   name: '',
   description: '',
   category: '',
@@ -101,6 +102,7 @@ const productReducer = (state = initialState, action) => {
       return {
         ...state,
         id: action.payload.id,
+        custom: action.payload.custom,
         name: action.payload.name,
         description: action.payload.description,
         category: action.payload.category,
@@ -120,6 +122,7 @@ const productReducer = (state = initialState, action) => {
     case EDIT_PRODUCT_SUCCESS: return {
       ...state,
       id: action.payload.id,
+      custom: action.payload.custom,
       name: action.payload.name,
       description: action.payload.description,
       category: action.payload.category,
@@ -139,6 +142,7 @@ const productReducer = (state = initialState, action) => {
     case RESET_PRODUCT: return {
       ...state,
       id: 0,
+      custom: action.payload.custom,
       name: '',
       description: '',
       category: '',

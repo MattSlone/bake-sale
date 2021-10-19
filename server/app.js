@@ -44,6 +44,14 @@ const sequelize = new Sequelize('database_development', 'root', 'root', {
 var myStore = new SequelizeStore({
   db: sequelize,
 });
+
+sequelize.define("Session", {
+  sid: {
+    type: Sequelize.STRING,
+    primaryKey: true,
+  }
+});
+
 app.use(
   session({
     secret: "keyboard cat",

@@ -209,9 +209,10 @@ export const editProductFailure = (error) => {
   }
 }
 
-export const resetProduct = () => {
+export const resetProduct = (custom = false) => {
   return {
-    type: RESET_PRODUCT
+    type: RESET_PRODUCT,
+    payload: custom
   }
 }
 

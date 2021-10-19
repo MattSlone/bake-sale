@@ -225,7 +225,7 @@ export default function FormGenerator(props) {
         </Grid>
       </Grid>
       <Grid item xs={12} md={6}>
-        <CustomProductForm setFields={setFields} fields={fields} />
+        <CustomProductForm setFields={setFields} fields={fields} title="Form Preview" />
       </Grid>
     </Grid>
   );

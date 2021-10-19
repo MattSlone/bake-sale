@@ -12,6 +12,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: database_development
       MYSQL_PASSWORD: root
+    cap_add:
+      - SYS_NICE
   client:
     container_name: client
     build: ./client

@@ -9,6 +9,7 @@ module.exports = class ProductController {
             const product = await db.Product.create({
                 name: req.body.product.name,
                 category: req.body.product.category,
+                custom: req.body.product.custom,
                 processingTime: req.body.product.processingTime,
                 description: req.body.product.description,
                 automaticRenewal: req.body.product.automaticRenewal,

@@ -60,15 +60,19 @@ export default function AddCustomProduct (props) {
     if (match.path.includes('edit')) {
       props.setProductEdit({
         ...product,
-        id: product.id
+        id: product.id,
+        custom: true
       })
     } else {
-      props.resetProduct()
+      props.resetProduct(true)
     }
   }, [])
 
   const formData = {
-    product: props.product,
+    product: {
+      ...props.product,
+      custom: true
+    },
     shopId: props.shop.id
   }
 

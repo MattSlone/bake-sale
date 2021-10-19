@@ -14,6 +14,9 @@ module.exports = {
       category: {
         type: Sequelize.STRING
       },
+      custom: {
+        type: Sequelize.BOOLEAN
+      },
       fields: {
         type: Sequelize.STRING
       },

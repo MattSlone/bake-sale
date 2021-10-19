@@ -5,7 +5,6 @@ const db = require('../models/index')
 module.exports = class ShopController {
   async create (req, res, next) {
     try {
-
       const shop = await db.Shop.create({
           name: req.body.name,
           state: req.body.state,

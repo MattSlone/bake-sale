@@ -1,20 +1,14 @@
 import React from 'react';
-import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import Link from '@material-ui/core/Link';
-import ProTip from './ProTip';
 import Drawer from './components/Drawer'
-import SignUpContainer from './components/containers/SignUpContainer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
 import DashboardContainer from './components/containers/DashboardContainer'
 import ProductContainer from './components/containers/ProductContainer'
+import CustomProductContainer from './components/containers/CustomProductContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
-import AddCustomProduct from './components/dashboard/AddCustomProduct';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,6 +54,7 @@ export default function App() {
               <Route path='/signup' component={HomeContainer}/>
               <Route path='/signout' component={HomeContainer} key='/'/>
               <Route path='/dashboard' component={DashboardContainer} key='/'/>
+              <Route path='/products/custom/:id' children={<CustomProductContainer />} />
               <Route path='/products/:id' children={<ProductContainer />} />
             </Switch>
           </main>

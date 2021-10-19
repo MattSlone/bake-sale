@@ -160,7 +160,6 @@ import {
         error: ''
       }
       case GET_SHOP_FAILURE: return {
-        shop: '',
         error: action.payload
       }
       case GET_SHOP_FAILURE_NOT_FOUND: return {

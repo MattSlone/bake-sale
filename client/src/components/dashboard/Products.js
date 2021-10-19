@@ -103,7 +103,7 @@ export default function Products(props) {
                 </Typography>
               </CardContent>
               <CardActions>
-                <RouterLink to={`/products/${product.id}`}>
+                <RouterLink to={product.custom ? `/products/custom/${product.id}` : `/products/${product.id}`}>
                   <Button size="small" color="primary">
                     View
                   </Button>

@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   Product.init({
     name: DataTypes.STRING,
     category: DataTypes.STRING,
+    custom: DataTypes.BOOLEAN,
     description: DataTypes.TEXT,
     processingTime: DataTypes.INTEGER,
     automaticRenewal: DataTypes.BOOLEAN,

@@ -56,6 +56,12 @@ export default function MainListItems() {
       </ListItem>
       <ListItem button>
         <ListItemIcon>
+          <ShoppingCartIcon />
+        </ListItemIcon>
+        <ListItemText primary="Quotes Requests" />
+      </ListItem>
+      <ListItem button>
+        <ListItemIcon>
           <PeopleIcon />
         </ListItemIcon>
         <ListItemText primary="Customers" />

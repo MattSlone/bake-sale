@@ -78,7 +78,7 @@ export default function Home({ userData }) {
       for home chefs. All that's left to do is order what looks good!
     </Typography>
     <div className={classes.heroButtons}>
-      <Grid container spacing={2} justify="center">
+      <Grid container spacing={2} justifyContent="center">
         <Grid item>
           <RouterLink to='/signin' className={classes.routerLinkButton}>
               <Button variant="contained" color="primary">

@@ -13,7 +13,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     createProduct: (formData) => dispatch(createProduct(formData)),
-    resetProduct: () => dispatch(resetProduct()),
+    resetProduct: (custom) => dispatch(resetProduct(custom)),
     editProduct: (product) => dispatch(editProduct(product)),
     setProductEdit: (product) => dispatch(setProductEdit(product)),
   }

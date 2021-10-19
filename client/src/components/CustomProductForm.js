@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, React } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { CardContent, TextField, Typography } from '@material-ui/core';
@@ -14,12 +14,10 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import { useRouteMatch } from "react-router-dom";
+
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -40,6 +38,12 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
     paddingTop: theme.spacing(3),
     minHeight: 400,
+  },
+  noshadow: {
+    boxShadow: 'none'
+  },
+  nopadding: {
+    padding: 0
   }
 }));
 
@@ -47,8 +51,9 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-export default function CustomProductForm({fields, setFields}) {
+export default function CustomProductForm({fields, setFields = null, title, noshadow, }) {
   const classes = useStyles();
+  const [formTitle, setFormTitle] = useState(title)
 
   const handleValueChange = (newValue, index) => {
     console.log(newValue)
@@ -62,14 +67,17 @@ export default function CustomProductForm({fields, setFields}) {
     setFields(newFields)
   }
 
+  const match = useRouteMatch()
+
+
   const renderField = (field, index) => {
     switch(field.type) {
       case 'text':
       case 'number':
       case 'paragraph':
         return (
-          <Card className={classes.card}>
-            <CardContent className={classes.cardContent}>
+          <Card className={noshadow ? `${classes.noshadow} ${classes.card}` : classes.card}>
+            <CardContent className={noshadow ? `${classes.nopadding} ${classes.cardContent}` : classes.cardContent}>
               <Typography gutterBottom>
                 {field.prompt}
               </Typography>
@@ -88,15 +96,17 @@ export default function CustomProductForm({fields, setFields}) {
                 onChange={(e) => handleValueChange(e.target.value, index)}
               />
             </CardContent>
-            <Grid container justify="flex-end">
-              <IconButton
-                edge="start" 
-                aria-label="delete"
-                onClick={() => {handleDeleteField(index)}}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Grid>
+            {formTitle === 'Form Preview' ? (
+              <Grid container justifyContent="flex-end">
+                <IconButton
+                  edge="start" 
+                  aria-label="delete"
+                  onClick={() => {handleDeleteField(index)}}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Grid>
+            ) : ''}
           </Card>
         )
       case 'select':
@@ -120,7 +130,7 @@ export default function CustomProductForm({fields, setFields}) {
                 </Select>
               </FormControl>
             </CardContent>
-            <Grid container justify="flex-end">
+            <Grid container justifyContent="flex-end">
               <IconButton
                 edge="start" 
                 aria-label="delete"
@@ -163,7 +173,7 @@ export default function CustomProductForm({fields, setFields}) {
                 )}
               />
             </CardContent>
-            <Grid container justify="flex-end">
+            <Grid container justifyContent="flex-end">
               <IconButton
                 edge="start" 
                 aria-label="delete"
@@ -194,7 +204,7 @@ export default function CustomProductForm({fields, setFields}) {
                 />
                 </MuiPickersUtilsProvider>
               </CardContent>
-              <Grid container justify="flex-end">
+              <Grid container justifyContent="flex-end">
                 <IconButton
                   edge="start" 
                   aria-label="delete"
@@ -211,9 +221,9 @@ export default function CustomProductForm({fields, setFields}) {
   }
 
   return (
-    <Paper className={classes.paper}>
+    <Paper className={noshadow ? `${classes.paper} ${classes.noshadow}` : classes.paper}>
       <Typography gutterBottom variant="h4">
-        Form Preview
+        {formTitle}
       </Typography>
       <Grid spacing={2} container direction="column">
       {fields.map((field, index) => {

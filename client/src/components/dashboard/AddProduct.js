@@ -78,6 +78,7 @@ export default function AddProduct(props) {
       props.setProductEdit({
         ...product,
         id: product.id,
+        custom: false,
         varieties: product.Varieties,
         ingredients: product.Ingredients,
         addons: product.Addons
