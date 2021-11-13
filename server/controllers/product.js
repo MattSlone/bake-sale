@@ -20,7 +20,7 @@ module.exports = class ProductController {
                 Ingredients: req.body.product.ingredients,
                 ShopId: req.body.shopId,
                 Form: {
-                    name: req.body.product.name,
+                    name: req.body.product.formName,
                     Fields: req.body.product.fields
                 },
               }, {
@@ -78,7 +78,6 @@ module.exports = class ProductController {
                     }
                 ]
             });
-            
             return products
         }
         catch(err) {

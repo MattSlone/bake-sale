@@ -57,14 +57,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-
-
 export default function CustomProduct(props)
 {
   const classes = useStyles()
   let { id } = useParams()
   const auth = useAuth()
   const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
+  const [quote, setQuote] = useState(props.quote.quotes.find(quote => quote.ProductId == id))
   const [fields, setFields] = useState(props.fields)
 
   useEffect(() => {
@@ -77,7 +76,9 @@ export default function CustomProduct(props)
 
   const handleRequestQuote = () => {
     props.requestQuote({
-      product: product
+      ...quote,
+      productId: product.id,
+      status: 'requested'
     })
   }
 
@@ -139,7 +140,7 @@ export default function CustomProduct(props)
               color="primary"
               onClick={handleRequestQuote}
               >
-                Request a Quote
+                {(quote.status == 'requested') ? "Requested!" : "Request a Quote"}
               </Button>
             </Grid>
           </Grid>

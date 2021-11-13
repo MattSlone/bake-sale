@@ -79,6 +79,7 @@ require('./routes/user')(app, passport)
 require('./routes/shop')(app)
 require('./routes/product')(app)
 require('./routes/ingredient')(app)
+require('./routes/quote')(app)
 
 
 // Default response for any other request

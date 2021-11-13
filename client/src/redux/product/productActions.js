@@ -224,7 +224,6 @@ export const editProduct = (formData) => {
       fields: mapFields(formData.product.fields)
     }
   }
-  console.log('before edit', formData)
   return async (dispatch) => {
     try {
       dispatch(editProductRequest)

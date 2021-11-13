@@ -5,7 +5,8 @@ import { requestQuote, getShop, setCustomForm } from '../../redux'
 const mapStateToProps = state => {
   return {
     shop: state.shop,
-    product: state.product
+    product: state.product,
+    quote: state.quote,
   }
 }
 
