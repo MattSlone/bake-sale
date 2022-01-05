@@ -5,12 +5,15 @@ const db = require('../models/index')
 module.exports = class QuoteController {
     async create (req, res, next) {
         try {
+
           const quote = await db.Quote.create({
             status: req.body.status,
             ProductId: req.body.productId,
+            Values: req.body.values
           }, {
             include: [
-              db.Product
+              db.Product,
+              db.Value
             ]
           })
           return quote

@@ -70,8 +70,13 @@ module.exports = class ProductController {
                                 include: [ 
                                     db.Option,
                                     db.Constraint,
-                                    db.Value,
-                                    db.ParagraphValue
+                                    db.ParagraphValue,
+                                    {
+                                        association: db.Field.Value,
+                                        include: [
+                                            db.Quote
+                                        ]
+                                    }
                                 ]
                             }
                         ]

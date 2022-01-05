@@ -11,8 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Form)
-      this.Value = this.hasOne(models.Value)
-      this.ParagraphValue = this.hasOne(models.ParagraphValue)
+      this.Value = this.hasMany(models.Value)
+      this.ParagraphValue = this.hasMany(models.ParagraphValue)
       this.Option = this.hasMany(models.Option)
       this.Constraint = this.hasMany(models.Constraint)
     }
