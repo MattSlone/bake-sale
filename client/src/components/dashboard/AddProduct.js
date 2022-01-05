@@ -68,6 +68,7 @@ export default function AddProduct(props) {
   const match = useRouteMatch()
 
   if(match.path.includes('edit')) {
+    console.log(product.fields)
     if(product.fields) {
       return <AddCustomProductContainer />
     }
@@ -75,6 +76,9 @@ export default function AddProduct(props) {
 
   useEffect(() => {
     if(match.path.includes('edit')) {
+      if(product.fields) {
+        return <AddCustomProductContainer />
+      }
       props.setProductEdit({
         ...product,
         id: product.id,

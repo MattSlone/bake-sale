@@ -8,13 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import CustomProductForm from './CustomProductForm';
-import Checkbox from '@material-ui/core/Checkbox';
 import { TextField, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,7 +58,7 @@ export default function CustomProduct(props)
   const auth = useAuth()
   const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
   const [quote, setQuote] = useState(props.quote.quotes.find(quote => quote.ProductId == id))
-  const [fields, setFields] = useState(props.fields)
+  const [fields, setFields] = useState(product.fields)
 
   useEffect(() => {
     props.setCustomForm(fields)
@@ -78,8 +72,19 @@ export default function CustomProduct(props)
     props.requestQuote({
       ...quote,
       productId: product.id,
-      status: 'requested'
+      status: 'requested',
+      values: mapValuesToFields()
     })
+  }
+
+  const mapValuesToFields = () => {
+    const values = fields.map(field => {
+      return {
+        FieldId: field.id,
+        value: field.value
+      }
+    })
+    return values
   }
 
   var items = [
@@ -140,7 +145,7 @@ export default function CustomProduct(props)
               color="primary"
               onClick={handleRequestQuote}
               >
-                {(quote.status == 'requested') ? "Requested!" : "Request a Quote"}
+                {(quote && quote.status == 'requested') ? "Requested!" : "Request a Quote"}
               </Button>
             </Grid>
           </Grid>

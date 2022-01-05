@@ -105,6 +105,7 @@ export const getProductsSuccess = (products) => {
           ...product,
           fields: product.Form.Fields.map(field => {
             return {
+              id: field.id,
               name: field.name,
               type: field.type,
               options: field.Options ? field.Options.map(option => option.name) : [],
