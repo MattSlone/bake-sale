@@ -53,11 +53,17 @@ module.exports = class ProductController {
     }
 
     async list(req, res, next) {
+        let where = {}
+        if (req.query.shop) {
+            where.ShopId = req.query.shop
+        }
+        if(req.query.products) {
+            where.id = [req.query.products]
+        }
+
         try {
             const products = db.Product.findAll({
-                where: {
-                    ShopId: req.query.shop
-                },
+                where: where,
                 include: [
                     db.Ingredient,
                     db.Variety,

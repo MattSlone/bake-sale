@@ -102,7 +102,6 @@ export const createShopFailure = (error) => {
 export const createShop = (formData) => {
   return async (dispatch) => {
     try {
-      console.log('before', formData)
       dispatch(createShopRequest)
       const res = await axios.post('/api/shop/create', formData)
       if(res.data.error[0]) {
@@ -110,7 +109,6 @@ export const createShop = (formData) => {
       }
       else {
         dispatch(createShopSuccess(res.data))
-        dispatch(getProducts({shop: res.data.success.id}))
       }
     } catch(error) {
       dispatch(createShopFailure(error.message))
@@ -198,7 +196,6 @@ export const getShop = (formData) => {
       }
       else {
         dispatch(getShopSuccess(res.data))
-        dispatch(getProducts({shop: res.data.success.id}))
       }
     } catch(error) {
       dispatch(getShopFailure(error.message))

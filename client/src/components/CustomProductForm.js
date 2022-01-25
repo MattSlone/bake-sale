@@ -1,4 +1,4 @@
-import { useState, React } from 'react';
+import { useState, useEffect, React } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { CardContent, TextField, Typography } from '@material-ui/core';
@@ -56,7 +56,6 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
   const [formTitle, setFormTitle] = useState(title)
 
   const handleValueChange = (newValue, index) => {
-    console.log(newValue)
     let newFields = [...fields]
     newFields[index].value = newValue
     setFields(newFields)
