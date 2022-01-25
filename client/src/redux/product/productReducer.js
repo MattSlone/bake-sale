@@ -91,6 +91,7 @@ const productReducer = (state = initialState, action) => {
     }
     case GET_PRODUCTS_SUCCESS: return {
       ...state,
+      loading: false,
       products: action.payload,
       error: ''
     }

@@ -2,8 +2,10 @@ import React from 'react';
 import Drawer from './components/Drawer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
+import SignUpContainer from './components/containers/SignUpContainer'
 import DashboardContainer from './components/containers/DashboardContainer'
 import ProductContainer from './components/containers/ProductContainer'
+import ShopContainer from './components/containers/ShopContainer'
 import CustomProductContainer from './components/containers/CustomProductContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
@@ -51,11 +53,12 @@ export default function App() {
             <Switch>
               <Route path='/' exact component={HomeContainer} key='/'/>
               <Route path='/signin' component={SignInContainer} key='/signin'/>
-              <Route path='/signup' component={HomeContainer}/>
+              <Route path='/signup' component={SignUpContainer}/>
               <Route path='/signout' component={HomeContainer} key='/'/>
               <Route path='/dashboard' component={DashboardContainer} key='/'/>
               <Route path='/products/custom/:id' children={<CustomProductContainer />} />
               <Route path='/products/:id' children={<ProductContainer />} />
+              <Route path='/shop/:id' children={<ShopContainer />} />
             </Switch>
           </main>
         </div>

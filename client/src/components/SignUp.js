@@ -58,7 +58,7 @@ export default function SignUp({ userSignUp, userData }) {
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [seller, setSeller] = useState('')
+  const [seller, setSeller] = useState(0)
 
   /*useEffect(() => {
     userSignUp()
@@ -151,7 +151,7 @@ export default function SignUp({ userSignUp, userData }) {
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel
-                control={<Checkbox value={true} onChange={e => setSeller(e.target.value)} color="primary" />}
+                control={<Checkbox value={1} onChange={e => setSeller(e.target.value)} color="primary" />}
                 label="Seller account"
               />
             </Grid>

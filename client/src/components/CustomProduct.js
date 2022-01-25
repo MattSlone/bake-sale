@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState, useEffect, useRef } from 'react';
 import Carousel from 'react-material-ui-carousel'
 import { useParams } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles';
@@ -56,17 +56,21 @@ export default function CustomProduct(props)
   const classes = useStyles()
   let { id } = useParams()
   const auth = useAuth()
-  const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
   const [quote, setQuote] = useState(props.quote.quotes.find(quote => quote.ProductId == id))
-  const [fields, setFields] = useState(product.fields)
+  const [fields, setFields] = useState([])
+  const [product, setProduct] = useState('')
 
   useEffect(() => {
-    props.setCustomForm(fields)
-  }, [fields])
-
-  useEffect(() => {
-    props.getShop({id: product.ShopId})
+    props.getProducts({products: [id]})
   }, [])
+
+  useEffect(() => {
+    let tempProduct = props.product.products.find(product => product.id == id)
+    if (tempProduct) {
+      setProduct(tempProduct)
+      setFields(tempProduct.fields)
+    }
+  }, [props.product.loading])
 
   const handleRequestQuote = () => {
     props.requestQuote({
@@ -152,7 +156,7 @@ export default function CustomProduct(props)
         </Grid>
       </Grid>
       <Grid>
-        <CustomProductForm fields={product.fields} setFields={setFields} title="Questions" noshadow />
+        <CustomProductForm fields={fields} setFields={setFields} title="Questions" noshadow />
       </Grid>
       
     </Paper>

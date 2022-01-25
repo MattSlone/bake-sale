@@ -154,10 +154,9 @@ export const createProduct = (formData) => {
       fields: mapFields(formData.product.fields)
     }
   }
-  console.log('before', formData)
   return async (dispatch) => {
     try {
-      dispatch(createProductRequest)
+      dispatch(createProductRequest())
       const res = await axios.post('/api/product/create', formData)
       if (res.data.error[0]) {
         dispatch(createProductFailure(res.data.error[0]))
@@ -174,7 +173,7 @@ export const createProduct = (formData) => {
 export const getProducts = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(getProductsRequest)
+      dispatch(getProductsRequest())
       const res = await axios.get('/api/products', {
         params: formData
       })
@@ -227,7 +226,7 @@ export const editProduct = (formData) => {
   }
   return async (dispatch) => {
     try {
-      dispatch(editProductRequest)
+      dispatch(editProductRequest())
       const res = await axios.post('/api/product/update', formData)
       if (res.data.error[0]) {
         dispatch(editProductFailure(res.data.error[0]))

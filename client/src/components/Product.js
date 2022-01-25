@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState, useEffect, useRef, useLayoutEffect } from 'react';
 import Carousel from 'react-material-ui-carousel'
 import { useParams } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles';
@@ -72,27 +72,41 @@ export default function Product(props)
   const classes = useStyles()
   let { id } = useParams()
   const auth = useAuth()
-  const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
+  const [product, setProduct] = useState('')
   const [shop, setShop] = useState(props.shop)
-  const [variation, setVariation] = useState(product.Varieties[0].quantity)
+  const [variation, setVariation] = useState('')
   const [personalization, setPersonalization] = useState('')
   const [fulfillment, setFulfillment] = useState('')
-  const [price, setPrice] = useState(Number.parseFloat(product.Varieties[0].price).toFixed(2))
-  const [addonsChecked, setAddonsChecked] = useState(Object.fromEntries(
-    product.Addons.map(addon => [addon.name, false])
-  ));
+  const [price, setPrice] = useState(0)
+  const [addonsChecked, setAddonsChecked] = useState([]);
+
+  useEffect(() => {
+    props.getProducts({products: [id]})
+  }, [id])
+
+  useEffect(() => {
+    let tempProduct = props.product.products.find(product => product.id == id)
+    console.log('temProduct: ', tempProduct)
+    if (tempProduct) {
+      setProduct(tempProduct)
+      props.getShop({id: tempProduct.ShopId})
+      setVariation(tempProduct.Varieties[0].quantity)
+      setPrice(Number.parseFloat(tempProduct.Varieties[0].price).toFixed(2))
+      setAddonsChecked(Object.fromEntries(
+        tempProduct.Addons.map(addon => [addon.name, false])
+      ))
+    }
+  }, [props.product.loading])
 
   const handleAddonCheckChange = (event) => {
     setAddonsChecked({ ...addonsChecked, [event.target.name]: event.target.checked });
   };
 
   useEffect(() => {
-    handleSetPrice()
-  }, [variation, fulfillment, addonsChecked])
-
-  useEffect(() => {
-    props.getShop({id: product.ShopId})
-  }, [])
+    if (product) {
+      handleSetPrice()
+    }
+  }, [product, variation, fulfillment, addonsChecked])
 
   const handleSetPrice = () => {
     let selectedVariation = product.Varieties.find(v => v.quantity == variation)
@@ -157,7 +171,7 @@ export default function Product(props)
     }
   ]
 
-  return (
+  return ( product ?
     <Paper className={classes.product}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}> 
@@ -182,7 +196,7 @@ export default function Product(props)
                 {product.name}
               </Typography>
             </Grid>
-            <Grid item className={classes.addToCart}>
+            <Grid item>
               <Typography gutterBottom>
                 {product.Addons.sort((a,b) => a.id - b.id).map((addon, i) => (
                   <FormControlLabel
@@ -286,10 +300,8 @@ export default function Product(props)
         </Grid>
         <DescriptionContainer product={product} classProp={classes.descriptionContainerBottom} />
       </Grid>
-      
-      
     </Paper>
-  )
+  : '')
 }
 
 function Item(props)
