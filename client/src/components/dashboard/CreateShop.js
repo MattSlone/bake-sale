@@ -15,9 +15,9 @@ import AddProductContainer from '../containers/AddProductContainer';
 import Grid from '@material-ui/core/Grid';
 import { stateList } from './stateList';
 import { useAuth } from '../../hooks/use-auth'
-import { useHistory, Redirect, Link, useRouteMatch } from "react-router-dom";
-import ShippingAndDeliveryContainer from '../containers/ShippingAndDeliveryContainer';
+import { useHistory, useLocation, Switch, Route, Redirect, Link, useRouteMatch } from "react-router-dom";
 import PickupAndDeliveryOptionsContainer from '../containers/PickupAndDeliveryOptionsContainer';
+import SetupPaymentAccountContainer from '../containers/SetupPaymentAccountContainer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,9 +49,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps(edit) {
-  let steps = ['Name your shop', 'Select your state', 'Pickup/Delivery Options', 'Add product(s)'];
+  let steps = [
+    'Name your shop',
+    'Select your state',
+    'Pickup/Delivery Options',
+    'Setup Payment Account',
+    'Add product(s)'
+  ];
   if(edit) {
-    steps.pop()
+    steps.splice(3, 2)
   }
   return steps
 }
@@ -64,8 +70,10 @@ function getStepContent(stepIndex) {
       return 'Select the state you will be selling in.';
     case 2:
       return 'Configure your pickup and delivery preferences';
-      case 3:
-        return 'Add a product to your shop';
+    case 3:
+        return 'Setup your Stripe Payments account';
+    case 4:
+      return 'Add a product to your shop';
     default:
       return 'Unknown stepIndex';
   }
@@ -76,13 +84,14 @@ export default function CreateShop(props) {
   const classes = useStyles();
   const auth = useAuth();
   const history = useHistory();
+  const location = useLocation();
 
   let edit = match.path.includes('edit')
 
   const steps = getSteps(edit);
   const [shopName, setShopName] = useState(props.shop.name)
   const [state, setState] = useState(props.shop.state)
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
 
   // wait for update then set shop
   useEffect(() => {
@@ -101,15 +110,21 @@ export default function CreateShop(props) {
     history.push("/dashboard/shop/create");
   }
 
+  useEffect(() => {
+    if (window.location.href.includes('stripe')) {
+      setActiveStep(3)
+    }
+  }, [])
+
   const handleNext = (e) => {
-    console.log(edit)
-    if(activeStep === steps.length - 1) {
-      console.log(edit)
-      if(edit) {
+    console.log('active step: ', activeStep)
+    if(edit) {
+      if (activeStep === steps.length - 1) {
         handleEditShop(e)
-      } else {
-        handleCreateShop(e)
       }
+    }
+    else if (activeStep === 2) {
+      handleCreateShop(e)
     }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -131,16 +146,14 @@ export default function CreateShop(props) {
     allowPickups: props.shop.allowPickups,
     contact: props.shop.contact,
     area: props.shop.area,
-    product: {
-      ...props.product,
-      fields: JSON.stringify(props.product.fields)
-    },
     user: auth.userData.user.success.id
   }
 
   const handleCreateShop = e => {
     e.preventDefault()
-    props.createShop(formData)
+    if (!props.shop.id) {
+      props.createShop(formData)
+    }
   }
 
   const handleEditShop = e => {
@@ -181,7 +194,7 @@ export default function CreateShop(props) {
             </div>
           ) : (
             <form className={classes.form} noValidate>
-              {(!match.path.includes('edit') && props.shop.created) ? (<Redirect to="/dashboard"/>) : (
+              {(
                 <div>
                   <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
                     {match.path.includes('edit') ? 'Edit your shop' : 'Create your shop'}
@@ -223,7 +236,8 @@ export default function CreateShop(props) {
                                       </Container>
                                       </>;
                       case 2: return <PickupAndDeliveryOptionsContainer />
-                      case 3: return <AddProductContainer />
+                      case 3: return <SetupPaymentAccountContainer />
+                      case 4: return <AddProductContainer />
                       default: return "";
                     }
                   })()}
@@ -236,9 +250,11 @@ export default function CreateShop(props) {
                     >
                       Back
                     </Button>
-                    <Button variant="contained" color="primary" onClick={handleNext}>
-                      {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                    </Button>
+                    <Link to={match.path + (activeStep === 2 ? '/stripe' : '')}>
+                      <Button variant="contained" color="primary" onClick={handleNext}>
+                        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               )}

@@ -67,13 +67,6 @@ export default function AddProduct(props) {
 
   const match = useRouteMatch()
 
-  if(match.path.includes('edit')) {
-    console.log(product.fields)
-    if(product.fields) {
-      return <AddCustomProductContainer />
-    }
-  }
-
   useEffect(() => {
     if(match.path.includes('edit')) {
       if(product.fields) {
@@ -163,18 +156,14 @@ export default function AddProduct(props) {
                   </Button>
                   {(() => {
                     if (activeStep === steps.length - 1) {
-                      if(match.path.includes('shop/create')) {
-                        return ''
-                      } else {
-                        return <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleFinish}
-                        className={classes.button}
+                      return <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleFinish}
+                      className={classes.button}
                       >
                         Finish
                       </Button>
-                      }
                     } else {
                       return <Button
                         variant="contained"

@@ -18,10 +18,11 @@ import {
     GET_SHOP_FAILURE_NOT_FOUND,
     SET_PICKUP_ADDRESS,
     SET_PICKUP_SCHEDULE,
-    SET_CONTACT
+    SET_CONTACT,
+    CREATE_STRIPE_ACCOUNT_REQUEST,
+    CREATE_STRIPE_ACCOUNT_SUCCESS,
+    CREATE_STRIPE_ACCOUNT_FAILURE,
  } from './shopTypes'
-
- import { getProducts } from '../product/productActions'
 
 export const setDeliveryArea = (area) => {
   return {
@@ -174,6 +175,26 @@ export const getShopFailure = (error) => {
   }
 }
 
+export const createStripeAccountRequest = () => {
+  return {
+    type: CREATE_STRIPE_ACCOUNT_REQUEST
+  }
+}
+
+export const createStripeAccountSuccess = (stripeAccountLink) => {
+  return {
+    type: CREATE_STRIPE_ACCOUNT_SUCCESS,
+    payload: stripeAccountLink
+  }
+}
+
+export const createStripeAccountFailure = (error) => {
+  return {
+    type: CREATE_STRIPE_ACCOUNT_FAILURE,
+    payload: error
+  }
+}
+
 export const getShopFailureNotFound = () => {
   return {
     type: GET_SHOP_FAILURE_NOT_FOUND,
@@ -218,6 +239,25 @@ export const getLatLngFromAddress = (formData) => {
       }
     } catch(error) {
       dispatch(getLatLngFailure(error.message))
+    }
+  }
+}
+
+export const createStripeAccount = (shopId) => {
+  return async (dispatch) => {
+    try {
+      dispatch(createStripeAccountRequest())
+      const res = await axios.post('/api/shop/stripe/create', {
+        shopId: shopId
+      })
+      if(res.error_message) {
+        dispatch(createStripeAccountFailure(res.error_message))
+      }
+      else {
+        dispatch(createStripeAccountSuccess(res.data.success))
+      }
+    } catch(error) {
+      dispatch(createStripeAccountFailure(error.message))
     }
   }
 }
