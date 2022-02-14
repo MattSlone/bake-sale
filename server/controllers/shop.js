@@ -1,6 +1,8 @@
 'use strict'
 
-const db = require('../models/index')
+const db = require('../models/index'),
+  MakeStripeAPI = require('../config/stripe'),
+  StripeAPI = new MakeStripeAPI()
 
 module.exports = class ShopController {
   async create (req, res, next) {
@@ -17,37 +19,13 @@ module.exports = class ShopController {
           PickupAddress: req.body.pickupAddress,
           PickupSchedules: req.body.pickupSchedule,
           ShopContact: req.body.contact,
-          Products: [
-            {
-              name: req.body.product.name,
-              category: req.body.product.category,
-              processingTime: req.body.product.processingTime,
-              description: req.body.product.description,
-              automaticRenewal: req.body.product.automaticRenewal,
-              inventory: req.body.product.inventory,
-              fields: req.body.product.fields,
-              personalizationPrompt: req.body.product.personalizationPrompt,
-              Varieties: req.body.product.varieties,
-              Addons: req.body.product.addons,
-              Ingredients: req.body.product.ingredients
-            }
-          ]
       }, {
         include: [
           db.PickupAddress,
           db.PickupSchedule,
-          db.ShopContact,
-          {
-            association: db.Shop.Product,
-            include: [ 
-              db.Product.Ingredient,
-              db.Product.Variety,
-              db.Product.Addon,
-            ]
-          }
+          db.ShopContact
         ]
       });
-
       return shop
     }
     catch (err) {
@@ -132,6 +110,26 @@ module.exports = class ShopController {
     }))
 
     return associatedInstance
+  }
+
+  async createStripeAccount(req, res, next) {
+    try {
+      const shop = await db.Shop.findByPk(req.body.shopId)
+      let accountId = shop.stripeAccountId
+
+      if (!accountId) {
+        const account = await StripeAPI.createAccount(req.body.shopId)
+        accountId = account.id
+        shop.stripeAccountId = accountId
+        await shop.save()
+      }
+      
+      const accountLink = await StripeAPI.createAccountLink(accountId)
+      return accountLink.url
+    }
+    catch (err) {
+      return next(err)
+    }
   }
 
   /* async list (req, res, next) {

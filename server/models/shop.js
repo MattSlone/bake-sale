@@ -24,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
     radius: DataTypes.INTEGER,
     lat: DataTypes.FLOAT,
     lng: DataTypes.FLOAT,
-    allowPickups: DataTypes.BOOLEAN
+    allowPickups: DataTypes.BOOLEAN,
+    stripeAccountId: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Shop',

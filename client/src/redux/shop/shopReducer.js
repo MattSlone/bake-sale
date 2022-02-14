@@ -16,7 +16,10 @@ import {
     GET_SHOP_FAILURE_NOT_FOUND,
     SET_PICKUP_ADDRESS,
     SET_PICKUP_SCHEDULE,
-    SET_CONTACT
+    SET_CONTACT,
+    CREATE_STRIPE_ACCOUNT_REQUEST,
+    CREATE_STRIPE_ACCOUNT_SUCCESS,
+    CREATE_STRIPE_ACCOUNT_FAILURE,
    } from './shopTypes'
   
   const initialState = {
@@ -50,7 +53,9 @@ import {
       radius: 30000,
       lat: -3.745,
       lng: -38.523
-    }
+    },
+    stripeAccountLink: '',
+    stripeAccountId: ''
   }
   
   const shopReducer = (state = initialState, action) => {
@@ -75,6 +80,19 @@ import {
           lat: '',
           lng: ''
         },
+        error: action.payload
+      }
+      case CREATE_STRIPE_ACCOUNT_REQUEST: return {
+        ...state,
+        loading: true
+      }
+      case CREATE_STRIPE_ACCOUNT_SUCCESS: return {
+        ...state,
+        stripeAccountLink: action.payload,
+        error: ''
+      }
+      case CREATE_STRIPE_ACCOUNT_FAILURE: return {
+        ...state,
         error: action.payload
       }
       case SET_DELIVERY_AREA: return {
@@ -147,7 +165,6 @@ import {
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
         loading: false,
-        created: false,
         area: {
           location: action.payload.success.location,
           radius: action.payload.success.radius,
@@ -157,6 +174,7 @@ import {
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
         created: true,
+        stripeAccountId: action.payload.success.stripeAccountId,
         error: ''
       }
       case GET_SHOP_FAILURE: return {
