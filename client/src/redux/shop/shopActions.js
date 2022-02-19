@@ -22,6 +22,9 @@ import {
     CREATE_STRIPE_ACCOUNT_REQUEST,
     CREATE_STRIPE_ACCOUNT_SUCCESS,
     CREATE_STRIPE_ACCOUNT_FAILURE,
+    CHECK_STRIPE_DETAILS_SUBMITTED_REQUEST,
+    CHECK_STRIPE_DETAILS_SUBMITTED_SUCCESS,
+    CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE
  } from './shopTypes'
 
 export const setDeliveryArea = (area) => {
@@ -202,6 +205,26 @@ export const getShopFailureNotFound = () => {
   }
 }
 
+export const checkStripeDetailsSubmittedRequest = () => {
+  return {
+    type: CHECK_STRIPE_DETAILS_SUBMITTED_REQUEST
+  }
+}
+
+export const checkStripeDetailsSubmittedSuccess = (submitted) => {
+  return {
+    type: CHECK_STRIPE_DETAILS_SUBMITTED_SUCCESS,
+    payload: submitted
+  }
+}
+
+export const checkStripeDetailsSubmittedFailure = (error) => {
+  return {
+    type: CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE,
+    payload: error
+  }
+}
+
 export const getShop = (formData) => {
   return async (dispatch) => {
     try {
@@ -225,6 +248,7 @@ export const getShop = (formData) => {
 }
 
 export const getLatLngFromAddress = (formData) => {
+  console.log(formData)
   return async (dispatch) => {
     try {
       dispatch(getLatLngRequest)
@@ -258,6 +282,25 @@ export const createStripeAccount = (shopId) => {
       }
     } catch(error) {
       dispatch(createStripeAccountFailure(error.message))
+    }
+  }
+}
+
+export const checkStripeDetailsSubmitted = (accountId) => {
+  return async (dispatch) => {
+    try {
+      dispatch(checkStripeDetailsSubmittedRequest())
+      const res = await axios.post('/api/shop/stripe/checkDetailsSubmitted', {
+        accountId: accountId
+      })
+      if(res.error_message) {
+        dispatch(checkStripeDetailsSubmittedFailure(res.error_message))
+      }
+      else {
+        dispatch(checkStripeDetailsSubmittedSuccess(res.data.success))
+      }
+    } catch(error) {
+      dispatch(checkStripeDetailsSubmittedFailure(error.message))
     }
   }
 }

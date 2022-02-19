@@ -118,7 +118,7 @@ module.exports = class ShopController {
       let accountId = shop.stripeAccountId
 
       if (!accountId) {
-        const account = await StripeAPI.createAccount(req.body.shopId)
+        const account = await StripeAPI.createAccount()
         accountId = account.id
         shop.stripeAccountId = accountId
         await shop.save()
@@ -126,6 +126,16 @@ module.exports = class ShopController {
       
       const accountLink = await StripeAPI.createAccountLink(accountId)
       return accountLink.url
+    }
+    catch (err) {
+      return next(err)
+    }
+  }
+
+  async checkDetailsSubmitted(req, res, next) {
+    try {
+      const detailsSubmitted = await StripeAPI.checkDetailsSubmitted(req.body.accountId)
+      return detailsSubmitted
     }
     catch (err) {
       return next(err)

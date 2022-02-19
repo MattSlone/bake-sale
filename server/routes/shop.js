@@ -32,6 +32,19 @@ module.exports = (app) => {
     }
   })
 
+  app.post('/api/shop/stripe/checkDetailsSubmitted', async (req, res, next) => {
+    try {
+        let response = await ShopController.checkDetailsSubmitted(req, res, next)
+        res.send({
+            error: req.flash('error'),
+            success: response
+        })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
+
   app.post('/api/shop/create', async (req, res, next) => {
     try {
         let shop = await ShopController.create(req, res, next)
