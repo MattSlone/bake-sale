@@ -69,7 +69,7 @@ export default function AddProduct(props) {
 
   useEffect(() => {
     if(match.path.includes('edit')) {
-      if(product.fields) {
+      if(product.custom) {
         return <AddCustomProductContainer />
       }
       props.setProductEdit({
@@ -96,7 +96,7 @@ export default function AddProduct(props) {
   const formData = {
     product: {
       ...props.product,
-      fields: JSON.stringify(props.product.fields)
+      fields: props.product.fields
     },
     shopId: props.shop.id
   }
@@ -106,6 +106,7 @@ export default function AddProduct(props) {
     if(match.path.includes('edit')) {
       props.editProduct(formData)
     } else {
+      console.log(formData)
       props.createProduct(formData)
     }
   };

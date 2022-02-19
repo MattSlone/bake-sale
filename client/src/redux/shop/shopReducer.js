@@ -20,6 +20,9 @@ import {
     CREATE_STRIPE_ACCOUNT_REQUEST,
     CREATE_STRIPE_ACCOUNT_SUCCESS,
     CREATE_STRIPE_ACCOUNT_FAILURE,
+    CHECK_STRIPE_DETAILS_SUBMITTED_REQUEST,
+    CHECK_STRIPE_DETAILS_SUBMITTED_SUCCESS,
+    CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE
    } from './shopTypes'
   
   const initialState = {
@@ -55,7 +58,8 @@ import {
       lng: -38.523
     },
     stripeAccountLink: '',
-    stripeAccountId: ''
+    stripeAccountId: '',
+    stripeDetailsSubmitted: false
   }
   
   const shopReducer = (state = initialState, action) => {
@@ -92,6 +96,19 @@ import {
         error: ''
       }
       case CREATE_STRIPE_ACCOUNT_FAILURE: return {
+        ...state,
+        error: action.payload
+      }
+      case CHECK_STRIPE_DETAILS_SUBMITTED_REQUEST: return {
+        ...state,
+        loading: true
+      }
+      case CHECK_STRIPE_DETAILS_SUBMITTED_SUCCESS: return {
+        ...state,
+        stripeDetailsSubmitted: action.payload,
+        error: ''
+      }
+      case CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE: return {
         ...state,
         error: action.payload
       }

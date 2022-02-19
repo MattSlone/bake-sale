@@ -4,7 +4,7 @@ const stripe = require('stripe')('sk_test_51KMDSaL7rHJy0SQF5Djaz08o3ohWMz4GHR6UL
 const db = require('../models/index')
 
 module.exports = class StripeAPI {
-  async createAccount (shopId) {
+  async createAccount () {
     try {
       const account = await stripe.accounts.create({type: 'standard'});
       return account;
@@ -25,6 +25,15 @@ module.exports = class StripeAPI {
     } catch (err) {
       return err
     }
-    
+  }
+
+  async checkDetailsSubmitted (id) {
+    try {
+      const account = await stripe.accounts.retrieve(id)
+      console.log(account)
+      return account.details_submitted
+    } catch (err) {
+      return err
+    }
   }
 }

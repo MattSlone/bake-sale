@@ -117,7 +117,6 @@ export default function CreateShop(props) {
   }, [])
 
   const handleNext = (e) => {
-    console.log('active step: ', activeStep)
     if(edit) {
       if (activeStep === steps.length - 1) {
         handleEditShop(e)
@@ -250,11 +249,13 @@ export default function CreateShop(props) {
                     >
                       Back
                     </Button>
+                    {!(activeStep === 3) || props.shop.stripeDetailsSubmitted ?
                     <Link to={match.path + (activeStep === 2 ? '/stripe' : '')}>
                       <Button variant="contained" color="primary" onClick={handleNext}>
                         {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                       </Button>
                     </Link>
+                    : ''}   
                   </div>
                 </div>
               )}
