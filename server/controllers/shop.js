@@ -1,7 +1,7 @@
 'use strict'
 
 const db = require('../models/index'),
-  MakeStripeAPI = require('../config/stripe'),
+  MakeStripeAPI = require('../lib/stripe'),
   StripeAPI = new MakeStripeAPI()
 
 module.exports = class ShopController {
