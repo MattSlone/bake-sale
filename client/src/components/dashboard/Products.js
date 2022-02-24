@@ -85,7 +85,7 @@ export default function Products(props) {
             />
           </Card>
         </Grid>
-        {products.map((product) => (
+        {products ? products.map((product) => (
           <Grid item key={product.id} xs={12} sm={6} md={4}>
             <Card className={classes.card}>
               <CardMedia
@@ -116,7 +116,7 @@ export default function Products(props) {
               </CardActions>
             </Card>
           </Grid>
-        ))}
+        )) : ''}
       </Grid>
     </Container>
   );

@@ -1,11 +1,17 @@
 import {
   ADD_TO_CART,
   EDIT_QUANTITY,
-  REMOVE_FROM_CART
+  REMOVE_FROM_CART,
+  CHECKOUT_REQUEST,
+  CHECKOUT_SUCCESS,
+  CHECKOUT_FAILURE
 } from './cartTypes'
 
 const initialState = {
-  products: []
+  products: [],
+  loading: false,
+  clientSecret: '',
+  error: ''
 }
 
 const cartReducer = (state = initialState, action) => {
@@ -37,6 +43,20 @@ const cartReducer = (state = initialState, action) => {
       }
     case REMOVE_FROM_CART: return {
       products: state.products.filter((product, index) => index != action.payload)
+    }
+    case CHECKOUT_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case CHECKOUT_SUCCESS: return {
+      ...state,
+      products: [],
+      clientSecret: action.payload,
+      error: ''
+    }
+    case CHECKOUT_FAILURE: return {
+      ...state,
+      error: action.payload
     }
     default: return state
   }

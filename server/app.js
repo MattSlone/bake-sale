@@ -9,7 +9,7 @@ const express = require('express'),
 
 const { Sequelize, Transaction } = require('sequelize')
 
-require('./config/passport')(passport)
+require('./lib/passport')(passport)
 
 var session = require("express-session");
 // initalize sequelize with session store
@@ -80,7 +80,7 @@ require('./routes/shop')(app)
 require('./routes/product')(app)
 require('./routes/ingredient')(app)
 require('./routes/quote')(app)
-
+require('./routes/order')(app)
 
 // Default response for any other request
 app.use(function(req, res) {

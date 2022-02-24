@@ -9,16 +9,19 @@ import ShopContainer from './components/containers/ShopContainer'
 import CustomProductContainer from './components/containers/CustomProductContainer'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
+import CheckoutContainer from './components/containers/CheckoutContainer';
+
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
+
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
   content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
+    flexGrow: 1
   },
 }));
 
@@ -59,6 +62,7 @@ export default function App() {
               <Route path='/products/custom/:id' children={<CustomProductContainer />} />
               <Route path='/products/:id' children={<ProductContainer />} />
               <Route path='/shop/:id' children={<ShopContainer />} />
+              <Route path='/checkout' component={CheckoutContainer} />
             </Switch>
           </main>
         </div>

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useIsMount } from '../hooks/useIsMount';
 import { alpha, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,6 +24,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Grid from '@material-ui/core/Grid';
 import DeleteIcon from '@material-ui/icons/Delete';
 import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -107,6 +109,11 @@ const useStyles = makeStyles((theme) => ({
   routerLinkButton: {
     color: 'white',
     textDecoration: 'none'
+  },
+  popoverRoot: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'f',
   }
 }));
 
@@ -114,8 +121,10 @@ export default function PrimarySearchAppBar(props) {
   const classes = useStyles(props);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const isMount = useIsMount();
 
   const [cartAnchorEl, setCartAnchorEl] = React.useState(null);
+  let cartAnchorRef = useRef('')
 
   const fulfillment = ['pickup', 'delivery', 'shipping']
 
@@ -124,6 +133,12 @@ export default function PrimarySearchAppBar(props) {
       setCartAnchorEl(event.currentTarget);
     }
   };
+
+  useEffect(() => {
+    if (!isMount && props.cart.products.length > 0) {
+      setCartAnchorEl(cartAnchorRef.current);
+    }
+  }, [props.cart.products])
 
   const handleCartPopoverClose = () => {
     setCartAnchorEl(null);
@@ -199,8 +214,9 @@ export default function PrimarySearchAppBar(props) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
-        <IconButton aria-label="show 4 new mails" color="inherit">
+      <MenuItem ref={cartAnchorRef} onClick={handleCartPopoverOpen}>
+        <IconButton aria-label="show 4 new mails" color="inherit"
+        >
           <Badge badgeContent={props.cart.products.length} color="secondary">
             <ShoppingCartIcon />
           </Badge>
@@ -264,6 +280,7 @@ export default function PrimarySearchAppBar(props) {
           <div className={classes.sectionDesktop}>
             <IconButton aria-label="show 4 new mails" color="inherit"
               onClick={handleCartPopoverOpen}
+              ref={cartAnchorRef}
             >
               <Badge badgeContent={props.cart.products.length} color="secondary">
                 <ShoppingCartIcon />
@@ -303,17 +320,11 @@ export default function PrimarySearchAppBar(props) {
         className={classes.popover}
         classes={{
           paper: classes.paper,
+          root: classes.popoverRoot
         }}
         open={cartOpen}
         anchorEl={cartAnchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
+        anchorReference='none'
         onClose={handleCartPopoverClose}
         disableRestoreFocus
       >
@@ -361,6 +372,15 @@ export default function PrimarySearchAppBar(props) {
                   </ListItemSecondaryAction>
                 </ListItem>
               ))}
+              <ListItem>
+                <Button 
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                >
+                  Checkout
+                </Button>
+              </ListItem>
             </List>
           </div>
         </Grid>

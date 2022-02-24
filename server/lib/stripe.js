@@ -30,10 +30,36 @@ module.exports = class StripeAPI {
   async checkDetailsSubmitted (id) {
     try {
       const account = await stripe.accounts.retrieve(id)
-      console.log(account)
       return account.details_submitted
     } catch (err) {
       return err
+    }
+  }
+
+  async createPaymentIntent(orderId, totalAmount)
+  {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 2000,
+      currency: 'usd',
+      payment_method_types: ['card'],
+      transfer_group: orderId
+    });
+    return paymentIntent
+  }
+
+  async createTransfer(amount, stripeAccountId, orderId)
+  {
+    try {
+      const transfer = await stripe.transfers.create({
+        amount: 100,
+        currency: 'usd',
+        destination: stripeAccountId,
+        transfer_group: orderId
+      });
+      console.log(transfer)
+      return transfer.id
+    } catch (err) {
+      console.log(err)
     }
   }
 }

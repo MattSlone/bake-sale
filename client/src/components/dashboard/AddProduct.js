@@ -62,6 +62,7 @@ export default function AddProduct(props) {
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
   let { id } = useParams()
+  console.log(props.product)
   const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
   
 
