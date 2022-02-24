@@ -9,9 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
-import Carousel from 'react-material-ui-carousel'
-import Link from '@material-ui/core/Link';
-import CardHeader from '@material-ui/core/CardHeader';
 import Fab from '@material-ui/core/Fab';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
@@ -97,7 +94,7 @@ export default function Shop(props) {
   }, [])
 
   return (
-    <Container disableGutters>
+    <Container>
       <Header title={shop.name} />
       <Paper className={classes.infoBox}>
         <Typography variant="body1">

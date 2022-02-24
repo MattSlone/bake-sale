@@ -194,8 +194,8 @@ export default function PricingAndInventory(props) {
             </Tooltip>
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2}>
-            <Tooltip title={<Typography>You can add a separate shipping cost for each additional package of this variety a customer orders. 
-            You can leave this blank to keep the same shipping cost.</Typography>}>
+            <Tooltip title={<Typography>You can add a separate shipping cost for each additional package of this variety a customer orders
+              after the first one. You can leave this blank to keep the same shipping cost.</Typography>}>
               <TextField
                 className={classes.fullWidth}
                 id="secondary-shipping"

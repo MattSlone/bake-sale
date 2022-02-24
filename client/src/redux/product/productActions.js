@@ -241,7 +241,6 @@ export const editProduct = (formData) => {
 }
 
 const mapFields = (fields) => {
-  console.log('hereeee: ', fields)
   fields.map((field) => {
     let mappedField = {
       name: field.name,

@@ -96,7 +96,8 @@ const productReducer = (state = initialState, action) => {
       error: ''
     }
     case GET_PRODUCTS_FAILURE: return {
-      products: '',
+      ...state,
+      products: [],
       error: action.payload
     }
     case SET_PRODUCT_EDIT:
