@@ -11,11 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
         this.belongsTo(models.Order)
+        this.belongsTo(models.Shop)
     }
   };
   Transfer.init({
     amount: DataTypes.FLOAT,
-    stripeTransfer: DataTypes.STRING
+    stripeTransferId: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Transfer',

@@ -6,6 +6,7 @@ const express = require('express'),
   session = require('express-session')
   flash = require('connect-flash')
   app = express();
+  webhookApp = express();
 
 const { Sequelize, Transaction } = require('sequelize')
 
@@ -71,6 +72,8 @@ app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+webhookApp.use(express.raw({ type: 'application/json' }))
+
 /* Don't worry about these */
 app.use(express.static(path.join(__dirname, '../build')));
 
@@ -80,7 +83,8 @@ require('./routes/shop')(app)
 require('./routes/product')(app)
 require('./routes/ingredient')(app)
 require('./routes/quote')(app)
-require('./routes/order')(app)
+require('./routes/order')(app, webhookApp)
+
 
 // Default response for any other request
 app.use(function(req, res) {
@@ -88,3 +92,4 @@ app.use(function(req, res) {
 });
 
 app.listen(process.env.EXPRESS_PORT, () => console.log(`App listening at http://server:${process.env.EXPRESS_PORT}`))
+webhookApp.listen(4242, () => console.log(`App listening at http://server:4242`))

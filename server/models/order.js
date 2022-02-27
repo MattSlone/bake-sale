@@ -11,13 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
         this.belongsTo(models.User)
-        this.belongsTo(models.Shop)
         this.Product = this.belongsToMany(models.Product, { through: "product_order" })
     }
   };
   Order.init({
     amount: DataTypes.FLOAT,
-    stripeCharge: DataTypes.STRING
+    stripePaymentIntentId: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Order',

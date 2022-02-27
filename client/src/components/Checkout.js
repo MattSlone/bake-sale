@@ -4,7 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from './CheckoutForm'
 import axios from 'axios'
 import { makeStyles } from '@material-ui/styles';
-const stripePromise = loadStripe("pk_test_51KMDSaL7rHJy0SQFdZI0Q9HFv1wbLuCHm6AuVequIPtqFCa738z7EjGXncDblPZowGe8ALzhjbwh9W25NtejoyxW00YxzwtmYo");
+
 
 const useStyles = makeStyles((theme) => ({
   paymentForm: {
@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
 export default function  Checkout(props) {
   const [clientSecret, setClientSecret] = useState("");
   const classes = useStyles()
+  const stripePromise = loadStripe("pk_test_51KMDSaL7rHJy0SQFdZI0Q9HFv1wbLuCHm6AuVequIPtqFCa738z7EjGXncDblPZowGe8ALzhjbwh9W25NtejoyxW00YxzwtmYo");
 
   useEffect(async () => {
     props.checkout(props.cart.products)
@@ -25,6 +26,12 @@ export default function  Checkout(props) {
     }
     
   }, [props.cart.clientSecret]);
+
+  useEffect( () => {
+    if (clientSecret) {
+      console.log(clientSecret)
+    }
+  }, [clientSecret]);
 
   const appearance = {
     theme: 'stripe',

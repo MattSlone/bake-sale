@@ -10,6 +10,7 @@ module.exports = {
       lat: 27.351,
       lng: -82.4222,
       allowPickups: 1,
+      stripeAccountId: 'acct_1KUhO1PpZkF3RQIm', // test account tied to slonem01@gmail.com
       UserId: 1,
       createdAt: new Date(),
       updatedAt: new Date()
