@@ -93,13 +93,13 @@ export default function Product(props)
       setVariation(tempProduct.Varieties[0].quantity)
       setPrice(Number.parseFloat(tempProduct.Varieties[0].price).toFixed(2))
       setAddonsChecked(Object.fromEntries(
-        tempProduct.Addons.map(addon => [addon.name, false])
+        tempProduct.Addons.map(addon => [addon.id, false])
       ))
     }
   }, [props.product.loading])
 
   const handleAddonCheckChange = (event) => {
-    setAddonsChecked({ ...addonsChecked, [event.target.name]: event.target.checked });
+    setAddonsChecked({ ...addonsChecked, [event.target.id]: event.target.checked });
   };
 
   useEffect(() => {
@@ -115,7 +115,7 @@ export default function Product(props)
     let addonsTotal = 0.0
 
     product.Addons.forEach((addon) => {
-      if(addonsChecked[addon.name]) {
+      if(addonsChecked[addon.id]) {
         addonsTotal += addon.price
         addonsTotal += addon.secondaryPrice * (variation-1)
       }
@@ -204,6 +204,7 @@ export default function Product(props)
                       <Checkbox
                         checked={addonsChecked[addon.name]}
                         name={addon.name}
+                        id={addon.id}
                         color="primary"
                         onChange={handleAddonCheckChange}
                       />

@@ -49,8 +49,11 @@ module.exports = class OrderController {
       const shopAmounts = Promise.all(shopItems.map(async shop => {
         try {
           const shopInstance = await db.Shop.findByPk(shop.id, { attributes: ['stripeAccountId'], raw: true })
-          const amount = shop.items.map(item => Number.parseFloat(item.clientSidePrice) * Number.parseInt(item.quantity))
-            .reduce((prev, curr) => prev + curr)
+          const amounts = await Promise.all(shop.items.map(async item => {
+            const productPrice = await this.calculateProductPrice(item)
+            return productPrice * item.quantity
+          }))
+          const amount = amounts.reduce((prev, curr) => prev + curr)
           return {
             id: shop.id,
             amount: amount,
@@ -62,6 +65,48 @@ module.exports = class OrderController {
       }))
       return shopAmounts
     } catch(err) {
+      console.log(err)
+    }
+  }
+
+  async calculateProductPrice(item) {
+    try {
+      console.log('clientSidePrice: ', item.clientSidePrice)
+      let selectedVariation = await db.Variety.findOne({ where: { ProductId: item.product.id, quantity: item.variation } })
+      let total = selectedVariation.price
+
+      let addonsTotal = 0.0
+      const addons = Object.entries(item.addons).map(addon => {
+        return {
+          id: addon[0],
+          checked: addon[1]
+        }
+      })
+      for (const addon of addons) {
+        if(addon.checked) {
+          let addonInstance = await db.Addon.findByPk(addon.id, { attributes: ['price', 'secondaryPrice', 'ProductId'] })
+          if (addonInstance.ProductId != item.product.id) {
+            throw Error('ERROR: addon doesn\'t exist for this product. Handle accordingly')
+          }
+          addonsTotal += addonInstance.price
+          addonsTotal += addonInstance.secondaryPrice * (item.variation-1)
+        }
+      }
+
+      total += addonsTotal
+
+      let fulfillmentPrice = 0.0
+      if (item.fulfillment == 'delivery') {
+        fulfillmentPrice = selectedVariation.delivery
+      } else if(item.fulfillment == 'shipping') {
+        fulfillmentPrice = selectedVariation.shipping
+      }
+
+      total += fulfillmentPrice
+
+      console.log('serverSidePrice: ', Number.parseFloat(total).toFixed(2))
+      return Number.parseFloat(total).toFixed(2)
+    } catch (err) {
       console.log(err)
     }
   }
