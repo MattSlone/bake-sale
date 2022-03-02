@@ -128,7 +128,6 @@ module.exports = class OrderController {
       const [event, data] = StripeAPI.handleWebhooks(req, res, next)
       switch (event) {
         case 'payment_intent.succeeded':
-          console.log('hereeee')
           const transfers = await db.Transfer.findAll({
             include: {
               model: db.Shop,
@@ -138,7 +137,6 @@ module.exports = class OrderController {
             where: { stripePaymentIntentId: data.id }
           })
           transfers.forEach(async transfer => {
-            console.log('creating transfer...')
             try {
               const transferId = await StripeAPI.createTransfer(
                 transfer.amount*100,
