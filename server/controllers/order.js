@@ -14,11 +14,11 @@ module.exports = class OrderController {
       const paymentIntent = await StripeAPI.createPaymentIntent(totalAmount*100)
 
       for (const shop of shopAmounts) {
-        const stripeFee = 0.032
-        const ourFee = 0.05
+        const stripeFee = shop.amount*0.029 + 0.3
+        const ourFee =shop.amount*0.05
 
         const transfer = await db.Transfer.create({
-          amount: Number.parseFloat(shop.amount * (1 - stripeFee - ourFee)).toFixed(2),
+          amount: Number.parseFloat(shop.amount - stripeFee - ourFee).toFixed(2),
           stripeTransferId: 0,
           stripePaymentIntentId: paymentIntent.id,
           ShopId: shop.id

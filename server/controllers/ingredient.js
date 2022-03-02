@@ -5,7 +5,6 @@ const db = require('../models/index')
 module.exports = class IngredientController {
     async create (req, res, next) {
         try {
-
             let ingredientsList = []
             req.body.ingredients.forEach((name) => {
                 ingredientsList.push({
