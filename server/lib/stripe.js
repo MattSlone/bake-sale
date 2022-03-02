@@ -37,13 +37,12 @@ module.exports = class StripeAPI {
     }
   }
 
-  async createPaymentIntent(orderId, totalAmount)
+  async createPaymentIntent(totalAmount)
   {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
       currency: 'usd',
-      payment_method_types: ['card'],
-      transfer_group: orderId
+      payment_method_types: ['card']
     });
     return paymentIntent
   }

@@ -10,22 +10,33 @@ module.exports = class OrderController {
       const shopAmounts = await this.mapCartToShopAmounts(req.body.items)
       const totalAmount = shopAmounts.map(shopAmount => shopAmount.amount)
         .reduce((prev, curr) => prev + curr)
+      
+      const paymentIntent = await StripeAPI.createPaymentIntent(totalAmount*100)
 
-      const order = await db.Order.create({ amount: totalAmount })
-      const paymentIntent = await StripeAPI.createPaymentIntent(order.id, totalAmount*100)
-      order.set({
-        stripePaymentIntentId: paymentIntent.id,
-      });
-      order.save()
+      for (const shop of shopAmounts) {
+        const stripeFee = 0.032
+        const ourFee = 0.05
 
-      shopAmounts.forEach(async shop => {
-        await db.Transfer.create({
-          amount: shop.amount,
+        const transfer = await db.Transfer.create({
+          amount: Number.parseFloat(shop.amount * (1 - stripeFee - ourFee)).toFixed(2),
           stripeTransferId: 0,
-          OrderId: order.id,
+          stripePaymentIntentId: paymentIntent.id,
           ShopId: shop.id
         })
-      });
+
+        for (const item of shop.items) {
+          const addonIds = Object.entries(item.addons).map(addon => addon[1] ? addon[0] : null)
+            .filter(addon => addon !== null)
+          const order = await db.Order.create({
+            amount: await this.calculateProductPrice(item),
+            TransferId: transfer.id,
+            ProductId: item.product.id,
+            VarietyId: item.variation,
+            fulfillment: item.fulfillment
+          })
+          await order.setAddons(addonIds)
+        }
+      }
       return paymentIntent.client_secret
     }
     catch (err) {
@@ -56,6 +67,7 @@ module.exports = class OrderController {
           const amount = amounts.reduce((prev, curr) => prev + curr)
           return {
             id: shop.id,
+            items: shop.items,
             amount: amount,
             stripeAccountId: shopInstance.stripeAccountId
           }
@@ -116,22 +128,17 @@ module.exports = class OrderController {
       const [event, data] = StripeAPI.handleWebhooks(req, res, next)
       switch (event) {
         case 'payment_intent.succeeded':
+          console.log('hereeee')
           const transfers = await db.Transfer.findAll({
-            include: [
-              {
-                model: db.Order,
-                attributes: ['id'],
-                where: { stripePaymentIntentId: data.id },
-                required: true,
-              },
-              {
-                model: db.Shop,
-                attributes: ['stripeAccountId'],
-                required: true
-              }
-            ]
+            include: {
+              model: db.Shop,
+              attributes: ['stripeAccountId'],
+              required: true
+            },
+            where: { stripePaymentIntentId: data.id }
           })
           transfers.forEach(async transfer => {
+            console.log('creating transfer...')
             try {
               const transferId = await StripeAPI.createTransfer(
                 transfer.amount*100,

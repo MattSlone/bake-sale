@@ -10,12 +10,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-        this.belongsTo(models.Order)
         this.belongsTo(models.Shop)
     }
   };
   Transfer.init({
     amount: DataTypes.FLOAT,
+    stripePaymentIntentId: DataTypes.STRING,
     stripeTransferId: DataTypes.STRING
   }, {
     sequelize,
