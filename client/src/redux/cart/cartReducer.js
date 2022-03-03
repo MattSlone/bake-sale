@@ -50,7 +50,6 @@ const cartReducer = (state = initialState, action) => {
     }
     case CHECKOUT_SUCCESS: return {
       ...state,
-      products: [],
       clientSecret: action.payload,
       error: ''
     }
