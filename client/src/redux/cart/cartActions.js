@@ -6,7 +6,8 @@ import {
   REMOVE_FROM_CART,
   CHECKOUT_REQUEST,
   CHECKOUT_SUCCESS,
-  CHECKOUT_FAILURE
+  CHECKOUT_FAILURE,
+  RESET_CART
 } from './cartTypes'
 
 export const addToCart = (product) => {
@@ -47,6 +48,12 @@ export const checkoutFailure = (error) => {
   return {
     type: CHECKOUT_FAILURE,
     payload: error
+  }
+}
+
+export const resetCart = () => {
+  return {
+    type: RESET_CART
   }
 }
 

@@ -4,6 +4,26 @@ const MakeOrderController = require('../controllers/order'),
   OrderController = new MakeOrderController()
 
 module.exports = (app, webhookApp) => {
+  app.get('/api/orders', async (req, res, next) => {
+    try {
+      if (req.user) {
+        let response = await OrderController.list(req, res, next)
+        res.send({
+          error: req.flash('error'),
+          success: response
+        })
+      } else {
+        res.send({
+          error: req.flash('Not Logged In'),
+          success: false
+        })
+      }
+    }
+    catch (err) {
+      next(err)
+    }
+  })
+
   app.post('/api/order/intent', async (req, res, next) => {
     try {
         let response = await OrderController.createPaymentIntent(req, res, next)

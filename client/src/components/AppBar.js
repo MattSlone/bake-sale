@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useIsMount } from '../hooks/useIsMount';
-import { alpha, makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
-import Badge from '@material-ui/core/Badge';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import Popover from '@material-ui/core/Popover';
+import { alpha, makeStyles } from '@mui/material/styles';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import InputBase from '@mui/material/InputBase';
+import Badge from '@mui/material/Badge';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import Popover from '@mui/material/Popover';
 import { Redirect, Link as RouterLink } from "react-router-dom";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Grid from '@material-ui/core/Grid';
-import DeleteIcon from '@material-ui/icons/Delete';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import Grid from '@mui/material/Grid';
+import DeleteIcon from '@mui/icons-material/Delete';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -32,6 +32,9 @@ const useStyles = makeStyles((theme) => ({
   },
   quantityInput: {
     width: 45
+  },
+  fullWidth: {
+    width: '100%'
   },
   paper: {
     padding: theme.spacing(1),
@@ -107,8 +110,11 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   routerLinkButton: {
-    color: 'white',
+    color: 'black',
     textDecoration: 'none'
+  },
+  white: {
+    color: 'white'
   },
   popoverRoot: {
     display: 'flex',
@@ -127,7 +133,6 @@ export default function PrimarySearchAppBar(props) {
   let cartAnchorRef = useRef('')
 
   const fulfillment = ['pickup', 'delivery', 'shipping']
-
   const handleCartPopoverOpen = (event) => {
     if (props.cart.products.length > 0) {
       setCartAnchorEl(event.currentTarget);
@@ -141,6 +146,7 @@ export default function PrimarySearchAppBar(props) {
   }, [props.cart.products])
 
   const handleCartPopoverClose = () => {
+    handleMenuClose()
     setCartAnchorEl(null);
   };
 
@@ -198,6 +204,10 @@ export default function PrimarySearchAppBar(props) {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <RouterLink to='/user/orders' className={classes.routerLinkButton}>
+        <MenuItem onClick={handleMenuClose}>My Orders</MenuItem>
+      </RouterLink>
+      
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
       {props.userData.loggedIn ? renderSignOutButton : null}
     </Menu>
@@ -258,7 +268,7 @@ export default function PrimarySearchAppBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <RouterLink to='/' className={classes.routerLinkButton}>
+          <RouterLink to='/' className={`${classes.routerLinkButton} ${classes.white}`}>
             <Typography className={classes.title} variant="h6">
               Bake.$ale
             </Typography>
@@ -373,13 +383,16 @@ export default function PrimarySearchAppBar(props) {
                 </ListItem>
               ))}
               <ListItem>
-                <Button 
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                >
-                  Checkout
-                </Button>
+                <RouterLink to='/checkout' className={`${classes.routerLinkButton} ${classes.fullWidth}`}>
+                  <Button 
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    onClick={handleCartPopoverClose}
+                  >
+                    Checkout
+                  </Button>
+                </RouterLink>
               </ListItem>
             </List>
           </div>

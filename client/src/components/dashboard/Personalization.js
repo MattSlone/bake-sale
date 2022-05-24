@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
-import { Input, TextField, Typography } from '@material-ui/core';
-import Checkbox from '@material-ui/core/Checkbox';
+import Grid from '@mui/material/Grid';
+import { makeStyles } from '@mui/material/styles';
+import { Input, TextField, Typography } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
 
 const useStyles = makeStyles((theme) => ({
   root: {

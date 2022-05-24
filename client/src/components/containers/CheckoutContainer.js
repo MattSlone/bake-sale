@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import Checkout from '../Checkout'
-import { checkout } from '../../redux'
+import { checkout, resetCart } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -13,7 +13,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    checkout: (items) => dispatch(checkout(items))
+    checkout: (items) => dispatch(checkout(items)),
+    resetCart: () => dispatch(resetCart())
   }
 }
 

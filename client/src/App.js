@@ -6,8 +6,9 @@ import SignUpContainer from './components/containers/SignUpContainer'
 import DashboardContainer from './components/containers/DashboardContainer'
 import ProductContainer from './components/containers/ProductContainer'
 import ShopContainer from './components/containers/ShopContainer'
+import OrdersContainer from './components/containers/OrdersContainer'
 import CustomProductContainer from './components/containers/CustomProductContainer'
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@mui/material/styles';
 
 import CheckoutContainer from './components/containers/CheckoutContainer';
 
@@ -24,25 +25,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1
   },
 }));
-
-/*const navItems = [
-  { path: '/signin', component: SignInContainer},
-  { path: '/signup', component: SignUpContainer},
-  { path: '/signout', component: () => <Redirect to='/' /> },
-  { path: '/dashboard', component: Dashboard },
-
-]
-
-function Routes ({userData}) {
-  return (
-    <>
-    <Route path='/' exact component={HomeContainer} key='/'/>
-    {navItems.map(item =>
-      <Route path={item.path} component={item.component} key={item.path}/>
-    )}
-    </>
-  )
-}*/
 
 
 export default function App() {
@@ -63,6 +45,7 @@ export default function App() {
               <Route path='/products/:id' children={<ProductContainer />} />
               <Route path='/shop/:id' children={<ShopContainer />} />
               <Route path='/checkout' component={CheckoutContainer} />
+              <Route path='/user/orders' component={OrdersContainer} />
             </Switch>
           </main>
         </div>

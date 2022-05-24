@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
-import { CardContent, TextField, Typography } from '@material-ui/core';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import Card from '@material-ui/core/Card';
-import Paper from '@material-ui/core/Paper';
-import DeleteIcon from '@material-ui/icons/Delete';
-import IconButton from '@material-ui/core/IconButton';
-import Checkbox from '@material-ui/core/Checkbox';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import Grid from '@mui/material/Grid';
+import { makeStyles } from '@mui/material/styles';
+import { CardContent, TextField, Typography } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Card from '@mui/material/Card';
+import Paper from '@mui/material/Paper';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import Checkbox from '@mui/material/Checkbox';
+import Autocomplete from '@mui/lab/Autocomplete';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useRouteMatch } from "react-router-dom";
-
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DatePicker from '@mui/lab/DatePicker';
+import DateAdapter from "@mui/lab/AdapterDateFns";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -190,8 +190,8 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                 <Typography gutterBottom>
                   {field.prompt}
                 </Typography>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <KeyboardDatePicker
+                <LocalizationProvider dateAdapter={DateAdapter}>
+                <DatePicker
                   margin="normal"
                   label={field.name}
                   format="MM/dd/yyyy"
@@ -201,7 +201,7 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                     'aria-label': 'change date',
                   }}
                 />
-                </MuiPickersUtilsProvider>
+                </LocalizationProvider>
               </CardContent>
               <Grid container justifyContent="flex-end">
                 <IconButton

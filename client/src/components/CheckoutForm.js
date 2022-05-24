@@ -5,7 +5,7 @@ import {
   useElements
 } from "@stripe/react-stripe-js";
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ resetCart }) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -29,6 +29,7 @@ export default function CheckoutForm() {
       switch (paymentIntent.status) {
         case "succeeded":
           setMessage("Payment succeeded!");
+          resetCart()
           break;
         case "processing":
           setMessage("Your payment is processing.");

@@ -25,14 +25,17 @@ module.exports = class OrderController {
         })
 
         for (const item of shop.items) {
+          // addon: {"addon name": true if added / false if not}
           const addonIds = Object.entries(item.addons).map(addon => addon[1] ? addon[0] : null)
             .filter(addon => addon !== null)
           const order = await db.Order.create({
             amount: await this.calculateProductPrice(item),
+            quantity: item.quantity,
             TransferId: transfer.id,
             ProductId: item.product.id,
             VarietyId: item.variation,
-            fulfillment: item.fulfillment
+            fulfillment: item.fulfillment,
+            UserId: req.user.id
           })
           await order.setAddons(addonIds)
         }
@@ -159,6 +162,46 @@ module.exports = class OrderController {
       console.log(err)
     }
   }
+
+  async list(req, res, next) {
+    let where = {}
+    if (req.query.shop) {
+        where.ShopId = req.query.shop
+    } else {
+      where.UserId = req.user.id
+    }
+    if(req.query.orderID) {
+        where.id = req.query.orderID
+    }
+
+    try {
+        const orders = db.Order.findAll({
+            where: where,
+            include: [
+              db.Variety,
+              {
+                model: db.Product,
+                include: [
+                  {
+                    model: db.Shop,
+                    attributes: ['name'],
+                    include: [
+                      db.PickupAddress,
+                      db.PickupSchedule,
+                      db.ShopContact
+                    ]
+                  }
+                ]
+              },
+              db.Addon
+            ]
+        });
+        return orders
+    }
+    catch(err) {
+        return err
+    }
+}
 
   async upsertAssociation(order, model, data, hasMany = false) {
     let associatedInstances = await Promise.all(data.map(async values => {

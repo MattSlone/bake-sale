@@ -35,16 +35,23 @@ module.exports = class ShopController {
 
   async read(req, res, next) {
     try {
-      if(req.query.UserId) {
-        const shop = await db.Shop.findOne({ 
+      let shop = null
+      const include = [db.PickupSchedule]
+      if (req.query.UserId && req.user.id == req.query.UserId) { // Is the users shop
+        shop = await db.Shop.findOne({ 
           where: { UserId:  req.query.UserId},
-          include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
+          include: [...include, db.PickupAddress, db.ShopContact]
         });
-        return shop
+      } else if (req.query.forOrder) {
+        shop = await db.Shop.findOne({
+          attributes: ['name'],
+          include: [...include, db.PickupAddress, db.ShopContact]
+        });
+      } else {
+        shop = await db.Shop.findByPk(req.query.id, {
+          include: include
+        });
       }
-      const shop = await db.Shop.findByPk(req.query.id, {
-        include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
-      });
       return shop
     }
     catch (err) {

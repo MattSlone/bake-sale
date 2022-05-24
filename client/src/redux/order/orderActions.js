@@ -3,7 +3,10 @@ import axios from 'axios'
 import {
   REFUND_REQUEST,
   REFUND_SUCCESS,
-  REFUND_FAILURE
+  REFUND_FAILURE,
+  GET_ORDERS_REQUEST,
+  GET_ORDERS_SUCCESS,
+  GET_ORDERS_FAILURE
 } from './orderTypes'
 
 export const refundRequest = () => {
@@ -26,6 +29,26 @@ export const refundFailure = (error) => {
   }
 }
 
+export const getOrdersRequest = () => {
+  return {
+    type: GET_ORDERS_REQUEST
+  }
+}
+
+export const getOrdersSuccess = (orders) => {
+  return {
+    type: GET_ORDERS_SUCCESS,
+    payload: orders
+  }
+}
+
+export const getOrdersFailure = (error) => {
+  return {
+    type: GET_ORDERS_FAILURE,
+    payload: error
+  }
+}
+
 export const refund = (orderId) => {
   const formData = {
     orderId: orderId
@@ -44,3 +67,23 @@ export const refund = (orderId) => {
     }
   }
 }
+
+export const getOrders = (formData = null) => {
+  return async (dispatch) => {
+    try {
+      dispatch(getOrdersRequest())
+      const res = await axios.get('/api/orders', {
+        params: formData
+      })
+      if(res.data.error[0]) {
+        dispatch(getOrdersFailure(res.data.error[0]))
+      }
+      else {
+        dispatch(getOrdersSuccess(res.data.success))
+      }
+    } catch(error) {
+      dispatch(getOrdersFailure(error.message))
+    }
+  }
+}
+

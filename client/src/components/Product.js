@@ -1,20 +1,20 @@
 import { React, useState, useEffect, useRef, useLayoutEffect } from 'react';
 import Carousel from 'react-material-ui-carousel'
 import { useParams } from 'react-router-dom'
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/material/styles';
 import { useAuth } from '../hooks/use-auth'
-import Card from '@material-ui/core/Card';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import CardMedia from '@material-ui/core/CardMedia';
-import Button from '@material-ui/core/Button';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import { TextField, Typography } from '@material-ui/core';
+import Card from '@mui/material/Card';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import CardMedia from '@mui/material/CardMedia';
+import Button from '@mui/material/Button';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import { TextField, Typography } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   product: {
@@ -86,7 +86,7 @@ export default function Product(props)
 
   useEffect(() => {
     let tempProduct = props.product.products.find(product => product.id == id)
-    console.log('temProduct: ', tempProduct)
+    console.log('tempProduct: ', tempProduct)
     if (tempProduct) {
       setProduct(tempProduct)
       props.getShop({id: tempProduct.ShopId})

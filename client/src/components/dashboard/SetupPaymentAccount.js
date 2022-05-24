@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { Link, Typography } from '@material-ui/core';
+import { makeStyles } from '@mui/material/styles';
+import { Link, Typography } from '@mui/material';
 
 import { useRouteMatch, useParams } from "react-router-dom";
-import Container from '@material-ui/core/Container';
+import Container from '@mui/material/Container';
 
 const useStyles = makeStyles((theme) => ({
   detailsSubmittedText: {

@@ -4,7 +4,8 @@ import {
   REMOVE_FROM_CART,
   CHECKOUT_REQUEST,
   CHECKOUT_SUCCESS,
-  CHECKOUT_FAILURE
+  CHECKOUT_FAILURE,
+  RESET_CART
 } from './cartTypes'
 
 const initialState = {
@@ -57,6 +58,7 @@ const cartReducer = (state = initialState, action) => {
       ...state,
       error: action.payload
     }
+    case RESET_CART: return initialState
     default: return state
   }
 }

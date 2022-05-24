@@ -1,7 +1,10 @@
 import {
   REFUND_REQUEST,
   REFUND_SUCCESS,
-  REFUND_FAILURE
+  REFUND_FAILURE,
+  GET_ORDERS_REQUEST,
+  GET_ORDERS_SUCCESS,
+  GET_ORDERS_FAILURE
 } from './orderTypes'
 
 const initialState = {
@@ -27,6 +30,21 @@ const orderReducer = (state = initialState, action) => {
     case REFUND_FAILURE: return {
       ...state,
       error: action.payload
+    }
+    case GET_ORDERS_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case GET_ORDERS_SUCCESS: return {
+      ...state,
+      orders: action.payload,
+      error: '',
+      loading: false
+    }
+    case GET_ORDERS_FAILURE: return {
+      ...state,
+      error: action.payload,
+      loading: false
     }
     default: return state
   }
