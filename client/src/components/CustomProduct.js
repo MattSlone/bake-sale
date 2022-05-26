@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useRef } from 'react';
+import { styled } from '@mui/material/styles';
 import Carousel from 'react-material-ui-carousel'
 import { useParams } from 'react-router-dom'
-import { makeStyles } from '@mui/material/styles';
 import { useAuth } from '../hooks/use-auth'
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -11,41 +11,69 @@ import Button from '@mui/material/Button';
 import CustomProductForm from './CustomProductForm';
 import { TextField, Typography } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  product: {
+const PREFIX = 'CustomProduct';
+
+const classes = {
+  product: `${PREFIX}-product`,
+  personalizationBox: `${PREFIX}-personalizationBox`,
+  card: `${PREFIX}-card`,
+  cardMedia: `${PREFIX}-cardMedia`,
+  sidebar: `${PREFIX}-sidebar`,
+  top: `${PREFIX}-top`,
+  titles: `${PREFIX}-titles`,
+  requestQuoteButton: `${PREFIX}-requestQuoteButton`,
+  formControl: `${PREFIX}-formControl`,
+  descTitle: `${PREFIX}-descTitle`
+};
+
+const StyledCard = styled(Card)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.product}`]: {
     padding: theme.spacing(2),
     marginTop: theme.spacing(8)
   },
-  personalizationBox: {
+
+  [`& .${classes.personalizationBox}`]: {
     width: '100%',
     marginBottom: theme.spacing(1)
   },
-  card: {
+
+  [`&.${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
-  cardMedia: {
+
+  [`& .${classes.cardMedia}`]: {
     paddingTop: '56.25%', // 16:9
   },
-  sidebar: {
+
+  [`& .${classes.sidebar}`]: {
     height: '100%'
   },
-  top: {
+
+  [`& .${classes.top}`]: {
     // flexWrap: 'nowrap'
   },
-  titles: {
+
+  [`& .${classes.titles}`]: {
     marginBottom: 'auto'
   },
-  requestQuoteButton: {
+
+  [`& .${classes.requestQuoteButton}`]: {
     width: '100%',
     marginTop: '5px'
   },
-  formControl: {
+
+  [`& .${classes.formControl}`]: {
     width: '100%',
     marginBottom: theme.spacing(1)
   },
-  descTitle: {
+
+  [`& .${classes.descTitle}`]: {
     fontWeight: 'bold',
     marginRight: theme.spacing(1)
   }
@@ -53,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CustomProduct(props)
 {
-  const classes = useStyles()
+
   let { id } = useParams()
   const auth = useAuth()
   const [quote, setQuote] = useState(props.quote.quotes.find(quote => quote.ProductId == id))
@@ -165,14 +193,14 @@ export default function CustomProduct(props)
 
 function Item(props)
 {
-  const classes = useStyles()
+
     return (
-      <Card className={classes.card}>
+      <StyledCard className={classes.card}>
         <CardMedia
           className={classes.cardMedia}
           image="https://source.unsplash.com/featured/?baked,goods"
           title="Image title"
         />
-      </Card>
-    )
+      </StyledCard>
+    );
 }

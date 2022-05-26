@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/material/styles';
 import { Input, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -13,25 +13,41 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'Addons';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  fullWidth: `${PREFIX}-fullWidth`,
+  tooltip: `${PREFIX}-tooltip`
+};
+
+const StyledGrid = styled(Grid)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
       flexGrow: 1,
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
-  fullWidth: {
+
+  [`& .${classes.fullWidth}`]: {
     width: '100%'
   },
-  tooltip: {
+
+  [`& .${classes.tooltip}`]: {
     fontSize: theme.typography.pxToRem(48),
   }
 }));
 
 export default function Addons(props) {
-  const classes = useStyles();
+
 
   const [addons, setAddons] = useState(props.addons)
   const [price, setPrice] = useState('')
@@ -64,7 +80,7 @@ export default function Addons(props) {
   }
 
   return (
-    <Grid container spacing={2} direction="column">
+    <StyledGrid container spacing={2} direction="column">
       <Grid item>
         <Typography>
           Create up to 5 additional optional add-ons for your product:
@@ -78,11 +94,11 @@ export default function Addons(props) {
                 {addon.name}
               </ListItemText>
               <ListItemSecondaryAction>
-                <IconButton 
-                  edge="end" 
+                <IconButton
+                  edge="end"
                   aria-label="delete"
                   onClick={() => {handleDeleteAddon(i)}}
-                >
+                  size="large">
                   <DeleteIcon />
                 </IconButton>
               </ListItemSecondaryAction>
@@ -138,6 +154,6 @@ export default function Addons(props) {
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </StyledGrid>
   );
 }

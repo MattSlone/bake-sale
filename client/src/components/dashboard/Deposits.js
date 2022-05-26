@@ -1,23 +1,30 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import Link from '@mui/material/Link';
-import { makeStyles } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
+
+const PREFIX = 'Deposits';
+
+const classes = {
+  depositContext: `${PREFIX}-depositContext`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')({
+  [`& .${classes.depositContext}`]: {
+    flex: 1,
+  },
+});
 
 function preventDefault(event) {
   event.preventDefault();
 }
 
-const useStyles = makeStyles({
-  depositContext: {
-    flex: 1,
-  },
-});
-
 export default function Deposits() {
-  const classes = useStyles();
+
   return (
-    <React.Fragment>
+    <Root>
       <Title>Recent Deposits</Title>
       <Typography component="p" variant="h4">
         $3,024.00
@@ -30,6 +37,6 @@ export default function Deposits() {
           View balance
         </Link>
       </div>
-    </React.Fragment>
+    </Root>
   );
 }

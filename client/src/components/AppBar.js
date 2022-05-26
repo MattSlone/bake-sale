@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { styled } from '@mui/material/styles';
 import { useIsMount } from '../hooks/useIsMount';
-import { alpha, makeStyles } from '@mui/material/styles';
+import  { alpha }  from '@mui/material/styles'
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -26,41 +27,76 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-const useStyles = makeStyles((theme) => ({
-  grow: {
+const PREFIX = 'AppBar';
+
+const classes = {
+  grow: `${PREFIX}-grow`,
+  quantityInput: `${PREFIX}-quantityInput`,
+  fullWidth: `${PREFIX}-fullWidth`,
+  paper: `${PREFIX}-paper`,
+  paddingLeft: `${PREFIX}-paddingLeft`,
+  menuButton: `${PREFIX}-menuButton`,
+  title: `${PREFIX}-title`,
+  appBar: `${PREFIX}-appBar`,
+  search: `${PREFIX}-search`,
+  searchIcon: `${PREFIX}-searchIcon`,
+  inputRoot: `${PREFIX}-inputRoot`,
+  inputInput: `${PREFIX}-inputInput`,
+  sectionDesktop: `${PREFIX}-sectionDesktop`,
+  sectionMobile: `${PREFIX}-sectionMobile`,
+  routerLinkButton: `${PREFIX}-routerLinkButton`,
+  white: `${PREFIX}-white`,
+  popoverRoot: `${PREFIX}-popoverRoot`
+};
+
+const Root = styled('div')((
+  {
+    theme,
+    drawerwidth
+  }
+) => ({
+  [`& .${classes.grow}`]: {
     flexGrow: 1,
   },
-  quantityInput: {
+
+  [`& .${classes.quantityInput}`]: {
     width: 45
   },
-  fullWidth: {
+
+  [`& .${classes.fullWidth}`]: {
     width: '100%'
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(1),
   },
-  paddingLeft: {
+
+  [`& .${classes.paddingLeft}`]: {
     paddingLeft: theme.spacing(1)
   },
-  menuButton: {
+
+  [`& .${classes.menuButton}`]: {
     marginRight: theme.spacing(2),
     [theme.breakpoints.up('sm')]: {
       display: 'none',
     },
   },
-  title: {
+
+  [`& .${classes.title}`]: {
     display: 'block',
     [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
   },
-  appBar: {
+
+  [`& .${classes.appBar}`]: {
     [theme.breakpoints.up('sm')]: {
-      width: (props) => `calc(100% - ${props.drawerWidth}px)`,
-      marginLeft: (props) => props.drawerWidth,
+      width: `calc(100% - ${drawerwidth}px)`,
+      marginLeft: drawerwidth,
     },
   },
-  search: {
+
+  [`& .${classes.search}`]: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -75,7 +111,8 @@ const useStyles = makeStyles((theme) => ({
       width: '100%',
     },
   },
-  searchIcon: {
+
+  [`& .${classes.searchIcon}`]: {
     padding: theme.spacing(0, 2),
     height: '100%',
     position: 'absolute',
@@ -84,39 +121,46 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  inputRoot: {
+
+  [`& .${classes.inputRoot}`]: {
     color: 'inherit',
   },
-  inputInput: {
+
+  [`& .${classes.inputInput}`]: {
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
       width: '20ch',
     },
   },
-  sectionDesktop: {
+
+  [`& .${classes.sectionDesktop}`]: {
     display: 'none',
     [theme.breakpoints.up('md')]: {
       display: 'flex',
     },
   },
-  sectionMobile: {
+
+  [`& .${classes.sectionMobile}`]: {
     display: 'flex',
     [theme.breakpoints.up('md')]: {
       display: 'none',
     },
   },
-  routerLinkButton: {
+
+  [`& .${classes.routerLinkButton}`]: {
     color: 'black',
     textDecoration: 'none'
   },
-  white: {
+
+  [`& .${classes.white}`]: {
     color: 'white'
   },
-  popoverRoot: {
+
+  [`& .${classes.popoverRoot}`]: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'f',
@@ -124,7 +168,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function PrimarySearchAppBar(props) {
-  const classes = useStyles(props);
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMount = useIsMount();
@@ -225,8 +269,7 @@ export default function PrimarySearchAppBar(props) {
       onClose={handleMobileMenuClose}
     >
       <MenuItem ref={cartAnchorRef} onClick={handleCartPopoverOpen}>
-        <IconButton aria-label="show 4 new mails" color="inherit"
-        >
+        <IconButton aria-label="show 4 new mails" color="inherit" size="large">
           <Badge badgeContent={props.cart.products.length} color="secondary">
             <ShoppingCartIcon />
           </Badge>
@@ -234,7 +277,7 @@ export default function PrimarySearchAppBar(props) {
         <p>Cart</p>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
+        <IconButton aria-label="show 11 new notifications" color="inherit" size="large">
           <Badge badgeContent={11} color="secondary">
             <NotificationsIcon />
           </Badge>
@@ -247,7 +290,7 @@ export default function PrimarySearchAppBar(props) {
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
           color="inherit"
-        >
+          size="large">
           <AccountCircle />
         </IconButton>
         <p>Profile</p>
@@ -256,7 +299,7 @@ export default function PrimarySearchAppBar(props) {
   );
 
   return (
-    <div>
+    <Root drawerwidth={props.drawerWidth}>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <IconButton
@@ -265,7 +308,7 @@ export default function PrimarySearchAppBar(props) {
             color="inherit"
             onClick={props.handleDrawerToggle}
             aria-label="open drawer"
-          >
+            size="large">
             <MenuIcon />
           </IconButton>
           <RouterLink to='/' className={`${classes.routerLinkButton} ${classes.white}`}>
@@ -288,15 +331,17 @@ export default function PrimarySearchAppBar(props) {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 4 new mails" color="inherit"
+            <IconButton
+              aria-label="show 4 new mails"
+              color="inherit"
               onClick={handleCartPopoverOpen}
               ref={cartAnchorRef}
-            >
+              size="large">
               <Badge badgeContent={props.cart.products.length} color="secondary">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
+            <IconButton aria-label="show 17 new notifications" color="inherit" size="large">
               <Badge badgeContent={17} color="secondary">
                 <NotificationsIcon />
               </Badge>
@@ -308,7 +353,7 @@ export default function PrimarySearchAppBar(props) {
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
               color="inherit"
-            >
+              size="large">
               <AccountCircle />
             </IconButton>
           </div>
@@ -319,7 +364,7 @@ export default function PrimarySearchAppBar(props) {
               aria-haspopup="true"
               onClick={handleMobileMenuOpen}
               color="inherit"
-            >
+              size="large">
               <MoreIcon />
             </IconButton>
           </div>
@@ -372,11 +417,11 @@ export default function PrimarySearchAppBar(props) {
                     ${Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}
                   </ListItemText>
                   <ListItemSecondaryAction>
-                    <IconButton 
-                      edge="end" 
+                    <IconButton
+                      edge="end"
                       aria-label="delete"
                       onClick={() => {handleRemoveFromCart(i)}}
-                    >
+                      size="large">
                       <DeleteIcon />
                     </IconButton>
                   </ListItemSecondaryAction>
@@ -401,6 +446,6 @@ export default function PrimarySearchAppBar(props) {
       
       {renderMobileMenu}
       {renderMenu}
-    </div>
+    </Root>
   );
 }

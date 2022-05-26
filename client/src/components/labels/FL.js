@@ -30,7 +30,7 @@ const LabelFL = () => (
         <Text style={styles.bold}>TO FLORIDA’S FOOD SAFETY REGULATIONS</Text>
       </View>
       <View style={styles.section}>
-        <Text style={styles.bold, styles.big}>Chocolate Chip Cookie</Text>
+        <Text style={(styles.bold, styles.big)}>Chocolate Chip Cookie</Text>
       </View>
       <View style={styles.section}>
         <Text>Ashley Christopher Bryant</Text>

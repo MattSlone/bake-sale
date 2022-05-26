@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Carousel from 'react-material-ui-carousel'
 import { useParams } from 'react-router-dom'
-import { makeStyles } from '@mui/material/styles';
 import { useAuth } from '../hooks/use-auth'
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -16,50 +16,80 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { TextField, Typography } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  product: {
+const PREFIX = 'Product';
+
+const classes = {
+  product: `${PREFIX}-product`,
+  personalizationBox: `${PREFIX}-personalizationBox`,
+  card: `${PREFIX}-card`,
+  cardMedia: `${PREFIX}-cardMedia`,
+  productAttributes: `${PREFIX}-productAttributes`,
+  addToCart: `${PREFIX}-addToCart`,
+  addToCartButton: `${PREFIX}-addToCartButton`,
+  formControl: `${PREFIX}-formControl`,
+  descriptionContainer: `${PREFIX}-descriptionContainer`,
+  descriptionContainerBottom: `${PREFIX}-descriptionContainerBottom`,
+  descTitle: `${PREFIX}-descTitle`
+};
+
+const StyledGrid = styled(Grid)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.product}`]: {
     padding: theme.spacing(8),
     marginTop: theme.spacing(8)
   },
-  personalizationBox: {
+
+  [`& .${classes.personalizationBox}`]: {
     width: '100%',
     marginBottom: theme.spacing(1)
   },
-  card: {
+
+  [`& .${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
-  cardMedia: {
+
+  [`& .${classes.cardMedia}`]: {
     paddingTop: '56.25%', // 16:9
   },
-  productAttributes: {
+
+  [`& .${classes.productAttributes}`]: {
     height: '100%'
   },
-  addToCart: {
+
+  [`& .${classes.addToCart}`]: {
     //marginTop: 'auto'
   },
-  addToCartButton: {
+
+  [`& .${classes.addToCartButton}`]: {
     width: '100%'
   },
-  formControl: {
+
+  [`& .${classes.formControl}`]: {
     width: '100%',
     marginBottom: theme.spacing(1)
   },
-  descriptionContainer: {
+
+  [`& .${classes.descriptionContainer}`]: {
     marginTop: theme.spacing(1),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: "none"
     },
   },
-  descriptionContainerBottom: {
+
+  [`& .${classes.descriptionContainerBottom}`]: {
     display: "none",
     marginTop: theme.spacing(1),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: "block"
     },
   },
-  descTitle: {
+
+  [`& .${classes.descTitle}`]: {
     fontWeight: 'bold',
     marginRight: theme.spacing(1)
   }
@@ -69,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Product(props)
 {
-  const classes = useStyles()
+
   let { id } = useParams()
   const auth = useAuth()
   const [product, setProduct] = useState('')
@@ -171,9 +201,9 @@ export default function Product(props)
     }
   ]
 
-  return ( product ?
+  return product ?
     <Paper className={classes.product}>
-      <Grid container spacing={3}>
+      <StyledGrid container spacing={3}>
         <Grid item xs={12} md={8}> 
           <Carousel
           indicators={false}
@@ -271,7 +301,7 @@ export default function Product(props)
                       onChange={handleSelectFulfillment}
                     >
                       <MenuItem value=''>Select an option</MenuItem>
-                      {props.shop.pickupAddress.street ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
+                      {props.shop.pickupAddress ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
                       {
                         (product.Varieties.find(v => v.quantity == variation).delivery > 0) ? 
                         <MenuItem value='delivery'>{`Delivery, $${Number.parseFloat(product.Varieties.find(v => v.quantity == variation).delivery).toFixed(2)}`}</MenuItem>
@@ -300,14 +330,14 @@ export default function Product(props)
           </Grid>
         </Grid>
         <DescriptionContainer product={product} classProp={classes.descriptionContainerBottom} />
-      </Grid>
+      </StyledGrid>
     </Paper>
-  : '')
+  : '';
 }
 
 function Item(props)
 {
-  const classes = useStyles()
+
     return (
       <Card className={classes.card}>
         <CardMedia
@@ -320,7 +350,7 @@ function Item(props)
 }
 
 function DescriptionContainer({product, classProp}) {
-  const classes = useStyles()
+
   return (
     <Grid direction="column" spacing={2} container className={classProp}>
       <Grid item>

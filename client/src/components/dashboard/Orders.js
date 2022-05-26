@@ -1,12 +1,29 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import Link from '@mui/material/Link';
-import { makeStyles } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
+
+const PREFIX = 'Orders';
+
+const classes = {
+  seeMore: `${PREFIX}-seeMore`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.seeMore}`]: {
+    marginTop: theme.spacing(3),
+  }
+}));
 
 // Generate Order Data
 function createData(id, date, name, shipTo, paymentMethod, amount) {
@@ -25,16 +42,10 @@ function preventDefault(event) {
   event.preventDefault();
 }
 
-const useStyles = makeStyles((theme) => ({
-  seeMore: {
-    marginTop: theme.spacing(3),
-  },
-}));
-
 export default function Orders() {
-  const classes = useStyles();
+
   return (
-    <React.Fragment>
+    <Root>
       <Title>Recent Orders</Title>
       <Table size="small">
         <TableHead>
@@ -63,6 +74,6 @@ export default function Orders() {
           See more orders
         </Link>
       </div>
-    </React.Fragment>
+    </Root>
   );
 }

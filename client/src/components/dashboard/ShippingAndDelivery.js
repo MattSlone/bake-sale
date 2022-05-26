@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/material/styles';
 import { GoogleMap, LoadScript, Circle } from '@react-google-maps/api';
 import { Input, TextField, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -9,24 +9,40 @@ import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import { useHistory } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'ShippingAndDelivery';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  addressField: `${PREFIX}-addressField`,
+  pickupAddress: `${PREFIX}-pickupAddress`,
+  flexGrow: `${PREFIX}-flexGrow`
+};
+
+const StyledGrid = styled(Grid)((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.root}`]: {
       flexGrow: 1,
   },
-  addressField: {
+
+  [`& .${classes.addressField}`]: {
     width: '100%'
   },
-  pickupAddress: {
+
+  [`& .${classes.pickupAddress}`]: {
     width: '100%',
     alignSelf: 'stretch'
   },
-  flexGrow: {
+
+  [`& .${classes.flexGrow}`]: {
     flex: 1
   }
 }));
 
 function ShippingAndDelivery(props) {
-  const classes = useStyles();
+
   const [circle, setCircle] = useState('')
   const [location, setLocation] = useState(props.shop.area.location)
   const [street, setStreet] = useState(props.shop.pickupAddress.street)
@@ -84,7 +100,7 @@ function ShippingAndDelivery(props) {
   };
 
   return (
-    <Grid alignItems="center" container spacing={2} className={classes.root} direction="column">
+    <StyledGrid alignItems="center" container spacing={2} className={classes.root} direction="column">
       <Grid item xs={12} md={8}>
         <Typography>
           Enter the address of your home/kitchen. This should be the location at which customers can pickup orders (if you allow pickups). 
@@ -185,10 +201,10 @@ function ShippingAndDelivery(props) {
           Save
         </Button>
       </Grid>
-      <Grid item xs={12} md={6} lg={4} container justify="flex-end">
+      <Grid item xs={12} md={6} lg={4} container justifyContent="flex-end">
         
       </Grid>
-    </Grid>
+    </StyledGrid>
   );
 }
 

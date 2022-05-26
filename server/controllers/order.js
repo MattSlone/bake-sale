@@ -7,6 +7,7 @@ const db = require('../models/index'),
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
     try {
+      console.log('top of createPaymentIntent')
       const shopAmounts = await this.mapCartToShopAmounts(req.body.items)
       const totalAmount = shopAmounts.map(shopAmount => shopAmount.amount)
         .reduce((prev, curr) => prev + curr)
@@ -25,6 +26,7 @@ module.exports = class OrderController {
         })
 
         for (const item of shop.items) {
+          console.log(req)
           // addon: {"addon name": true if added / false if not}
           const addonIds = Object.entries(item.addons).map(addon => addon[1] ? addon[0] : null)
             .filter(addon => addon !== null)

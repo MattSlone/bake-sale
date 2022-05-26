@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
@@ -23,31 +23,53 @@ import InputLabel from '@mui/material/InputLabel';
 import { setContact } from '../../redux';
 
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'PickupAndDeliveryOptions';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  desktop: `${PREFIX}-desktop`,
+  mobile: `${PREFIX}-mobile`,
+  button: `${PREFIX}-button`,
+  actionsContainer: `${PREFIX}-actionsContainer`,
+  resetContainer: `${PREFIX}-resetContainer`,
+  fullWidth: `${PREFIX}-fullWidth`
+};
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.root}`]: {
     maxWidth: '100%',
   },
-  desktop: {
+
+  [`& .${classes.desktop}`]: {
     paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
     paddingLeft: 0,
     paddingRight: 0
   },
-  mobile: {
+
+  [`& .${classes.mobile}`]: {
     paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(7) : theme.spacing(0),
     paddingLeft: 0,
     paddingRight: 0
   },
-  button: {
+
+  [`& .${classes.button}`]: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
   },
-  actionsContainer: {
+
+  [`& .${classes.actionsContainer}`]: {
     marginBottom: theme.spacing(2),
   },
-  resetContainer: {
+
+  [`& .${classes.resetContainer}`]: {
     padding: theme.spacing(3),
   },
-  fullWidth: {
+
+  [`& .${classes.fullWidth}`]: {
     width: '100%'
   }
 }));
@@ -61,7 +83,7 @@ function getSteps() {
 }
 
 export default function PickupAndDeliveryOptions(props) {
-  const classes = useStyles();
+
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
   const match = useRouteMatch()
@@ -212,7 +234,7 @@ export default function PickupAndDeliveryOptions(props) {
   };
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <Stepper classes={matches ? {root: classes.desktop} : {root: classes.mobile}} activeStep={activeStep} orientation="vertical">
         {steps.map((label, index) => (
           <Step key={label}>
@@ -300,7 +322,7 @@ export default function PickupAndDeliveryOptions(props) {
                       </Grid>
                       <Grid spacing={1}  container alignItems="center" item>
                         {pickupSchedule.map((pickupDay, i) => (
-                          <Grid key={i} container justify="center" item sm={6} md={3}>
+                          <Grid key={i} container justifyContent="center" item sm={6} md={3}>
                             <Grid item>
                               <FormControlLabel
                                 control={
@@ -315,7 +337,7 @@ export default function PickupAndDeliveryOptions(props) {
                                 disabled={!pickup}
                               />
                             </Grid>
-                            <Grid container item xs={12} justify="center">
+                            <Grid container item xs={12} justifyContent="center">
                               <Grid item>
                                 <TextField
                                   label="Start Time"
@@ -353,7 +375,7 @@ export default function PickupAndDeliveryOptions(props) {
                         ))}
                       </Grid>
                     </Grid>
-                  )
+                  );
                 case 2:
                   return (
                     <Grid container spacing={2} className={classes.root} direction="column">
@@ -515,6 +537,6 @@ export default function PickupAndDeliveryOptions(props) {
           </Button>
         </Paper>
       )}
-    </div>
+    </Root>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AppBarContainer from './containers/AppBarContainer';
@@ -14,49 +15,73 @@ import ListSubheader from '@mui/material/ListSubheader';
 import MainListItems from './dashboard/ListItems';
 import Icon from '@mui/material/Icon';
 import { loadCSS } from 'fg-loadcss';
-import { makeStyles, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/styles';
 
-const drawerWidth = 240;
+const PREFIX = 'ResponsiveDrawer';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const classes = {
+  root: `${PREFIX}-root`,
+  drawer: `${PREFIX}-drawer`,
+  listItemText: `${PREFIX}-listItemText`,
+  appBar: `${PREFIX}-appBar`,
+  menuButton: `${PREFIX}-menuButton`,
+  toolbar: `${PREFIX}-toolbar`,
+  drawerPaper: `${PREFIX}-drawerPaper`,
+  content: `${PREFIX}-content`
+};
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     display: 'flex',
   },
-  drawer: {
+
+  [`& .${classes.drawer}`]: {
     [theme.breakpoints.up('sm')]: {
       width: drawerWidth,
       flexShrink: 0,
     },
   },
-  listItemText: {
+
+  [`& .${classes.listItemText}`]: {
     marginLeft: theme.spacing(1)
   },
-  appBar: {
+
+  [`& .${classes.appBar}`]: {
     [theme.breakpoints.up('sm')]: {
       width: `calc(100% - ${drawerWidth}px)`,
       marginLeft: drawerWidth,
     },
   },
-  menuButton: {
+
+  [`& .${classes.menuButton}`]: {
     marginRight: theme.spacing(2),
     [theme.breakpoints.up('sm')]: {
       display: 'none',
     },
   },
+
   // necessary for content to be below app bar
-  toolbar: theme.mixins.toolbar,
-  drawerPaper: {
+  [`& .${classes.toolbar}`]: theme.mixins.toolbar,
+
+  [`& .${classes.drawerPaper}`]: {
     width: drawerWidth,
   },
-  content: {
+
+  [`& .${classes.content}`]: {
     flexGrow: 1,
     padding: theme.spacing(3),
-  },
+  }
 }));
+
+const drawerWidth = 240;
 
 function ResponsiveDrawer(props) {
   const { window } = props;
-  const classes = useStyles();
+
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -70,6 +95,7 @@ function ResponsiveDrawer(props) {
   })
 
   const handleDrawerToggle = () => {
+    console.log('toggling!!!')
     setMobileOpen(!mobileOpen);
   };
 
@@ -106,16 +132,17 @@ function ResponsiveDrawer(props) {
   )
 
   const drawer = (
-    <div>
+    <Root>
       <div className={classes.toolbar} />
       <Divider />
       {location.pathname.includes('/dashboard') ? DashboardListItems : DefaultListItems}
-    </div>
+    </Root>
   );
 
   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
+    <Root>
     <div className={classes.root}>
       <CssBaseline />
       <AppBarContainer position="fixed" drawerWidth="240" handleDrawerToggle={handleDrawerToggle} />
@@ -138,7 +165,7 @@ function ResponsiveDrawer(props) {
             {drawer}
           </Drawer>
         </Hidden>
-        <Hidden xsDown implementation="css">
+        <Hidden smDown implementation="css">
           <Drawer
             classes={{
               paper: classes.drawerPaper,
@@ -151,6 +178,7 @@ function ResponsiveDrawer(props) {
         </Hidden>
       </nav>
     </div>
+    </Root>
   );
 }
 

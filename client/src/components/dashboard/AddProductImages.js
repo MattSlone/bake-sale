@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CameraIcon from '@mui/icons-material/PhotoCamera';
 import Card from '@mui/material/Card';
@@ -9,39 +10,57 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import { Input } from '@mui/material';
 import { CardActionArea } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  icon: {
+const PREFIX = 'AddProductImages';
+
+const classes = {
+  icon: `${PREFIX}-icon`,
+  cardGrid: `${PREFIX}-cardGrid`,
+  card: `${PREFIX}-card`,
+  cardMedia: `${PREFIX}-cardMedia`,
+  cardContent: `${PREFIX}-cardContent`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.icon}`]: {
     marginRight: theme.spacing(2),
   },
-  cardGrid: {
+
+  [`& .${classes.cardGrid}`]: {
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(1),
   },
-  card: {
+
+  [`& .${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
     borderRadius: 0,
   },
-  cardMedia: {
+
+  [`& .${classes.cardMedia}`]: {
     paddingTop: '56.25%', // 16:9
     backgroundColor: 'lightgrey',
   },
-  cardContent: {
+
+  [`& .${classes.cardContent}`]: {
     flexGrow: 1,
-  },
+  }
 }));
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function AddProductImages({ imageFiles, setProductImagesPreview }) {
-  const classes = useStyles();
+
   const hiddenFileInput = React.useRef([])
 
   console.log(imageFiles)
@@ -67,7 +86,7 @@ export default function AddProductImages({ imageFiles, setProductImagesPreview }
   };
 
   return (
-    <React.Fragment>
+    <Root>
       <CssBaseline />
       <main>
         <Container className={classes.cardGrid} maxWidth="lg">
@@ -89,6 +108,6 @@ export default function AddProductImages({ imageFiles, setProductImagesPreview }
           </Grid>
         </Container>
       </main>
-    </React.Fragment>
+    </Root>
   );
 }

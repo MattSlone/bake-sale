@@ -1,5 +1,7 @@
 FROM node:16-alpine
 RUN apk update && apk upgrade
+RUN rm -rf /app
+RUN mkdir /app
 WORKDIR /app
 
 ARG NODE_ENV

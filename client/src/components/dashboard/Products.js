@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -6,33 +7,52 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import { useHistory, Link as RouterLink, Redirect } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
-  cardGrid: {
+const PREFIX = 'Products';
+
+const classes = {
+  cardGrid: `${PREFIX}-cardGrid`,
+  card: `${PREFIX}-card`,
+  cardMedia: `${PREFIX}-cardMedia`,
+  cardMediaAdd: `${PREFIX}-cardMediaAdd`,
+  cardContent: `${PREFIX}-cardContent`,
+  routerLinkButton: `${PREFIX}-routerLinkButton`
+};
+
+const StyledContainer = styled(Container)((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.cardGrid}`]: {
     paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
   },
-  card: {
+
+  [`& .${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
-  cardMedia: {
+
+  [`& .${classes.cardMedia}`]: {
     paddingTop: '56.25%', // 16:9
   },
-  cardMediaAdd: {
+
+  [`& .${classes.cardMediaAdd}`]: {
     paddingTop: '56.25%', // 16:9
     height: '100%',
     cursor: 'pointer'
   },
-  cardContent: {
+
+  [`& .${classes.cardContent}`]: {
     flexGrow: 1,
   },
-  routerLinkButton: {
+
+  [`& .${classes.routerLinkButton}`]: {
     textDecoration: 'none',
   }
 }));
@@ -40,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function Products(props) {
-  const classes = useStyles();
+
   const [products, setProducts] = useState(props.product.products)
   const history = useHistory()
 
@@ -65,7 +85,7 @@ export default function Products(props) {
   }
 
   return (
-    <Container spacing={2} className={classes.cardGrid} maxWidth="lg">
+    <StyledContainer spacing={2} className={classes.cardGrid} maxWidth="lg">
       <Grid container spacing={4}>
         <Grid item xs={12} sm={6} md={4}>
           <Card className={classes.card} onClick={handleAddProduct}>
@@ -118,6 +138,6 @@ export default function Products(props) {
           </Grid>
         )) : ''}
       </Grid>
-    </Container>
+    </StyledContainer>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -10,20 +11,28 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import PeopleIcon from '@mui/icons-material/People';
 import { Link } from 'react-router-dom'
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { makeStyles } from '@mui/material/styles';
+const PREFIX = 'ListItems';
 
-const useStyles = makeStyles((theme) => ({
-  routerLink: {
+const classes = {
+  routerLink: `${PREFIX}-routerLink`
+};
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.routerLink}`]: {
     textDecoration: 'none',
     color: 'rgba(0, 0, 0, 0.87)'
   }
 }));
 
 export default function MainListItems() {
-  const classes = useStyles()
+
 
   return (
-    <div>
+    <Root>
       <Link className={classes.routerLink} to="/dashboard">
         <ListItem button>
           <ListItemIcon>
@@ -66,7 +75,7 @@ export default function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Customers" />
       </ListItem>
-    </div>
+    </Root>
   );
 }
 

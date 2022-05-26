@@ -1,8 +1,8 @@
 import { React, useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from './CheckoutForm'
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
@@ -11,17 +11,28 @@ import ListItemText from '@mui/material/ListItemText';
 const stripePromise = loadStripe("pk_test_51KMDSaL7rHJy0SQFdZI0Q9HFv1wbLuCHm6AuVequIPtqFCa738z7EjGXncDblPZowGe8ALzhjbwh9W25NtejoyxW00YxzwtmYo");
 import './Checkout.css'
 
-const useStyles = makeStyles((theme) => ({
-  checkoutContainer: {
+const PREFIX = 'Checkout';
+
+const classes = {
+  checkoutContainer: `${PREFIX}-checkoutContainer`
+};
+
+const StyledContainer = styled(Container)((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.checkoutContainer}`]: {
     padding: theme.spacing(10, 3, 10, 3),
     [theme.breakpoints.up('md')]: {
       padding: theme.spacing(10)
     },
   }
 }));
+
 export default function  Checkout(props) {
   const [clientSecret, setClientSecret] = useState("");
-  const classes = useStyles()
+
   
 
   useEffect(async () => {
@@ -46,7 +57,7 @@ export default function  Checkout(props) {
   };
 
   return (
-    <Container className={classes.checkoutContainer}>
+    <StyledContainer className={classes.checkoutContainer}>
       {props.cart.products.length > 0 ?
       <div>
       <Typography variant="h6" gutterBottom>
@@ -82,6 +93,6 @@ export default function  Checkout(props) {
           </Elements>
         )}
       </div>
-    </Container>
+    </StyledContainer>
   );
 }

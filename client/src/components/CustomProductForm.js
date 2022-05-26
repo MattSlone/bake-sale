@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/material/styles';
 import { CardContent, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -19,30 +19,52 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import DateAdapter from "@mui/lab/AdapterDateFns";
 
-const useStyles = makeStyles((theme) => ({
-  card: {
+const PREFIX = 'CustomProductForm';
+
+const classes = {
+  card: `${PREFIX}-card`,
+  cardContent: `${PREFIX}-cardContent`,
+  formControl: `${PREFIX}-formControl`,
+  textField: `${PREFIX}-textField`,
+  paper: `${PREFIX}-paper`,
+  noshadow: `${PREFIX}-noshadow`,
+  nopadding: `${PREFIX}-nopadding`
+};
+
+const StyledPaper = styled(Paper)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column'
   },
-  cardContent: {
+
+  [`& .${classes.cardContent}`]: {
     flexGrow: 1,
   },
-  formControl: {
+
+  [`& .${classes.formControl}`]: {
     minWidth: 200,
   },
-  textField: {
+
+  [`& .${classes.textField}`]: {
     minWidth: 200
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(1),
     paddingTop: theme.spacing(3),
     minHeight: 400,
   },
-  noshadow: {
+
+  [`& .${classes.noshadow}`]: {
     boxShadow: 'none'
   },
-  nopadding: {
+
+  [`& .${classes.nopadding}`]: {
     padding: 0
   }
 }));
@@ -52,7 +74,7 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export default function CustomProductForm({fields, setFields = null, title, noshadow, }) {
-  const classes = useStyles();
+
   const [formTitle, setFormTitle] = useState(title)
 
   const handleValueChange = (newValue, index) => {
@@ -98,16 +120,16 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
             {formTitle === 'Form Preview' ? (
               <Grid container justifyContent="flex-end">
                 <IconButton
-                  edge="start" 
+                  edge="start"
                   aria-label="delete"
                   onClick={() => {handleDeleteField(index)}}
-                >
+                  size="large">
                   <DeleteIcon />
                 </IconButton>
               </Grid>
             ) : ''}
           </Card>
-        )
+        );
       case 'select':
         return (
           <Card className={classes.card}>
@@ -131,15 +153,15 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
             </CardContent>
             <Grid container justifyContent="flex-end">
               <IconButton
-                edge="start" 
+                edge="start"
                 aria-label="delete"
                 onClick={() => {handleDeleteField(index)}}
-              >
+                size="large">
                 <DeleteIcon />
               </IconButton>
             </Grid>
           </Card>
-        )
+        );
       case 'multiselect':
         return (
           <Card className={classes.card}>
@@ -174,15 +196,15 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
             </CardContent>
             <Grid container justifyContent="flex-end">
               <IconButton
-                edge="start" 
+                edge="start"
                 aria-label="delete"
                 onClick={() => {handleDeleteField(index)}}
-              >
+                size="large">
                 <DeleteIcon />
               </IconButton>
             </Grid>
           </Card>
-        )
+        );
         case 'date':
           return (
             <Card className={classes.card}>
@@ -205,22 +227,22 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
               </CardContent>
               <Grid container justifyContent="flex-end">
                 <IconButton
-                  edge="start" 
+                  edge="start"
                   aria-label="delete"
                   onClick={() => {handleDeleteField(index)}}
-                >
+                  size="large">
                   <DeleteIcon />
                 </IconButton>
               </Grid>
             </Card>
-          )
+          );
       default: 
         return
     }
   }
 
   return (
-    <Paper className={noshadow ? `${classes.paper} ${classes.noshadow}` : classes.paper}>
+    <StyledPaper className={noshadow ? `${classes.paper} ${classes.noshadow}` : classes.paper}>
       <Typography gutterBottom variant="h4">
         {formTitle}
       </Typography>
@@ -233,6 +255,6 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
         )
       })}
       </Grid>
-    </Paper>
+    </StyledPaper>
   );
 }

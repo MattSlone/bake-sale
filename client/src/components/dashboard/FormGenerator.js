@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/material/styles';
 import { TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -16,14 +16,28 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import CustomProductForm from '../CustomProductForm';
 
-const useStyles = makeStyles((theme) => ({
-  formControl: {
+const PREFIX = 'FormGenerator';
+
+const classes = {
+  formControl: `${PREFIX}-formControl`,
+  textField: `${PREFIX}-textField`,
+  inline: `${PREFIX}-inline`
+};
+
+const StyledGrid = styled(Grid)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.formControl}`]: {
     minWidth: 200,
   },
-  textField: {
+
+  [`& .${classes.textField}`]: {
     minWidth: 200
   },
-  inline: {
+
+  [`& .${classes.inline}`]: {
     display: 'flex',
     flexDirection: 'row',
     padding: 0,
@@ -32,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FormGenerator(props) {
-  const classes = useStyles();
+
   const [fields, setFields] = useState(props.fields)
   const [name, setName] = useState('')
   const [type, setType] = useState('')
@@ -104,7 +118,7 @@ export default function FormGenerator(props) {
   }
 
   return (
-    <Grid item spacing={2} container>
+    <StyledGrid item spacing={2} container>
       <Grid item>
         <Grid spacing={2} item container direction="column">
           <Grid item>
@@ -197,11 +211,11 @@ export default function FormGenerator(props) {
                       {optionName}
                     </ListItemText>
                     <ListItemSecondaryAction>
-                      <IconButton 
-                        edge="end" 
+                      <IconButton
+                        edge="end"
                         aria-label="delete"
                         onClick={() => {handleDeleteOption(i)}}
-                      >
+                        size="large">
                         <DeleteIcon />
                       </IconButton>
                     </ListItemSecondaryAction>
@@ -227,6 +241,6 @@ export default function FormGenerator(props) {
       <Grid item xs={12} md={6}>
         <CustomProductForm setFields={setFields} fields={fields} title="Form Preview" />
       </Grid>
-    </Grid>
+    </StyledGrid>
   );
 }

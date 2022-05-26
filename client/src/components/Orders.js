@@ -1,39 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Order from './Order'
 
-const useStyles = makeStyles((theme) => ({
-  icon: {
+const PREFIX = 'Orders';
+
+const classes = {
+  icon: `${PREFIX}-icon`,
+  cardGrid: `${PREFIX}-cardGrid`,
+  card: `${PREFIX}-card`,
+  cardContent: `${PREFIX}-cardContent`,
+  footer: `${PREFIX}-footer`,
+  routerLinkButton: `${PREFIX}-routerLinkButton`,
+  routerLink: `${PREFIX}-routerLink`
+};
+
+const StyledContainer = styled(Container)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.icon}`]: {
     marginRight: theme.spacing(2),
   },
-  cardGrid: {
+
+  [`&.${classes.cardGrid}`]: {
     paddingTop: theme.spacing(10),
     paddingBottom: theme.spacing(8),
   },
-  card: {
+
+  [`& .${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
-  cardContent: {
+
+  [`& .${classes.cardContent}`]: {
     flexGrow: 1,
   },
-  footer: {
+
+  [`& .${classes.footer}`]: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(6),
   },
-  routerLinkButton: {
+
+  [`& .${classes.routerLinkButton}`]: {
     textDecoration: 'none',
   },
-  routerLink: {
+
+  [`& .${classes.routerLink}`]: {
     textDecoration: 'none'
   }
 }));
 
 export default function Orders(props) {
-  const classes = useStyles();
+
   const [orders, setOrders] = useState([])
 
   useEffect(() => {
@@ -47,7 +69,7 @@ export default function Orders(props) {
   }, [props.order.loading])
 
   return (
-    <Container className={classes.cardGrid} maxWidth="lg">
+    <StyledContainer className={classes.cardGrid} maxWidth="lg">
       <Grid container spacing={4}>
         {orders.map((order) => (
           <Grid className={classes.gridItem} item key={order.id} xs={12}>
@@ -55,6 +77,6 @@ export default function Orders(props) {
           </Grid>
         ))}
       </Grid>
-    </Container>
+    </StyledContainer>
   );
 }

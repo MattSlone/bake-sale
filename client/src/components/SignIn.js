@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -10,9 +11,49 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import {Redirect,  Link as RouterLink } from "react-router-dom";
+
+const PREFIX = 'SignIn';
+
+const classes = {
+  paper: `${PREFIX}-paper`,
+  avatar: `${PREFIX}-avatar`,
+  form: `${PREFIX}-form`,
+  submit: `${PREFIX}-submit`,
+  routerLinkButton: `${PREFIX}-routerLinkButton`
+};
+
+const StyledContainer = styled(Container)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.paper}`]: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  [`& .${classes.avatar}`]: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+
+  [`& .${classes.form}`]: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+
+  [`& .${classes.submit}`]: {
+    margin: theme.spacing(3, 0, 2),
+  },
+
+  [`& .${classes.routerLinkButton}`]: {
+    textDecoration: 'none',
+  }
+}));
 
 function Copyright() {
   return (
@@ -27,31 +68,8 @@ function Copyright() {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  routerLinkButton: {
-    textDecoration: 'none',
-  }
-}));
-
 export default function SignIn({ userSignIn, userData }) {
-  const classes = useStyles();
+
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -73,7 +91,7 @@ export default function SignIn({ userSignIn, userData }) {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
+    <StyledContainer component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
@@ -140,6 +158,6 @@ export default function SignIn({ userSignIn, userData }) {
       <Box mt={8}>
         <Copyright />
       </Box>
-    </Container>
+    </StyledContainer>
   );
 }

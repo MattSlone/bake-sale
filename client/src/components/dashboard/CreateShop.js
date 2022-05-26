@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
@@ -19,31 +19,55 @@ import { useHistory, useLocation, Switch, Route, Redirect, Link, useRouteMatch }
 import PickupAndDeliveryOptionsContainer from '../containers/PickupAndDeliveryOptionsContainer';
 import SetupPaymentAccountContainer from '../containers/SetupPaymentAccountContainer';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'CreateShop';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  backButton: `${PREFIX}-backButton`,
+  instructions: `${PREFIX}-instructions`,
+  appBarSpacer: `${PREFIX}-appBarSpacer`,
+  content: `${PREFIX}-content`,
+  submit: `${PREFIX}-submit`,
+  formControl: `${PREFIX}-formControl`,
+  routerLink: `${PREFIX}-routerLink`
+};
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.root}`]: {
     width: '100%',
   },
-  backButton: {
+
+  [`& .${classes.backButton}`]: {
     marginRight: theme.spacing(1),
   },
-  instructions: {
+
+  [`& .${classes.instructions}`]: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
+
+  [`& .${classes.appBarSpacer}`]: theme.mixins.toolbar,
+
+  [`& .${classes.content}`]: {
     flexGrow: 1,
     //height: '100vh',
     //overflow: 'auto',
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     margin: theme.spacing(3, 0, 2),
   },
-  formControl: {
+
+  [`& .${classes.formControl}`]: {
     margin: theme.spacing(1),
     minWidth: 120,
   },
-  routerLink: {
+
+  [`& .${classes.routerLink}`]: {
     textDecoration: 'none'
   }
 }));
@@ -81,7 +105,7 @@ function getStepContent(stepIndex) {
 
 export default function CreateShop(props) {
   const match = useRouteMatch();
-  const classes = useStyles();
+
   const auth = useAuth();
   const history = useHistory();
   const location = useLocation();
@@ -161,7 +185,7 @@ export default function CreateShop(props) {
   }
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <CssBaseline />
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -263,6 +287,6 @@ export default function CreateShop(props) {
           )}
         </div>
       </main>
-    </div>
+    </Root>
   );
 }

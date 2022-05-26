@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -6,7 +7,6 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Fab from '@mui/material/Fab';
@@ -14,41 +14,70 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useHistory, Link as RouterLink, useParams } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
-  cardGrid: {
+const PREFIX = 'Shop';
+
+const classes = {
+  cardGrid: `${PREFIX}-cardGrid`,
+  card: `${PREFIX}-card`,
+  cardMedia: `${PREFIX}-cardMedia`,
+  cardMediaAdd: `${PREFIX}-cardMediaAdd`,
+  cardContent: `${PREFIX}-cardContent`,
+  routerLinkButton: `${PREFIX}-routerLinkButton`,
+  header: `${PREFIX}-header`,
+  headerImage: `${PREFIX}-headerImage`,
+  headerOverlay: `${PREFIX}-headerOverlay`,
+  headerOverlayTop: `${PREFIX}-headerOverlayTop`,
+  infoBox: `${PREFIX}-infoBox`,
+  shopOptionsIcon: `${PREFIX}-shopOptionsIcon`
+};
+
+const StyledCard = styled(Card)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.cardGrid}`]: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(8),
   },
-  card: {
+
+  [`&.${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column'
   },
-  cardMedia: {
+
+  [`& .${classes.cardMedia}`]: {
     paddingTop: '56.25%', // 16:9
   },
-  cardMediaAdd: {
+
+  [`& .${classes.cardMediaAdd}`]: {
     paddingTop: '56.25%', // 16:9
     height: '100%',
     cursor: 'pointer'
   },
-  cardContent: {
+
+  [`& .${classes.cardContent}`]: {
     flexGrow: 1,
   },
-  routerLinkButton: {
+
+  [`& .${classes.routerLinkButton}`]: {
     textDecoration: 'none',
   },
-  header: {
+
+  [`& .${classes.header}`]: {
     marginTop: theme.spacing(8),
     height: '50%',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative'
   },
-  headerImage: {
+
+  [`& .${classes.headerImage}`]: {
     paddingTop: '28.125%', // 16:9
   },
-  headerOverlay: {
+
+  [`& .${classes.headerOverlay}`]: {
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -57,16 +86,19 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
     padding: '1em',
   },
-  headerOverlayTop: {
+
+  [`& .${classes.headerOverlayTop}`]: {
     position: 'absolute',
     top: 0,
     right: 0,
   },
-  infoBox: {
+
+  [`& .${classes.infoBox}`]: {
     padding: '1em',
     marginTop: '1em'
   },
-  shopOptionsIcon: {
+
+  [`& .${classes.shopOptionsIcon}`]: {
     visibility: 'hidden',
     opacity: 0,
     transition: 'visibility 0s, opacity 0.5s linear',
@@ -80,7 +112,7 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function Shop(props) {
   let { id } = useParams()
-  const classes = useStyles();
+
   const [products, setProducts] = useState(props.product.products)
   const [shop, setShop] = useState(props.shop)
   const history = useHistory()
@@ -105,7 +137,7 @@ export default function Shop(props) {
         <Grid container spacing={4}>
           {products.map((product) => (
             <Grid item key={product.id} xs={12} sm={6} md={4}>
-              <Card className={classes.card}>
+              <StyledCard className={classes.card}>
                 <CardMedia
                   className={classes.cardMedia}
                   image="https://source.unsplash.com/featured/?baked,goods"
@@ -127,7 +159,7 @@ export default function Shop(props) {
                     </Button>
                   </RouterLink>
                 </CardActions>
-              </Card>
+              </StyledCard>
             </Grid>
           ))}
         </Grid>
@@ -142,7 +174,7 @@ function Header({title})
 {
   const [headerHovered, setHeaderHovered] = useState(false)
 
-  const classes = useStyles()
+
   const fabDisplay = headerHovered ? {
     visibility: 'visible',
     opacity: 1

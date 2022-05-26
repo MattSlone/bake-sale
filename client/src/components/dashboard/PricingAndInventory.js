@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import { Input, TextField, Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -14,25 +14,41 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'PricingAndInventory';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  fullWidth: `${PREFIX}-fullWidth`,
+  tooltip: `${PREFIX}-tooltip`
+};
+
+const StyledGrid = styled(Grid)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
       flexGrow: 1,
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
-  fullWidth: {
+
+  [`& .${classes.fullWidth}`]: {
     width: '100%'
   },
-  tooltip: {
+
+  [`& .${classes.tooltip}`]: {
     fontSize: theme.typography.pxToRem(48),
   }
 }));
 
 export default function PricingAndInventory(props) {
-  const classes = useStyles();
+
 
   const [inventory, setInventory] = useState(props.inventory);
   const [varieties, setVarieties] = useState(props.varieties)
@@ -89,7 +105,7 @@ export default function PricingAndInventory(props) {
 
 
   return (
-    <Grid container spacing={2} direction="column">
+    <StyledGrid container spacing={2} direction="column">
       <Grid item>
         <Typography>
           Total inventory of product for listing:
@@ -140,7 +156,7 @@ export default function PricingAndInventory(props) {
                 </Typography>
               </Grid>
               <Grid item>
-               <IconButton aria-label="delete" onClick={() => {handleDeleteVariety(i)}}>
+               <IconButton aria-label="delete" onClick={() => {handleDeleteVariety(i)}} size="large">
                   <DeleteIcon />
                 </IconButton>
               </Grid>
@@ -263,6 +279,6 @@ export default function PricingAndInventory(props) {
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </StyledGrid>
   );
 }

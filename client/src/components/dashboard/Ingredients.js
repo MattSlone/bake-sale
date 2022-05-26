@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { makeStyles } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -16,39 +16,62 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import IconButton from '@mui/material/IconButton';
 import { Typography } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'Ingredients';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  cardHeader: `${PREFIX}-cardHeader`,
+  cardHeaderEmpty: `${PREFIX}-cardHeaderEmpty`,
+  flexGrow: `${PREFIX}-flexGrow`,
+  flexGrow2: `${PREFIX}-flexGrow2`,
+  inlineFlex: `${PREFIX}-inlineFlex`,
+  list: `${PREFIX}-list`,
+  button: `${PREFIX}-button`
+};
+
+const StyledGrid = styled(Grid)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     margin: 'auto',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       flexDirection: 'column',
       alignItems: 'stretch'
     },
   },
-  cardHeader: {
+
+  [`& .${classes.cardHeader}`]: {
     padding: theme.spacing(1, 2),
   },
-  cardHeaderEmpty: {
+
+  [`& .${classes.cardHeaderEmpty}`]: {
     height: 48,
     padding: theme.spacing(1, 2),
   },
-  flexGrow: {
+
+  [`& .${classes.flexGrow}`]: {
     flex: 1
   },
-  flexGrow2: {
+
+  [`& .${classes.flexGrow2}`]: {
     flex: 2
   },
-  inlineFlex: {
+
+  [`& .${classes.inlineFlex}`]: {
     display: "inline-flex"
   },
-  list: {
+
+  [`& .${classes.list}`]: {
     height: 230,
     backgroundColor: theme.palette.background.paper,
     overflow: 'auto',
   },
-  button: {
-    margin: theme.spacing(0.5, 0),
-  },
 
+  [`& .${classes.button}`]: {
+    margin: theme.spacing(0.5, 0),
+  }
 }));
 
 function not(a, b) {
@@ -60,7 +83,7 @@ function intersection(a, b) {
 }
 
 export default function Ingredients({ ingredients, setIngredients }) {
-  const classes = useStyles();
+
   const [checked, setChecked] = React.useState([]);
   const [right, setRight] = React.useState(ingredients);
   const [left, setLeft] = React.useState([]);
@@ -155,13 +178,13 @@ export default function Ingredients({ ingredients, setIngredients }) {
       </div>
       
       ) : (
-        <Grid alignContent="center" container className={classes.cardHeader, classes.cardHeaderEmpty}>
+        <StyledGrid alignContent="center" container className={(classes.cardHeader, classes.cardHeaderEmpty)}>
           <Grid item>
             <Typography>
               Product Ingredients
             </Typography>
           </Grid>
-        </Grid>
+        </StyledGrid>
       )
       }
       <Divider />
@@ -198,7 +221,7 @@ export default function Ingredients({ ingredients, setIngredients }) {
 
       </Grid>
       <Grid item>
-        <Grid container spacing={2} justify="center" alignItems="center">
+        <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid className={classes.flexGrow2} item>{customList('left', left)}</Grid>
           <Grid className={classes.flexGrow} item>
             <Grid container direction="column" alignItems="center">

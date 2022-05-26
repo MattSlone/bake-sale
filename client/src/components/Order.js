@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import axios from 'axios'
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -7,7 +8,6 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -18,44 +18,72 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Redirect, Link as RouterLink } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
-  icon: {
+const PREFIX = 'Order';
+
+const classes = {
+  icon: `${PREFIX}-icon`,
+  cardGrid: `${PREFIX}-cardGrid`,
+  card: `${PREFIX}-card`,
+  cardContent: `${PREFIX}-cardContent`,
+  footer: `${PREFIX}-footer`,
+  routerLinkButton: `${PREFIX}-routerLinkButton`,
+  routerLink: `${PREFIX}-routerLink`,
+  boldText: `${PREFIX}-boldText`,
+  accordion: `${PREFIX}-accordion`,
+  accordionSummary: `${PREFIX}-accordionSummary`
+};
+
+const StyledCard = styled(Card)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.icon}`]: {
     marginRight: theme.spacing(2),
   },
-  cardGrid: {
+
+  [`& .${classes.cardGrid}`]: {
     paddingTop: theme.spacing(10),
     paddingBottom: theme.spacing(8),
   },
-  card: {
+
+  [`&.${classes.card}`]: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
-  cardContent: {
+
+  [`& .${classes.cardContent}`]: {
     flexGrow: 1,
     padding: 0
   },
-  footer: {
+
+  [`& .${classes.footer}`]: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(6),
   },
-  routerLinkButton: {
+
+  [`& .${classes.routerLinkButton}`]: {
     textDecoration: 'none',
   },
-  routerLink: {
+
+  [`& .${classes.routerLink}`]: {
     textDecoration: 'none'
   },
-  boldText: {
+
+  [`& .${classes.boldText}`]: {
     fontWeight: 'bold'
   },
-  accordion: {
+
+  [`& .${classes.accordion}`]: {
     border: `1px solid ${theme.palette.divider}`,
     boxShadow: 'none',
     '&:last-child': {
       borderRadius: 0
     },
   },
-  accordionSummary: {
+
+  [`& .${classes.accordionSummary}`]: {
     backgroundColor: theme.palette.mode === 'dark'
     ? 'rgba(255, 255, 255, .05)'
     : 'rgba(0, 0, 0, .03)',
@@ -63,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Order({ order }) {
-  const classes = useStyles();
+
   const [street, setStreet] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
@@ -128,7 +156,7 @@ export default function Order({ order }) {
   }
 
   return (
-    <Card className={classes.card}>
+    <StyledCard className={classes.card}>
       <CardHeader
         action={
           <Typography variant="h5">
@@ -196,6 +224,6 @@ export default function Order({ order }) {
           </Button>
         </RouterLink>
       </CardActions>
-    </Card>
+    </StyledCard>
   );
 }

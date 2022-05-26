@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
@@ -20,30 +20,50 @@ import { useRouteMatch, useParams, Redirect } from "react-router-dom";
 import { setProductImagesPreview } from '../../redux';
 import Personalization from './Personalization';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'AddProduct';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  desktop: `${PREFIX}-desktop`,
+  mobile: `${PREFIX}-mobile`,
+  button: `${PREFIX}-button`,
+  actionsContainer: `${PREFIX}-actionsContainer`,
+  resetContainer: `${PREFIX}-resetContainer`
+};
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.root}`]: {
     maxWidth: '100%',
   },
-  desktop: {
+
+  [`& .${classes.desktop}`]: {
     paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
     paddingLeft: 0,
     paddingRight: 0
   },
-  mobile: {
+
+  [`& .${classes.mobile}`]: {
     paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(7) : theme.spacing(0),
     paddingLeft: 0,
     paddingRight: 0
   },
-  button: {
+
+  [`& .${classes.button}`]: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
   },
-  actionsContainer: {
+
+  [`& .${classes.actionsContainer}`]: {
     marginBottom: theme.spacing(2),
   },
-  resetContainer: {
+
+  [`& .${classes.resetContainer}`]: {
     padding: theme.spacing(3),
-  },
+  }
 }));
 
 function getSteps() {
@@ -58,7 +78,7 @@ function getSteps() {
 }
 
 export default function AddProduct(props) {
-  const classes = useStyles();
+
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
   let { id } = useParams()
@@ -122,7 +142,7 @@ export default function AddProduct(props) {
   const matches = useMediaQuery('(min-width:600px)');
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <Stepper classes={matches ? {root: classes.desktop} : {root: classes.mobile}} activeStep={activeStep} orientation="vertical">
         {steps.map((label, index) => (
           <Step key={label}>
@@ -191,6 +211,6 @@ export default function AddProduct(props) {
           </Button>
         </Paper>
       )}
-    </div>
+    </Root>
   );
 }

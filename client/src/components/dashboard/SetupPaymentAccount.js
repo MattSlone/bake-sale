@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Link, Typography } from '@mui/material';
 
 import { useRouteMatch, useParams } from "react-router-dom";
 import Container from '@mui/material/Container';
 
-const useStyles = makeStyles((theme) => ({
-  detailsSubmittedText: {
+const PREFIX = 'SetupPaymentAccount';
+
+const classes = {
+  detailsSubmittedText: `${PREFIX}-detailsSubmittedText`
+};
+
+const StyledContainer = styled(Container)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.detailsSubmittedText}`]: {
     color: 'blue'
   }
 }));
 
 export default function SetupPaymentAccount(props) {
-  const classes = useStyles();
+
 
   useEffect(() => {
     if (window.location.href.includes('return')) {
@@ -31,7 +41,7 @@ export default function SetupPaymentAccount(props) {
   }, [props.shop.id])
 
   return (
-    <Container disableGutters>
+    <StyledContainer disableGutters>
       <Typography variant="body1">
         Bake.Sale partners with Stripe to provide secure payments for your shop,
         and handle payouts. Click the link below to create your Stripe Payments account.
@@ -47,7 +57,6 @@ export default function SetupPaymentAccount(props) {
         Setup Link
       </Link>
       }
-    </Container>
-    
-  )
+    </StyledContainer>
+  );
 }

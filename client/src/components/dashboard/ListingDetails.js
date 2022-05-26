@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import { Input, TextField } from '@mui/material';
 import Select from '@mui/material/Select';
@@ -12,22 +12,37 @@ import FormControl from '@mui/material/FormControl';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'ListingDetails';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  formControl: `${PREFIX}-formControl`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
       flexGrow: 1,
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
-  formControl: {
+
+  [`& .${classes.formControl}`]: {
     width: '100%'
-  },
+  }
 }));
 
 export default function ListingDetails(props) {
-  const classes = useStyles();
+
 
   const [name, setName] = React.useState(props.name);
   const [description, setDescription] = React.useState(props.description);
@@ -68,7 +83,7 @@ export default function ListingDetails(props) {
   };
 
   return (
-    <React.Fragment>
+    <Root>
       <CssBaseline />
       <div className={classes.root}>
         <Container className={classes.cardGrid} maxWidth="lg">
@@ -153,6 +168,6 @@ export default function ListingDetails(props) {
           </Grid>
         </Container>
       </div>
-    </React.Fragment>
+    </Root>
   );
 }
