@@ -76,6 +76,10 @@ export default function SignUp({ userSignUp, userData }) {
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+  const [street, setStreet] = useState('')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('')
+  const [zipcode, setZipcode] = useState('')
   const [seller, setSeller] = useState(0)
 
   /*useEffect(() => {
@@ -85,6 +89,10 @@ export default function SignUp({ userSignUp, userData }) {
   let formData = {
     firstName: firstName,
     lastName: lastName,
+    street: street,
+    city: city,
+    state: state,
+    zipcode: zipcode,
     username: username,
     password: password,
     seller: seller
@@ -165,6 +173,58 @@ export default function SignUp({ userSignUp, userData }) {
                 autoComplete="current-password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="street"
+                label="Street"
+                name="street"
+                autoComplete="street"
+                value={street}
+                onChange={e => setStreet(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="city"
+                label="City"
+                name="city"
+                autoComplete="city"
+                value={city}
+                onChange={e => setCity(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="state"
+                label="State"
+                name="state"
+                autoComplete="state"
+                value={state}
+                onChange={e => setState(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="zipcode"
+                label="Zipcode"
+                name="zipcode"
+                autoComplete="zipcode"
+                value={zipcode}
+                onChange={e => setZipcode(e.target.value)}
               />
             </Grid>
             <Grid item xs={12}>

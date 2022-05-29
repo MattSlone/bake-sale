@@ -1,6 +1,7 @@
 'use strict'
 
-const User = require('../models/user')
+const User = require('../models/user'),
+  db = require('../models/index')
 
 module.exports = class UserController {
   /* static async isAdmin (req, res, next) {
@@ -25,6 +26,15 @@ module.exports = class UserController {
     else {
       req.flash('error', 'Not logged in.')
       res.redirect('/api')
+    }
+  }
+
+  async read (req, res, next) {
+    try {
+      let user = await db.User.findOne({ where: { id: req.query.UserId } })
+      return user
+    } catch (err) {
+
     }
   }
 }

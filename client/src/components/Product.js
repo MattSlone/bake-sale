@@ -13,8 +13,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import CustomProductContainer from './containers/CustomProductContainer'
 import Checkbox from '@mui/material/Checkbox';
 import { TextField, Typography } from '@mui/material';
+import productReducer from '../redux/product/productReducer';
 
 const PREFIX = 'Product';
 
@@ -32,15 +34,13 @@ const classes = {
   descTitle: `${PREFIX}-descTitle`
 };
 
-const StyledGrid = styled(Grid)((
+const StyledPaper = styled(Paper)((
   {
     theme
   }
 ) => ({
-  [`& .${classes.product}`]: {
-    padding: theme.spacing(8),
-    marginTop: theme.spacing(8)
-  },
+  padding: theme.spacing(8),
+  marginTop: theme.spacing(8),
 
   [`& .${classes.personalizationBox}`]: {
     width: '100%',
@@ -119,12 +119,14 @@ export default function Product(props)
     console.log('tempProduct: ', tempProduct)
     if (tempProduct) {
       setProduct(tempProduct)
-      props.getShop({id: tempProduct.ShopId})
-      setVariation(tempProduct.Varieties[0].quantity)
-      setPrice(Number.parseFloat(tempProduct.Varieties[0].price).toFixed(2))
-      setAddonsChecked(Object.fromEntries(
-        tempProduct.Addons.map(addon => [addon.id, false])
-      ))
+      if (!tempProduct.custom) {
+        props.getShop({id: tempProduct.ShopId})
+        setVariation(tempProduct.Varieties[0].quantity)
+        setPrice(Number.parseFloat(tempProduct.Varieties[0].price).toFixed(2))
+        setAddonsChecked(Object.fromEntries(
+          tempProduct.Addons.map(addon => [addon.id, false])
+        ))
+      }
     }
   }, [props.product.loading])
 
@@ -133,7 +135,7 @@ export default function Product(props)
   };
 
   useEffect(() => {
-    if (product) {
+    if (product && !product.custom) {
       handleSetPrice()
     }
   }, [product, variation, fulfillment, addonsChecked])
@@ -201,9 +203,9 @@ export default function Product(props)
     }
   ]
 
-  return product ?
-    <Paper className={classes.product}>
-      <StyledGrid container spacing={3}>
+  return product ? (product.custom ? <CustomProductContainer /> :
+    <StyledPaper className={classes.product}>
+      <Grid container spacing={3}>
         <Grid item xs={12} md={8}> 
           <Carousel
           indicators={false}
@@ -230,11 +232,12 @@ export default function Product(props)
               <Typography gutterBottom>
                 {product.Addons.sort((a,b) => a.id - b.id).map((addon, i) => (
                   <FormControlLabel
+                    key={i}
                     control={
                       <Checkbox
                         checked={addonsChecked[addon.name]}
                         name={addon.name}
-                        id={addon.id}
+                        id={`${addon.id}`}
                         color="primary"
                         onChange={handleAddonCheckChange}
                       />
@@ -330,8 +333,8 @@ export default function Product(props)
           </Grid>
         </Grid>
         <DescriptionContainer product={product} classProp={classes.descriptionContainerBottom} />
-      </StyledGrid>
-    </Paper>
+      </Grid>
+    </StyledPaper>)
   : '';
 }
 

@@ -36,6 +36,11 @@ const StyledPaper = styled(Paper)((
     theme
   }
 ) => ({
+  padding: theme.spacing(1),
+  paddingTop: theme.spacing(3),
+  minHeight: 400,
+  boxShadow: 'none',
+
   [`& .${classes.card}`]: {
     height: '100%',
     display: 'flex',

@@ -26,15 +26,13 @@ const classes = {
   descTitle: `${PREFIX}-descTitle`
 };
 
-const StyledCard = styled(Card)((
+const StyledPaper = styled(Paper)((
   {
     theme
   }
 ) => ({
-  [`& .${classes.product}`]: {
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(8)
-  },
+  padding: theme.spacing(2),
+  marginTop: theme.spacing(8),
 
   [`& .${classes.personalizationBox}`]: {
     width: '100%',
@@ -131,7 +129,7 @@ export default function CustomProduct(props)
   ]
 
   return (
-    <Paper className={classes.product}>
+    <StyledPaper className={classes.product}>
       <Grid container spacing={3} className={classes.top}>
         <Grid item xs={12} md={8}> 
           <Carousel
@@ -187,7 +185,7 @@ export default function CustomProduct(props)
         <CustomProductForm fields={fields} setFields={setFields} title="Questions" noshadow />
       </Grid>
       
-    </Paper>
+    </StyledPaper>
   )
 }
 
@@ -195,12 +193,12 @@ function Item(props)
 {
 
     return (
-      <StyledCard className={classes.card}>
+      <Card className={classes.card}>
         <CardMedia
           className={classes.cardMedia}
           image="https://source.unsplash.com/featured/?baked,goods"
           title="Image title"
         />
-      </StyledCard>
+      </Card>
     );
 }

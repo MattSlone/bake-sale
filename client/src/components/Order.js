@@ -109,7 +109,7 @@ export default function Order({ order }) {
     try {
       const res = await axios.get('/api/user', {
         params: {
-          id: order.UserId,
+          UserId: order.UserId,
           forOrder: true
         }
       })
@@ -117,12 +117,11 @@ export default function Order({ order }) {
         console.log(res.data.error[0])
       }
       else {
-        const deliveryAddress = res.data.success.DeliveryAddress
-        setStreet(deliveryAddress.street)
-        setCity(deliveryAddress.city)
-        setState(deliveryAddress.state)
-        setZipcode(deliveryAddress.zipcode)
-        console.log(res.data.success)
+        const user = res.data.success
+        setStreet(user.street)
+        setCity(user.city)
+        setState(user.state)
+        setZipcode(user.zipcode)
       }
     } catch(error) {
       console.log('Error getting delivery address')
@@ -202,15 +201,14 @@ export default function Order({ order }) {
               </ListItem>
               {order.fulfillment == 'pickup' || order.fulfillment == 'delivery' ?
               <ListItem disableGutters>
+                <ListItemText>
                 <Box display="flex" flexDirection="column">
-                  {order.fulfillment == 'pickup' ?
-                  <Box fontWeight="bold">Pickup Location:</Box>
-                  : <Box fontWeight="bold">Delivery Location:</Box>
-                  }
+                  <Box component="span" fontWeight="bold">{capitalize(order.fulfillment)} Location:</Box>
                   <Box>{street}</Box>
                   <Box>{city}, {state}</Box>
                   <Box>{zipcode}</Box>
                 </Box>
+                </ListItemText>
               </ListItem>
               : '' }
             </List>

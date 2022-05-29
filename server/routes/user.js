@@ -1,6 +1,8 @@
 'use strict'
 let multer = require('multer');
 let upload = multer();
+const MakeUserController = require('../controllers/user'),
+  UserController = new MakeUserController()
 
 module.exports = (app, passport) => {
   app.get('/api/signin', (req, res, next) => {
@@ -8,6 +10,18 @@ module.exports = (app, passport) => {
       error: req.flash('error'),
       success: req.user
     })
+  })
+
+  app.get('/api/user', async (req, res, next) => {
+    try {
+      let user = await UserController.read(req, res, next)
+      res.send({
+        error: req.flash('error'),
+        success: user
+      })
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   app.get('/api/signup', (req, res, next) => {
