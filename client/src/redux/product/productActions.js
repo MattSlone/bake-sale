@@ -13,6 +13,9 @@ import {
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
   GET_PRODUCTS_FAILURE,
+  GET_PRODUCTS_COUNT_REQUEST,
+  GET_PRODUCTS_COUNT_SUCCESS,
+  GET_PRODUCTS_COUNT_FAILURE,
   EDIT_PRODUCT_REQUEST,
   EDIT_PRODUCT_SUCCESS,
   EDIT_PRODUCT_FAILURE,
@@ -139,6 +142,26 @@ export const getProductsFailure = (error) => {
   }
 }
 
+export const getProductsCountRequest = () => {
+  return {
+    type: GET_PRODUCTS_COUNT_REQUEST
+  }
+}
+
+export const getProductsCountSuccess = (count) => {
+  return {
+    type: GET_PRODUCTS_COUNT_SUCCESS,
+    payload: count
+  }
+}
+
+export const getProductsCountFailure = (error) => {
+  return {
+    type: GET_PRODUCTS_COUNT_FAILURE,
+    payload: error
+  }
+}
+
 export const setProductEdit = (product) => {
   return {
     type: SET_PRODUCT_EDIT,
@@ -181,6 +204,24 @@ export const getProducts = (formData) => {
         dispatch(getProductsFailure(res.data.error[0]))
       } else {
         dispatch(getProductsSuccess(res.data))
+      }
+    } catch (error) {
+      dispatch(getProductsFailure(error.message))
+    }
+  }
+}
+
+export const getProductsCount = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(getProductsCountRequest())
+      const res = await axios.get('/api/products/count', {
+        params: formData
+      })
+      if (res.data.error[0]) {
+        dispatch(getProductsCountFailure(res.data.error[0]))
+      } else {
+        dispatch(getProductsCountSuccess(res.data.success))
       }
     } catch (error) {
       dispatch(getProductsFailure(error.message))

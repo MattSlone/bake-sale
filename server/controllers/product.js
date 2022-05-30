@@ -1,6 +1,8 @@
 'use strict'
 
+const { query } = require('express');
 const db = require('../models/index')
+const { Op, fn, col } = require("sequelize");
 
 module.exports = class ProductController {
     async create (req, res, next) {
@@ -42,8 +44,7 @@ module.exports = class ProductController {
                         ]
                     }
                 ]
-              });
-
+            });
             return product
         }
         catch (err) {
@@ -52,17 +53,17 @@ module.exports = class ProductController {
     }
 
     async list(req, res, next) {
-        let where = {}
-        if (req.query.shop) {
-            where.ShopId = req.query.shop
-        }
-        if(req.query.products) {
-            where.id = [req.query.products]
-        }
-
         try {
-            const products = db.Product.findAll({
+            let where = {
+                ...(req.query.shop && {ShopId: req.query.shop}),
+                ...(req.query.products && {id: [req.query.products]})
+            }
+            let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
+            let limit = 2
+            const products = await db.Product.findAll({
                 where: where,
+                offset: offset,
+                limit: limit,
                 include: [
                     db.Ingredient,
                     db.Variety,
@@ -91,6 +92,22 @@ module.exports = class ProductController {
             return products
         }
         catch(err) {
+            console.log('ERROR:', err)
+            return err
+        }
+    }
+
+    async count(req, res, next) {
+        try {
+            let where = {
+                ...(req.query.shop && {ShopId: req.query.shop}),
+                ...(req.query.products && {id: [req.query.products]})
+            }
+            const count = await db.Product.count({ where: where });
+            return count
+        }
+        catch(err) {
+            console.log('ERROR:', err)
             return err
         }
     }

@@ -12,6 +12,7 @@ import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import { useHistory, Link as RouterLink } from "react-router-dom";
 import { store } from '../redux/store'
+import Pagination from '@mui/material/Pagination'
 
 function Copyright() {
   return (
@@ -28,11 +29,27 @@ function Copyright() {
 
 export default function Home(props) {
   const [products, setProducts] = useState(props.product.products)
+  const [count, setCount] = useState(props.product.count)
+  const [lastId, setLastId] = useState(0)
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
-    props.getProducts()
-    setProducts(props.product.products)
+    props.getProducts({ lastId: lastId })
+    props.getProductsCount()
   }, [])
+
+  useEffect(() => {
+    setProducts(props.product.products)
+    setCount(props.product.count)
+    console.log(props.product.count)
+  }, [props.product.loading])
+
+  const handleChangePage = function(event, value) {
+    const page = value
+    const lastId = (page-1) * 2
+    props.getProducts({ lastId: lastId })
+    setPage(page)
+  }
 
   const PREFIX = 'Home';
 
@@ -124,7 +141,7 @@ export default function Home(props) {
     </>
   )
 
-  return (
+  return ( 
     <Root userdata={props.userData}>
       <CssBaseline />
       <main>
@@ -166,6 +183,9 @@ export default function Home(props) {
                 </Card>
               </Grid>
             )) : ''}
+            <Grid item xs={12} container justifyContent="center">
+              <Pagination count={Math.ceil(count / 2)} page={page} color="primary" onChange={handleChangePage} />
+            </Grid>
           </Grid>
         </Container>
       </main>

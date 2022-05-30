@@ -35,6 +35,19 @@ module.exports = (app) => {
     }
   })
 
+  app.get('/api/products/count', async (req, res, next) => {
+    try {
+        let response = await ProductController.count(req, res, next)
+        res.send({
+            error: req.flash('error'),
+            success: response
+        })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
+
   app.post('/api/product/update', async (req, res, next) => {
     try {
         let product = await ProductController.update(req, res, next)

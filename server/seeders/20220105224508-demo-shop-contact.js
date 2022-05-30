@@ -10,7 +10,7 @@ module.exports = {
       deliveryFeeType: 'flat',
       delivery: 3,
       secondaryDelivery: 0,
-      ProductId: 1,
+      ProductId: 5,
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

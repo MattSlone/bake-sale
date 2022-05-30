@@ -11,6 +11,9 @@ import {
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
   GET_PRODUCTS_FAILURE,
+  GET_PRODUCTS_COUNT_REQUEST,
+  GET_PRODUCTS_COUNT_SUCCESS,
+  GET_PRODUCTS_COUNT_FAILURE,
   SET_PRODUCT_EDIT,
   EDIT_PRODUCT_REQUEST,
   EDIT_PRODUCT_SUCCESS,
@@ -35,7 +38,8 @@ const initialState = {
   imageFiles: [],
   loading: false,
   products: [],
-  fields: []
+  fields: [],
+  count: 0
 }
 
 const productReducer = (state = initialState, action) => {
@@ -98,6 +102,21 @@ const productReducer = (state = initialState, action) => {
     case GET_PRODUCTS_FAILURE: return {
       ...state,
       products: [],
+      error: action.payload
+    }
+    case GET_PRODUCTS_COUNT_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case GET_PRODUCTS_COUNT_SUCCESS: return {
+      ...state,
+      loading: false,
+      count: action.payload,
+      error: ''
+    }
+    case GET_PRODUCTS_COUNT_FAILURE: return {
+      ...state,
+      count: 0,
       error: action.payload
     }
     case SET_PRODUCT_EDIT:
