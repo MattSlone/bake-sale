@@ -7,7 +7,6 @@ const db = require('../models/index'),
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
     try {
-      console.log('top of createPaymentIntent')
       const shopAmounts = await this.mapCartToShopAmounts(req.body.items)
       const totalAmount = shopAmounts.map(shopAmount => shopAmount.amount)
         .reduce((prev, curr) => prev + curr)
@@ -26,10 +25,11 @@ module.exports = class OrderController {
         })
 
         for (const item of shop.items) {
-          console.log(req)
           // addon: {"addon name": true if added / false if not}
           const addonIds = Object.entries(item.addons).map(addon => addon[1] ? addon[0] : null)
             .filter(addon => addon !== null)
+          console.log('VARIATION: ', item.variation)
+          const pendingStatus = await db.OrderStatus.findOne({ where: { status: 'pending' } })
           const order = await db.Order.create({
             amount: await this.calculateProductPrice(item),
             quantity: item.quantity,
@@ -37,6 +37,7 @@ module.exports = class OrderController {
             ProductId: item.product.id,
             VarietyId: item.variation,
             fulfillment: item.fulfillment,
+            OrderStatusId: pendingStatus.id,
             UserId: req.user.id
           })
           await order.setAddons(addonIds)
@@ -45,6 +46,7 @@ module.exports = class OrderController {
       return paymentIntent.client_secret
     }
     catch (err) {
+      console.log(err)
       return next(err)
     }
   }
@@ -152,6 +154,12 @@ module.exports = class OrderController {
                 stripeTransferId: transferId
               });
               await transfer.save()
+
+              const completedStatus = await db.OrderStatus.findOne({ where: { status: 'completed' } })
+              const order = await db.Order.findOne({ where: { TransferId: transfer.id } })
+              order.OrderStatusId = completedStatus.id
+              await order.save()
+              this.removeStaleOrders(order.UserId)
             } catch (err) {
               console.log(err)
             }
@@ -218,5 +226,17 @@ module.exports = class OrderController {
     }))
 
     return associatedInstances
+  }
+
+  async removeStaleOrders(userId) {
+    try {
+      const pending = await db.OrderStatus.findOne({ where: { status: 'pending' } })
+      const staleOrders = await db.Order.findAll({ where: { OrderStatusId: pending.id, UserId: userId } })
+      for (let order of staleOrders) {
+        await order.destroy()
+      }
+    } catch (err) {
+      console.log(err)
+    }
   }
 }

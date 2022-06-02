@@ -36,7 +36,8 @@ module.exports = (app, webhookApp) => {
       next(err)
     }
   })
-  webhookApp.post('/webhook',  async (req, res, next) => {
+  
+  webhookApp.post('/webhook', async (req, res, next) => {
     try {
       const response = await OrderController.handleStripeWebhooks(req, res, next)
       res.send(response)

@@ -31,3 +31,9 @@ run "docker exec client yarn add " followed by the name(s) of your dependencies
 ### Server side
 
 run "docker exec server yarn add " followed by the name(s) of your dependencies
+
+### Stripe CLI
+Install it
+run "stripe login"
+run "sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server" to get the ip address of the server container
+run "stripe listen --forward-to IP_ADDRESS_HERE:4242/webhook"

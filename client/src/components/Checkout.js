@@ -22,18 +22,14 @@ const StyledContainer = styled(Container)((
     theme
   }
 ) => ({
-  [`&.${classes.checkoutContainer}`]: {
-    padding: theme.spacing(10, 3, 10, 3),
-    [theme.breakpoints.up('md')]: {
-      padding: theme.spacing(10)
-    },
+  padding: theme.spacing(10, 3, 10, 3),
+  [theme.breakpoints.up('md')]: {
+    padding: theme.spacing(10)
   }
 }));
 
 export default function  Checkout(props) {
   const [clientSecret, setClientSecret] = useState("");
-
-  
 
   useEffect(async () => {
     if (props.cart.products.length > 0) {

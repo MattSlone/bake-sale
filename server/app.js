@@ -1,18 +1,17 @@
 require('dotenv').config()
 const express = require('express'),
   bodyParser = require('body-parser'),
-  path = require('path');
-  passport = require('passport')
-  session = require('express-session')
-  flash = require('connect-flash')
-  app = express();
-  webhookApp = express();
+  path = require('path'),
+  passport = require('passport'),
+  session = require('express-session'),
+  flash = require('connect-flash'),
+  app = express(),
+  webhookApp = express()
 
 const { Sequelize, Transaction } = require('sequelize')
 
 require('./lib/passport')(passport)
 
-var session = require("express-session");
 // initalize sequelize with session store
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
@@ -92,4 +91,4 @@ app.use(function(req, res) {
 });
 
 app.listen(process.env.EXPRESS_PORT, () => console.log(`App listening at http://server:${process.env.EXPRESS_PORT}`))
-webhookApp.listen(4242, () => console.log(`App listening at http://server:4242`))
+webhookApp.listen(4242, () => console.log(`Webhook App listening at http://server:4242`))

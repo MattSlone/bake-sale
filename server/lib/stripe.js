@@ -67,12 +67,12 @@ module.exports = class StripeAPI {
   }
 
   handleWebhooks(req, res, next) {
-    let event = req.body;
+    let event
     // Only verify the event if you have an endpoint secret defined.
     // Otherwise use the basic event deserialized with JSON.parse
     if (endpointSecret) {
       // Get the signature sent by Stripe
-      const signature = req.headers['stripe-signature'];
+      const signature = req.headers['stripe-signature']
       try {
         event = stripe.webhooks.constructEvent(
           req.body,
