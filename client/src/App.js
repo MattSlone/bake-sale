@@ -4,6 +4,7 @@ import Drawer from './components/Drawer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
 import SignUpContainer from './components/containers/SignUpContainer'
+import ForgotPasswordContainer from './components/containers/ForgotPasswordContainer'
 import DashboardContainer from './components/containers/DashboardContainer'
 import ProductContainer from './components/containers/ProductContainer'
 import ShopContainer from './components/containers/ShopContainer'
@@ -16,6 +17,7 @@ import CheckoutContainer from './components/containers/CheckoutContainer';
 
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
+import ResetPassword from './components/ResetPassword';
 
 
 
@@ -54,6 +56,8 @@ export default function App() {
                 <Route path='/' exact component={HomeContainer} key='/'/>
                 <Route path='/signin' component={SignInContainer} key='/signin'/>
                 <Route path='/signup' component={SignUpContainer}/>
+                <Route path='/forgotpassword' component={ForgotPasswordContainer}/>
+                <Route path='/resetpassword' component={ResetPassword}/>
                 <Route path='/signout' component={HomeContainer} key='/'/>
                 <Route path='/dashboard' component={DashboardContainer} key='/'/>
                 <Route path='/products/custom/:id' children={<CustomProductContainer />} />

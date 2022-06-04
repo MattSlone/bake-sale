@@ -9,7 +9,10 @@ import {
   USER_SIGNIN_FAILURE,
   USER_SIGNOUT_REQUEST,
   USER_SIGNOUT_SUCCESS,
-  USER_SIGNOUT_FAILURE
+  USER_SIGNOUT_FAILURE,
+  FORGOT_PASSWORD_REQUEST,
+  FORGOT_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_FAILURE
  } from './userTypes'
 
  import { getShop } from '../shop/shopActions'
@@ -32,6 +35,25 @@ export const userSignUpFailure = (error) => {
   return {
     type: USER_SIGNUP_FAILURE,
     payload: error
+  }
+}
+
+// Forgot Password
+export const forgotPasswordRequest = () => {
+  return {
+    type: FORGOT_PASSWORD_REQUEST
+  }
+}
+
+export const forgotPasswordSuccess = () => {
+  return {
+    type: FORGOT_PASSWORD_SUCCESS
+  }
+}
+
+export const forgotPasswordFailure = () => {
+  return {
+    type: FORGOT_PASSWORD_FAILURE
   }
 }
 
@@ -109,6 +131,23 @@ export const userSignIn = (formData) => {
       }
     } catch(error) {
       dispatch(userSignInFailure(error.message))
+    }
+  }
+}
+
+export const forgotPassword = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(forgotPasswordRequest())
+      
+      if(res.data.error[0]) {
+        dispatch(forgotPasswordFailure())
+      }
+      else {
+        dispatch(forgotPasswordSuccess())
+      }
+    } catch(error) {
+      dispatch(forgotPasswordFailure())
     }
   }
 }

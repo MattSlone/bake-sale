@@ -1,4 +1,5 @@
 'use strict'
+require('dotenv').config()
 let multer = require('multer');
 let upload = multer();
 const MakeUserController = require('../controllers/user'),
@@ -37,7 +38,43 @@ module.exports = (app, passport) => {
   })
 
   app.post('/api/signin', passport.authenticate('local', { failureRedirect: '/api/signin', successRedirect: '/api/signin', failureFlash: true}))
-  app.post('/api/signup', passport.authenticate('local-signup', { failureRedirect: '/api/signup', successRedirect: '/api/signup', failureFlash: true }))
+  app.post('/api/signup', passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
+  async (req, res) => {
+    try {
+      await UserController.sendSignUpEmail(req)
+    } catch (err) {
+      console.log(err)
+    }
+  })
+
+  app.post("/api/forgotpassword", async (req, res, next) => {
+    try {
+      await UserController.forgotPassword(req, res, next)
+      res.send({
+        error: req.flash('error'),
+        success: true
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  })
+
+  app.post("/api/resetpassword", async (req, res, next) => {
+    try {
+      console.log('in route')
+      await UserController.resetPassword(req, res, next)
+      res.send({
+        error: req.flash('error'),
+        success: true
+      })
+    } catch (err) {
+      console.log(err)
+      res.send({
+        error: err,
+        success: false
+      })
+    }
+  })
 
 /* DEBUGGER
   app.post('/api/signup',
