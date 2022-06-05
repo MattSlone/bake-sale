@@ -19,8 +19,6 @@ import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-d
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
 import ResetPassword from './components/ResetPassword';
 
-
-
 const PREFIX = 'App';
 
 const classes = {

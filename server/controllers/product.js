@@ -3,6 +3,8 @@
 const { query } = require('express');
 const db = require('../models/index')
 const { Op, fn, col } = require("sequelize");
+const GMaps = require('../lib/gmaps');
+const shop = require('../routes/shop');
 
 module.exports = class ProductController {
     async create (req, res, next) {
@@ -52,11 +54,30 @@ module.exports = class ProductController {
         }
     }
 
+    async getLocalShopIds(user) {
+        try {
+            const latLng = await GMaps.getLatLng(user)
+            console.log('LATLG: ', latLng)
+            const shops = await db.Shop.findAll()
+            const shopIds = latLng?.lat ? (await Promise.all(
+                shops.map(async shop => (await GMaps.haversine_distance(latLng, { lat: shop.lat, lng: shop.lng }) < shop.radius) ? shop.id : false)))
+                    .filter(shop => shop !== false) : []
+            return shopIds
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     async list(req, res, next) {
         try {
-            let where = {
-                ...(req.query.shop && {ShopId: req.query.shop}),
-                ...(req.query.products && {id: [req.query.products]})
+            const user = req.user.id ? await db.User.findByPk(req.user.id) : {}
+            console.log('USERID: ', user.id)
+            const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
+            console.log('SHOP IDS: ', shopIds)
+            const where = {
+                ...('shop' in req.query && {ShopId: req.query.shop}),
+                ...('products' in req.query && {id: [req.query.products]}),
+                ...('id' in user && 'shop' in req.query && {ShopId: [shopIds]})
             }
             let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
             let limit = 2
