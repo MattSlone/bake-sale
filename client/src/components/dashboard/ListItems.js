@@ -63,12 +63,14 @@ export default function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Orders" />
       </ListItem>
-      <ListItem button>
-        <ListItemIcon>
-          <ShoppingCartIcon />
-        </ListItemIcon>
-        <ListItemText primary="Quotes Requests" />
-      </ListItem>
+      <Link className={classes.routerLink} to="/dashboard/requests">
+        <ListItem button>
+          <ListItemIcon>
+            <RedeemIcon />
+          </ListItemIcon>
+          <ListItemText primary="Quote Requests" />
+        </ListItem>
+      </Link>
       <ListItem button>
         <ListItemIcon>
           <PeopleIcon />

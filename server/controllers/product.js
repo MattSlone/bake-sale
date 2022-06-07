@@ -55,7 +55,7 @@ module.exports = class ProductController {
     }
 
     async getLocalShopIds(user) {
-        try {
+        try { 
             const latLng = await GMaps.getLatLng(user)
             console.log('LATLG: ', latLng)
             const shops = await db.Shop.findAll()
@@ -70,14 +70,14 @@ module.exports = class ProductController {
 
     async list(req, res, next) {
         try {
-            const user = req.user.id ? await db.User.findByPk(req.user.id) : {}
-            console.log('USERID: ', user.id)
+            console.log("QUERY PARAMS: ", req.query)
+            const user = req.user ? await db.User.findByPk(req.user.id) : {}
             const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
             console.log('SHOP IDS: ', shopIds)
             const where = {
                 ...('shop' in req.query && {ShopId: req.query.shop}),
-                ...('products' in req.query && {id: [req.query.products]}),
-                ...('id' in user && 'shop' in req.query && {ShopId: [shopIds]})
+                ...('products' in req.query && {id: req.query.products}),
+                ...((user.id && !req.query.shop) && {ShopId: shopIds})
             }
             let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
             let limit = 2

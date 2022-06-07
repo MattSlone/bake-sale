@@ -37,7 +37,7 @@ module.exports = class ShopController {
     try {
       let shop = null
       const include = [db.PickupSchedule]
-      if (req.query.UserId && req.user.id == req.query.UserId) { // Is the users shop
+      if (req.query.UserId && req.user.id && req.user.id == req.query.UserId) { // Is the users shop
         shop = await db.Shop.findOne({ 
           where: { UserId:  req.query.UserId},
           include: [...include, db.PickupAddress, db.ShopContact]

@@ -82,9 +82,11 @@ export default function CustomProduct(props)
 
   let { id } = useParams()
   const auth = useAuth()
-  const [quote, setQuote] = useState(props.quote.quotes.find(quote => quote.ProductId == id))
+  const [quote, setQuote] = useState(props.quote.quotes.filter(quote => quote.ProductId == id)[props.quote.quotes.length-1])
   const [fields, setFields] = useState([])
   const [product, setProduct] = useState('')
+  const [message, setMessage] = useState('')
+  console.log(quote)
 
   useEffect(() => {
     props.getProducts({products: [id]})
@@ -102,9 +104,10 @@ export default function CustomProduct(props)
     props.requestQuote({
       ...quote,
       productId: product.id,
-      status: 'requested',
       values: mapValuesToFields()
     })
+    setMessage('You\'ll receive an email with a final price once your quote has been processed')
+    console.log(quote)
   }
 
   const mapValuesToFields = () => {
@@ -175,8 +178,11 @@ export default function CustomProduct(props)
               color="primary"
               onClick={handleRequestQuote}
               >
-                {(quote && quote.status == 'requested') ? "Requested!" : "Request a Quote"}
+                {(quote && quote.QuoteStatusId == '1') ? "Requested!" : "Request a Quote"}
               </Button>
+            </Grid>
+            <Grid item>
+              {message}
             </Grid>
           </Grid>
         </Grid>

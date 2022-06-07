@@ -6,7 +6,10 @@ import {
   REQUEST_QUOTE_FAILURE,
   GET_QUOTES_REQUEST,
   GET_QUOTES_SUCCESS,
-  GET_QUOTES_FAILURE
+  GET_QUOTES_FAILURE,
+  SET_QUOTE_PRICE_REQUEST,
+  SET_QUOTE_PRICE_SUCCESS,
+  SET_QUOTE_PRICE_FAILURE
 } from './quoteTypes'
 
 export const requestQuoteRequest = () => {
@@ -49,9 +52,28 @@ export const getQuotesFailure = (error) => {
   }
 }
 
+export const setQuotePriceRequest = () => {
+  return {
+    type: SET_QUOTE_PRICE_REQUEST
+  }
+}
+
+export const setQuotePriceSuccess = () => {
+  return {
+    type: SET_QUOTE_PRICE_SUCCESS,
+  }
+}
+
+export const setQuotePriceFailure = (error) => {
+  return {
+    type: SET_QUOTE_PRICE_FAILURE,
+    payload: error
+  }
+}
+
 export const requestQuote = (formData) => {
   return async (dispatch) => {
-    dispatch(requestQuoteRequest)
+    dispatch(requestQuoteRequest())
     try {
       const res = await axios.post('/api/quote/create', formData)
       if (res.data.error[0]) {
@@ -66,10 +88,27 @@ export const requestQuote = (formData) => {
   }
 }
 
+export const setQuotePrice = (formData) => {
+  return async (dispatch) => {
+    dispatch(setQuotePriceRequest())
+    try {
+      const res = await axios.post('/api/quote/setprice', formData)
+      if (res.data.error[0]) {
+        dispatch(setQuotePriceFailure(res.data.error[0]))
+      } else {
+        dispatch(setQuotePriceSuccess())
+        dispatch(getQuotes())
+      }
+    } catch (error) {
+      dispatch(setQuotePriceFailure(error.message))
+    }
+  }
+}
+
 export const getQuotes = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(getQuotesRequest)
+      dispatch(getQuotesRequest())
       const res = await axios.get('/api/quotes', {
         params: formData
       })

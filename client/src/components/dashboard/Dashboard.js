@@ -18,6 +18,8 @@ import CreateShopContainer from "../containers/CreateShopContainer"
 import ProductsContainer from "../containers/ProductsContainer"
 import AddProductContainer from '../containers/AddProductContainer';
 import AddCustomProductContainer from '../containers/AddCustomProductContainer';
+import QuotesContainer from '../containers/QuotesContainer';
+import RequestContainer from '../containers/RequestContainer';
 
 const PREFIX = 'Dashboard';
 
@@ -223,6 +225,12 @@ export default function Dashboard(props) {
       </Route>
       <Route path={`${match.path}/products`}>
         <ProductsContainer />
+      </Route>
+      <Route path={`${match.path}/requests/:id`}>
+        <RequestContainer />
+      </Route>
+      <Route path={`${match.path}/requests`}>
+        <QuotesContainer />
       </Route>
       <Route path={match.path}>
         {defaultDashboard}

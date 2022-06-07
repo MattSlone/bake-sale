@@ -28,7 +28,6 @@ function Copyright() {
 }
 
 export default function Home(props) {
-  const [products, setProducts] = useState(props.product.products)
   const [count, setCount] = useState(props.product.count)
   const [lastId, setLastId] = useState(0)
   const [page, setPage] = useState(1)
@@ -39,9 +38,10 @@ export default function Home(props) {
   }, [])
 
   useEffect(() => {
-    setProducts(props.product.products)
-    setCount(props.product.count)
-    console.log(props.product.count)
+    if (props.product.loading == false) {
+      console.log(props.product.count)
+      console.log('getting products...')
+    }
   }, [props.product.loading])
 
   const handleChangePage = function(event, value) {
@@ -157,7 +157,7 @@ export default function Home(props) {
         <Container className={classes.cardGrid} maxWidth="lg">
           {/* End hero unit */}
           <Grid container spacing={4}>
-            {products ? products.map((card) => (
+            {props.product.products ? props.product.products.map((card) => (
               <Grid item key={card.id} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
                   <CardMedia
@@ -184,7 +184,7 @@ export default function Home(props) {
               </Grid>
             )) : ''}
             <Grid item xs={12} container justifyContent="center">
-              <Pagination count={Math.ceil(count / 2)} page={page} color="primary" onChange={handleChangePage} />
+              <Pagination count={Math.ceil(props.product.count / 2)} page={page} color="primary" onChange={handleChangePage} />
             </Grid>
           </Grid>
         </Container>

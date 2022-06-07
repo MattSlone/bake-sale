@@ -102,7 +102,8 @@ const productReducer = (state = initialState, action) => {
     case GET_PRODUCTS_FAILURE: return {
       ...state,
       products: [],
-      error: action.payload
+      error: action.payload,
+      loading: false
     }
     case GET_PRODUCTS_COUNT_REQUEST: return {
       ...state,

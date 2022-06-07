@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Product)
+      this.belongsTo(models.User)
       this.Value = this.hasMany(models.Value)
     }
   };
   Quote.init({
-    status: DataTypes.STRING,
     price: DataTypes.FLOAT
   }, {
     sequelize,

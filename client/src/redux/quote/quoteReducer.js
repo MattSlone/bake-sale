@@ -4,7 +4,10 @@ import {
   REQUEST_QUOTE_FAILURE,
   GET_QUOTES_REQUEST,
   GET_QUOTES_SUCCESS,
-  GET_QUOTES_FAILURE
+  GET_QUOTES_FAILURE,
+  SET_QUOTE_PRICE_FAILURE,
+  SET_QUOTE_PRICE_SUCCESS,
+  SET_QUOTE_PRICE_REQUEST
 } from './quoteTypes'
 
 const initialState = {
@@ -26,11 +29,13 @@ const quoteReducer = (state = initialState, action) => {
       ...state,
       error: '',
       status: action.payload.status,
-      product: action.payload.ProductId
+      product: action.payload.ProductId,
+      loading: false
     }
     case REQUEST_QUOTE_FAILURE: return {
       ...state,
-      error: action.payload
+      error: action.payload,
+      loading: false
     }
     case GET_QUOTES_REQUEST: return {
       ...state,
@@ -40,11 +45,27 @@ const quoteReducer = (state = initialState, action) => {
     return {
       ...state,
       error: '',
-      quotes: action.payload
+      quotes: action.payload,
+      loading: false
     }
     case GET_QUOTES_FAILURE: return {
       ...state,
-      error: action.payload
+      error: action.payload,
+      loading: false
+    }
+    case SET_QUOTE_PRICE_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case SET_QUOTE_PRICE_SUCCESS: 
+    return {
+      ...state,
+      error: '',
+      loading: false
+    }
+    case SET_QUOTE_PRICE_FAILURE: return {
+      ...state,
+      loading: false
     }
     default: return state
   }
