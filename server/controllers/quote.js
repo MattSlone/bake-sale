@@ -39,7 +39,12 @@ module.exports = class QuoteController {
       const quotes = await db.Quote.findAll({
         where: where,
         include: [
-          db.Product,
+          {
+            model: db.Product,
+            include: {
+              model: db.Variety
+            }
+          },
           {
             model: db.Value,
             include: {
@@ -89,10 +94,12 @@ module.exports = class QuoteController {
       const requestedStatus = await db.QuoteStatus.findOne({ where: { status: 'requested' } })
       const quotedStatus = await db.QuoteStatus.findOne({ where: { status: 'quoted' } })
       let quote = await db.Quote.findByPk(req.body.QuoteId)
+      const variety = await db.Variety.findOne({ where: { ProductId: quote.ProductId} })
       if (quote.UserId === req.user.id && quote.QuoteStatusId === requestedStatus.id) {
-        quote.price = req.body.price
+        variety.price = req.body.price
         quote.QuoteStatusId = quotedStatus.id
         await quote.save()
+        await variety.save()
         this.sendQuotedEmail(quote)
       }
     } catch (err) {

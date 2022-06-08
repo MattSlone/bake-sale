@@ -90,7 +90,7 @@ module.exports = class OrderController {
 
   async calculateProductPrice(item) {
     try {
-      console.log('clientSidePrice: ', item.clientSidePrice)
+      console.log('clientSidePrice: ', item)
       let selectedVariation = await db.Variety.findOne({ where: { ProductId: item.product.id, quantity: item.variation } })
       let total = selectedVariation.price
 
@@ -122,7 +122,7 @@ module.exports = class OrderController {
       }
 
       total += fulfillmentPrice
-
+      console.log(total)
       console.log('serverSidePrice: ', Number.parseFloat(total).toFixed(2))
       return Number.parseFloat(total).toFixed(2)
     } catch (err) {
@@ -231,8 +231,14 @@ module.exports = class OrderController {
   async removeStaleOrders(userId) {
     try {
       const pending = await db.OrderStatus.findOne({ where: { status: 'pending' } })
-      const staleOrders = await db.Order.findAll({ where: { OrderStatusId: pending.id, UserId: userId } })
+      const staleOrders = await db.Order.findAll({
+        where: { OrderStatusId: pending.id, UserId: userId },
+        include: db.Transfer
+      })
       for (let order of staleOrders) {
+        if (order.Transfer) {
+          await order.Transfer.destroy()
+        }
         await order.destroy()
       }
     } catch (err) {

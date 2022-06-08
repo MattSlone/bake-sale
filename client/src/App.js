@@ -14,6 +14,7 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/styles';
 
 import CheckoutContainer from './components/containers/CheckoutContainer';
+import QuoteContainer from './components/containers/QuoteContainer';
 
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
@@ -63,6 +64,7 @@ export default function App() {
                 <Route path='/shop/:id' children={<ShopContainer />} />
                 <Route path='/checkout' component={CheckoutContainer} />
                 <Route path='/user/orders' component={OrdersContainer} />
+                <Route path='/user/quotes/:id' component={QuoteContainer} />
               </Switch>
             </main>
           </div>

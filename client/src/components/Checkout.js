@@ -41,7 +41,6 @@ export default function  Checkout(props) {
     if (props.cart.clientSecret) {
       setClientSecret(props.cart.clientSecret)
     }
-    
   }, [props.cart.clientSecret]);
 
   const appearance = {
@@ -63,7 +62,7 @@ export default function  Checkout(props) {
         {props.cart.products.map((product) => (
           <ListItem key={product.product.name} sx={{ py: 1, px: 0 }}>
             <ListItemText>x{product.quantity}</ListItemText>
-            <ListItemText primary={product.product.name} secondary={`package of ${product.variation}`} />
+            <ListItemText primary={product.product.name} secondary={product.quote ? '' : `package of ${product.variation}`} />
             <Typography variant="body2">{Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}</Typography>
           </ListItem>
         ))}

@@ -93,6 +93,10 @@ export default function CustomProduct(props)
   }, [])
 
   useEffect(() => {
+    setQuote(props.quote.quotes.filter(quote => quote.ProductId == id)[props.quote.quotes.length-1])
+  }, [props.quote.quotes])
+
+  useEffect(() => {
     let tempProduct = props.product.products.find(product => product.id == id)
     if (tempProduct) {
       setProduct(tempProduct)

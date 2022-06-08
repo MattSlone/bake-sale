@@ -398,16 +398,17 @@ export default function PrimarySearchAppBar(props) {
                       onChange={(e) => {handleQuantityChange(e.target.value, i)}}
                     />
                   </ListItemText>
+                  {product.quote ? '' : 
                   <ListItemText 
-                  secondary={
-                    `package of ${product.product.Varieties.find(
-                      variation => variation.quantity == product.variation
+                    secondary={
+                      `package of ${product.product?.Varieties.find(
+                        variation => variation.quantity == product.variation
                       ).quantity}`
                     }
                     className={classes.paddingLeft}
                   >
-                    {product.product.name}
-                  </ListItemText>
+                    {product.product?.name}
+                  </ListItemText>}
                   <ListItemText 
                   secondary={product.quantity > 1 
                     ? `$${Number.parseFloat(product.clientSidePrice).toFixed(2)} ea` 

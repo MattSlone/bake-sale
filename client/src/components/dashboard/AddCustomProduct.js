@@ -13,6 +13,7 @@ import { useRouteMatch, useParams } from 'react-router-dom'
 // import { setProductImagesPreview } from '../../redux'
 import FormGeneratorContainer from '../containers/FormGeneratorContainer'
 import ListingDetailsContainer from '../containers/ListingDetailsContainer'
+import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
 
 const PREFIX = 'AddCustomProduct';
 
@@ -63,6 +64,7 @@ const Root = styled('div')((
 function getSteps () {
   return ['Add product images',
     'Listing details',
+    'Pricing and fulfillment',
     'Create Custom Form'
   ]
 }
@@ -130,6 +132,8 @@ export default function AddCustomProduct (props) {
                   case 1:
                     return <ListingDetailsContainer />
                   case 2:
+                    return <PricingAndInventoryContainer custom={true} />
+                  case 3:
                     return <FormGeneratorContainer />
                   default:
                     return 'Unknown step'
