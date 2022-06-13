@@ -41,7 +41,7 @@ export default function  Quote(props) {
         variation: 1, // variation = quantity
         fulfillment: '',
         addons: [],
-        clientSidePrice: tempQuote.Product.Varieties[0].price,
+        clientSidePrice: tempQuote.price,
         quantity: 1,
         quote: true
       })

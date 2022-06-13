@@ -1,5 +1,8 @@
 'use strict'
 
+const GMaps = require('../lib/gmaps')
+const order = require('../models/order')
+
 const db = require('../models/index'),
   MakeStripeAPI = require('../lib/stripe'),
   StripeAPI = new MakeStripeAPI()
@@ -7,7 +10,7 @@ const db = require('../models/index'),
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
     try {
-      const shopAmounts = await this.mapCartToShopAmounts(req.body.items)
+      const shopAmounts = await this.mapCartToShopAmounts(req, req.body.items)
       const totalAmount = shopAmounts.map(shopAmount => shopAmount.amount)
         .reduce((prev, curr) => prev + curr)
       
@@ -31,7 +34,7 @@ module.exports = class OrderController {
           console.log('VARIATION: ', item.variation)
           const pendingStatus = await db.OrderStatus.findOne({ where: { status: 'pending' } })
           const order = await db.Order.create({
-            amount: await this.calculateProductPrice(item),
+            amount: await this.calculateProductPrice(req, item),
             quantity: item.quantity,
             TransferId: transfer.id,
             ProductId: item.product.id,
@@ -51,24 +54,29 @@ module.exports = class OrderController {
     }
   }
 
-  async mapCartToShopAmounts(items) {
+  async mapCartToShopAmounts(req, items) {
     try {
       const shops = items.map(item => item.product.ShopId)
         .filter((shop, index, shops) => shops.indexOf(shop) === index)
 
-      const shopItems = shops.map(id => {
-        const itemsTest = items.filter(item => item.product.ShopId === id)
+      const shopItems = await Promise.all(shops.map(async id => {
+        let itemsTest = await Promise.all(items.map(async item => {
+          return {
+            ...item,
+            product: (await db.Product.findByPk(item.product.id))
+          }
+        }))
         return {
           id: id,
-          items: itemsTest
+          items: itemsTest.filter(item => item.product.ShopId === id)
         }
-      })
+      }))
 
       const shopAmounts = Promise.all(shopItems.map(async shop => {
         try {
           const shopInstance = await db.Shop.findByPk(shop.id, { attributes: ['stripeAccountId'], raw: true })
           const amounts = await Promise.all(shop.items.map(async item => {
-            const productPrice = await this.calculateProductPrice(item)
+            const productPrice = await this.calculateProductPrice(req, item)
             return productPrice * item.quantity
           }))
           const amount = amounts.reduce((prev, curr) => prev + curr)
@@ -88,11 +96,22 @@ module.exports = class OrderController {
     }
   }
 
-  async calculateProductPrice(item) {
+  async calculateProductPrice(req, item) {
     try {
       console.log('clientSidePrice: ', item)
-      let selectedVariation = await db.Variety.findOne({ where: { ProductId: item.product.id, quantity: item.variation } })
-      let total = selectedVariation.price
+      let total = 0
+      let selectedVariation = await db.Variety.findOne({
+        where: {
+          ProductId: item.product.id,
+          quantity: item.variation
+        }
+      })
+      if (item.product.custom) {
+        const quote = db.Quote.findOne({ where: { UserId: req.user.id, ProductId: item.product.id } })
+        total = Number(quote.price)
+      } else {
+        total = Number(selectedVariation.price)
+      }
 
       let addonsTotal = 0.0
       const addons = Object.entries(item.addons).map(addon => {
@@ -107,8 +126,8 @@ module.exports = class OrderController {
           if (addonInstance.ProductId != item.product.id) {
             throw Error('ERROR: addon doesn\'t exist for this product. Handle accordingly')
           }
-          addonsTotal += addonInstance.price
-          addonsTotal += addonInstance.secondaryPrice * (item.variation-1)
+          addonsTotal += Number(addonInstance.price)
+          addonsTotal += Number(addonInstance.secondaryPrice) * Number(item.variation-1)
         }
       }
 
@@ -116,15 +135,22 @@ module.exports = class OrderController {
 
       let fulfillmentPrice = 0.0
       if (item.fulfillment == 'delivery') {
-        fulfillmentPrice = selectedVariation.delivery
+        if (selectedVariation.deliveryFeeType == 'mile') {
+          const shop = await db.Shop.findByPk(item.product.ShopId)
+          const latLng = await GMaps.getLatLng(req.user)
+          const distance = GMaps.haversine_distance(latLng, { lat: shop.lat, lng: shop.lng })
+          fulfillmentPrice = Number(selectedVariation.delivery) * (distance * 0.000621371)
+        } else {
+          fulfillmentPrice = Number(selectedVariation.delivery)
+        }
       } else if(item.fulfillment == 'shipping') {
-        fulfillmentPrice = selectedVariation.shipping
+        fulfillmentPrice = Number(selectedVariation.shipping)
       }
 
       total += fulfillmentPrice
       console.log(total)
-      console.log('serverSidePrice: ', Number.parseFloat(total).toFixed(2))
-      return Number.parseFloat(total).toFixed(2)
+      console.log('serverSidePrice: ', Number(total).toFixed(2))
+      return Number(total).toFixed(2)
     } catch (err) {
       console.log(err)
     }
@@ -174,23 +200,19 @@ module.exports = class OrderController {
   }
 
   async list(req, res, next) {
-    let where = {}
-    if (req.query.shop) {
-        where.ShopId = req.query.shop
-    } else {
-      where.UserId = req.user.id
+    const shop = req.query.forShop ? await db.Shop.findOne({ where: { UserId: req.user.id } }) : null
+    const where = {
+      ...(!shop && {UserId: req.user.id}),
+      ...(req.query.orderId && {id: req.query.orderId })
     }
-    if(req.query.orderID) {
-        where.id = req.query.orderID
-    }
-
     try {
-        const orders = db.Order.findAll({
+        const orders = await db.Order.findAll({
             where: where,
             include: [
               db.Variety,
               {
                 model: db.Product,
+                required: true,
                 include: [
                   {
                     model: db.Shop,
@@ -201,11 +223,34 @@ module.exports = class OrderController {
                       db.ShopContact
                     ]
                   }
-                ]
+                ],
+                where: {
+                  ...(shop && {ShopId: shop.id})
+                }
               },
-              db.Addon
+              db.Addon,
+              ...(shop ? [{
+                model: db.User,
+                attributes: [
+                  'firstName',
+                  'lastName',
+                  'street',
+                  'city',
+                  'state',
+                  'zipcode']
+              },
+              {
+                model: db.Transfer,
+                attributes: ['amount']
+              }
+            ] : [])
             ]
         });
+        if (orders[0]?.User && orders[0]?.fulfillment == 'pickup') {
+          for (order of orders) {
+            delete order.User
+          } 
+        }
         return orders
     }
     catch(err) {

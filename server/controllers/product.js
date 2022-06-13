@@ -68,6 +68,31 @@ module.exports = class ProductController {
         }
     }
 
+    async getDeliveryByTheMileCost(user, productId, quantity) {
+        try {
+            const product = await db.Product.findOne({
+                where: { id: productId }
+            })
+            const shop = await db.Shop.findByPk(product.ShopId)
+            if (product.custom) {
+                quantity = 1
+            }
+            const variation = await db.Variety.findOne({ 
+                where: {
+                    ProductId: product.id,
+                    quantity: quantity 
+                }
+            })
+            const latLng = await GMaps.getLatLng(user)
+            const distance_meters = GMaps.haversine_distance(latLng, { lat: shop.lat, lng: shop.lng })
+            const miles = GMaps.convertMetersToMiles(distance_meters)
+            const fulfillmentPrice = variation.delivery * miles
+            return fulfillmentPrice
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     async list(req, res, next) {
         try {
             console.log("QUERY PARAMS: ", req.query)
@@ -80,7 +105,7 @@ module.exports = class ProductController {
                 ...((user.id && !req.query.shop) && {ShopId: shopIds})
             }
             let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
-            let limit = 2
+            let limit = 6
             const products = await db.Product.findAll({
                 where: where,
                 offset: offset,
@@ -120,9 +145,14 @@ module.exports = class ProductController {
 
     async count(req, res, next) {
         try {
-            let where = {
-                ...(req.query.shop && {ShopId: req.query.shop}),
-                ...(req.query.products && {id: [req.query.products]})
+            console.log("QUERY PARAMS: ", req.query)
+            const user = req.user ? await db.User.findByPk(req.user.id) : {}
+            const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
+            console.log('SHOP IDS: ', shopIds)
+            const where = {
+                ...('shop' in req.query && {ShopId: req.query.shop}),
+                ...('products' in req.query && {id: req.query.products}),
+                ...((user.id && !req.query.shop) && {ShopId: shopIds})
             }
             const count = await db.Product.count({ where: where });
             return count

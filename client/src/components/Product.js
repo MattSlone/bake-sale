@@ -16,7 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import CustomProductContainer from './containers/CustomProductContainer'
 import Checkbox from '@mui/material/Checkbox';
 import { TextField, Typography } from '@mui/material';
-import productReducer from '../redux/product/productReducer';
+import axios from 'axios'
 
 const PREFIX = 'Product';
 
@@ -109,6 +109,7 @@ export default function Product(props)
   const [fulfillment, setFulfillment] = useState('')
   const [price, setPrice] = useState(0)
   const [addonsChecked, setAddonsChecked] = useState([]);
+  const [deliveryCost, setDeliveryCost] = useState('')
 
   useEffect(() => {
     props.getProducts({products: [id]})
@@ -116,7 +117,6 @@ export default function Product(props)
 
   useEffect(() => {
     let tempProduct = props.product.products.find(product => product.id == id)
-    console.log('tempProduct: ', tempProduct)
     if (tempProduct) {
       setProduct(tempProduct)
       if (!tempProduct.custom) {
@@ -137,19 +137,20 @@ export default function Product(props)
   useEffect(() => {
     if (product && !product.custom) {
       handleSetPrice()
+      getDeliveryByTheMileCost()
     }
   }, [product, variation, fulfillment, addonsChecked])
 
   const handleSetPrice = () => {
     let selectedVariation = product.Varieties.find(v => v.quantity == variation)
-    let total = selectedVariation.price
+    let total = Number(selectedVariation.price)
 
     let addonsTotal = 0.0
 
     product.Addons.forEach((addon) => {
       if(addonsChecked[addon.id]) {
-        addonsTotal += addon.price
-        addonsTotal += addon.secondaryPrice * (variation-1)
+        addonsTotal += Number(addon.price)
+        addonsTotal += Number(addon.secondaryPrice) * (variation-1)
       }
     })
 
@@ -157,14 +158,14 @@ export default function Product(props)
 
     let fulfillmentPrice = 0.0
     if (fulfillment == 'delivery') {
-      fulfillmentPrice = selectedVariation.delivery
+      fulfillmentPrice = deliveryCost
     } else if(fulfillment == 'shipping') {
-      fulfillmentPrice = selectedVariation.shipping
+      fulfillmentPrice = Number(selectedVariation.shipping)
     }
 
     total += fulfillmentPrice
 
-    setPrice(Number.parseFloat(total).toFixed(2))
+    setPrice(Number(total).toFixed(2))
   }
 
   const handleAddToCart = () => {
@@ -191,6 +192,26 @@ export default function Product(props)
   const handlePersonalizationChange = (e) => {
     setPersonalization(e.target.value)
   }
+
+  const getDeliveryByTheMileCost = (async () => {
+    if (product.Varieties.find(v => v.quantity == variation).deliveryFeeType == 'mile') {
+      console.log(product.id)
+      const res = await axios.get('/api/product/deliverycost', {
+        params: {
+          productId: product.id,
+          quantity: variation
+        }
+      })
+      if(res.data.error[0]) {
+        console.log(res.data.error[0])
+      } else {
+        console.log(res.data.success)
+        setDeliveryCost(Number(res.data.success))
+      }
+    } else {
+      setDeliveryCost(Number(product.Varieties.find(v => v.quantity == 1).delivery))
+    }
+  })
 
   var items = [
     {
@@ -242,7 +263,7 @@ export default function Product(props)
                         onChange={handleAddonCheckChange}
                       />
                     }
-                    label={`${addon.name} ($${addon.price.toFixed(2)}${addon.secondaryPrice > 0 ? ` + $${addon.secondaryPrice.toFixed(2)}`: ""})`}
+                    label={`${addon.name} ($${Number(addon.price).toFixed(2)}${Number(addon.secondaryPrice) > 0 ? ` + $${Number(addon.secondaryPrice).toFixed(2)}`: ""})`}
                   />
                 ))}
               </Typography>
@@ -307,7 +328,7 @@ export default function Product(props)
                       {props.shop.pickupAddress ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
                       {
                         (product.Varieties.find(v => v.quantity == variation).delivery > 0) ? 
-                        <MenuItem value='delivery'>{`Delivery, $${Number.parseFloat(product.Varieties.find(v => v.quantity == variation).delivery).toFixed(2)}`}</MenuItem>
+                        <MenuItem value='delivery'>{`Delivery, $${Number.parseFloat(deliveryCost).toFixed(2)}`}</MenuItem>
                         : ""
                       }
                       {

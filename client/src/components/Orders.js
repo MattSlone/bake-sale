@@ -71,11 +71,11 @@ export default function Orders(props) {
   return (
     <StyledContainer className={classes.cardGrid} maxWidth="lg">
       <Grid container spacing={4}>
-        {orders.map((order) => (
+        {orders ? orders.map((order) => (
           <Grid className={classes.gridItem} item key={order.id} xs={12}>
             <Order order={order} />
           </Grid>
-        ))}
+        )) : ''}
       </Grid>
     </StyledContainer>
   );

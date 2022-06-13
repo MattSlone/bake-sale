@@ -48,6 +48,23 @@ module.exports = (app) => {
     }
   })
 
+  app.get('/api/product/deliverycost', async (req, res, next) => {
+    try {
+      let response = await ProductController.getDeliveryByTheMileCost(
+        req.user,
+        req.query.productId,
+        req.query.quantity
+      )
+      res.send({
+          error: req.flash('error'),
+          success: response
+      })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
+
   app.post('/api/product/update', async (req, res, next) => {
     try {
         let product = await ProductController.update(req, res, next)

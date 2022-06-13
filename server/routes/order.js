@@ -6,8 +6,11 @@ const MakeOrderController = require('../controllers/order'),
 module.exports = (app, webhookApp) => {
   app.get('/api/orders', async (req, res, next) => {
     try {
+      console.log('inside routeeee!')
       if (req.user) {
+        console.log('user is logged in!!!')
         let response = await OrderController.list(req, res, next)
+        console.log('RESPONSEEEEE: ', response)
         res.send({
           error: req.flash('error'),
           success: response

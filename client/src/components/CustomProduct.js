@@ -10,6 +10,11 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import CustomProductForm from './CustomProductForm';
 import { TextField, Typography } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import axios from 'axios'
 
 const PREFIX = 'CustomProduct';
 
@@ -79,14 +84,14 @@ const StyledPaper = styled(Paper)((
 
 export default function CustomProduct(props)
 {
-
   let { id } = useParams()
   const auth = useAuth()
   const [quote, setQuote] = useState(props.quote.quotes.filter(quote => quote.ProductId == id)[props.quote.quotes.length-1])
   const [fields, setFields] = useState([])
   const [product, setProduct] = useState('')
   const [message, setMessage] = useState('')
-  console.log(quote)
+  const [fulfillment, setFulfillment] = useState('')
+  const [deliveryCost, setDeliveryCost] = useState(0)
 
   useEffect(() => {
     props.getProducts({products: [id]})
@@ -104,6 +109,12 @@ export default function CustomProduct(props)
     }
   }, [props.product.loading])
 
+  useEffect(() => {
+    if (product) {
+      getDeliveryByTheMileCost()
+    }
+  }, [product])
+
   const handleRequestQuote = () => {
     props.requestQuote({
       ...quote,
@@ -111,7 +122,9 @@ export default function CustomProduct(props)
       values: mapValuesToFields()
     })
     setMessage('You\'ll receive an email with a final price once your quote has been processed')
-    console.log(quote)
+  }
+  const handleSelectFulfillment = (e) => {
+    setFulfillment(e.target.value)
   }
 
   const mapValuesToFields = () => {
@@ -124,6 +137,25 @@ export default function CustomProduct(props)
     return values
   }
 
+  const getDeliveryByTheMileCost = (async () => {
+    if (product.Varieties.find(v => v.quantity == 1).deliveryFeeType == 'mile') {
+      const res = await axios.get('/api/product/deliverycost', {
+        params: {
+          productId: product.id,
+          quantity: 1
+        }
+      })
+      if(res.data.error[0]) {
+        console.log(res.data.error[0])
+      } else {
+        console.log('right here', res.data.success)
+        setDeliveryCost(res.data.success)
+      }
+    } else {
+      setDeliveryCost(product.Varieties.find(v => v.quantity == 1).delivery)
+    }
+  })
+
   var items = [
     {
       name: "Random Name #1",
@@ -135,7 +167,7 @@ export default function CustomProduct(props)
     }
   ]
 
-  return (
+  return ( product ?
     <StyledPaper className={classes.product}>
       <Grid container spacing={3} className={classes.top}>
         <Grid item xs={12} md={8}> 
@@ -176,6 +208,32 @@ export default function CustomProduct(props)
               </Typography>
             </Grid>
             <Grid item>
+            <FormControl variant="outlined" className={classes.formControl}>
+                <InputLabel id="variation-label">Fulfillment Type</InputLabel>
+                <Select
+                  labelId="variation-label"
+                  id="variation-select"
+                  label="Select an option"
+                  value={fulfillment}
+                  onChange={handleSelectFulfillment}
+                >
+                  <MenuItem value=''>Select an option</MenuItem>
+                  {props.shop.pickupAddress ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
+                  {
+                    (product.Varieties.find(v => v.quantity == 1).delivery > 0) ? 
+                    <MenuItem value='delivery'>{
+                      `Delivery, $${Number.parseFloat(deliveryCost).toFixed(2)}`}</MenuItem>
+                    : ""
+                  }
+                  {
+                    (product.Varieties.find(v => v.quantity == 1).shipping) ? 
+                    <MenuItem value='shipping'>{`Shipped, $${Number.parseFloat(product.Varieties.find(v => v.quantity == 1).shipping).toFixed(2)}`}</MenuItem>
+                    : ""
+                  }
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item>
               <Button
               className={classes.requestQuoteButton}
               variant="contained"
@@ -194,8 +252,8 @@ export default function CustomProduct(props)
       <Grid>
         <CustomProductForm fields={fields} setFields={setFields} title="Questions" noshadow />
       </Grid>
-      
     </StyledPaper>
+    : ''
   )
 }
 

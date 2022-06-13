@@ -46,7 +46,7 @@ export default function Home(props) {
 
   const handleChangePage = function(event, value) {
     const page = value
-    const lastId = (page-1) * 2
+    const lastId = (page-1) * 6
     props.getProducts({ lastId: lastId })
     setPage(page)
   }
@@ -184,7 +184,7 @@ export default function Home(props) {
               </Grid>
             )) : ''}
             <Grid item xs={12} container justifyContent="center">
-              <Pagination count={Math.ceil(props.product.count / 2)} page={page} color="primary" onChange={handleChangePage} />
+              <Pagination count={Math.ceil(props.product.count / 6)} page={page} color="primary" onChange={handleChangePage} />
             </Grid>
           </Grid>
         </Container>

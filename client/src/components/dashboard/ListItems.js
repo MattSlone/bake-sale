@@ -57,12 +57,14 @@ export default function MainListItems() {
           <ListItemText primary="Products" />
         </ListItem>
       </Link>
-      <ListItem button>
-        <ListItemIcon>
-          <ShoppingCartIcon />
-        </ListItemIcon>
-        <ListItemText primary="Orders" />
-      </ListItem>
+      <Link className={classes.routerLink} to="/dashboard/orders">
+        <ListItem button>
+          <ListItemIcon>
+            <ShoppingCartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Orders" />
+        </ListItem>
+      </Link>
       <Link className={classes.routerLink} to="/dashboard/requests">
         <ListItem button>
           <ListItemIcon>
@@ -71,12 +73,6 @@ export default function MainListItems() {
           <ListItemText primary="Quote Requests" />
         </ListItem>
       </Link>
-      <ListItem button>
-        <ListItemIcon>
-          <PeopleIcon />
-        </ListItemIcon>
-        <ListItemText primary="Customers" />
-      </ListItem>
     </Root>
   );
 }

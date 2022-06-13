@@ -127,32 +127,32 @@ export default function PricingAndInventory(props) {
             <Grid container spacing={1} alignItems="center">
               <Grid item>
                 <Typography>
-                <b>Quantity:</b> {variety.quantity.toFixed(2)}
+                <b>Quantity:</b> {Number(variety.quantity.toFixed(2))}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                <b>Price:</b> ${variety.price.toFixed(2)}
+                <b>Price:</b> ${Number(variety.price).toFixed(2)}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Shipping:</b> {(typeof variety.shipping === 'number') ? `$${variety.shipping.toFixed(2)}`: "NA"}
+                  <b>Shipping:</b> {variety.shipping > 0 ? `$${Number(variety.shipping).toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Secondary Shipping:</b> {(typeof variety.shipping === 'number') && (typeof variety.secondaryShipping === 'number') ? `$${variety.secondaryShipping.toFixed(2)}`: "NA"}
+                  <b>Secondary Shipping:</b> {variety.shipping > 0 && variety.secondaryShipping > 0 ? `$${Number(variety.secondaryShipping).toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Delivery:</b> {(typeof variety.delivery === 'number') ? `$${(variety.deliveryFeeType == 'mile') ? `${variety.delivery.toFixed(2)}/mi` : variety.delivery.toFixed(2)}`: "NA"}
+                  <b>Delivery:</b> {variety.delivery > 0 ? `$${(variety.deliveryFeeType == 'mile') ? `${Number(variety.delivery).toFixed(2)}/mi` : Number(variety.delivery).toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  <b>Secondary Delivery:</b> {(typeof variety.delivery === 'number') && (typeof variety.secondaryDelivery === 'number') ? `$${(variety.deliveryFeeType == 'mile') ? `${variety.secondaryDelivery.toFixed(2)}/mi` : variety.secondaryDelivery.toFixed(2)}`: "NA"}
+                  <b>Secondary Delivery:</b> {variety.delivery > 0 && variety.secondaryDelivery > 0 ? `$${(variety.deliveryFeeType == 'mile') ? `${Number(variety.secondaryDelivery).toFixed(2)}/mi` : Number(variety.secondaryDelivery).toFixed(2)}`: "NA"}
                 </Typography>
               </Grid>
               <Grid item>

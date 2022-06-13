@@ -11,7 +11,7 @@ import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
 import Chart from './Chart';
 import Deposits from './Deposits';
-import Orders from './Orders';
+import Orders from './ShopOrders';
 import { useAuth } from '../../hooks/use-auth'
 import { Switch, Route, Redirect, useRouteMatch } from "react-router-dom";
 import CreateShopContainer from "../containers/CreateShopContainer"
@@ -20,6 +20,8 @@ import AddProductContainer from '../containers/AddProductContainer';
 import AddCustomProductContainer from '../containers/AddCustomProductContainer';
 import QuotesContainer from '../containers/QuotesContainer';
 import RequestContainer from '../containers/RequestContainer';
+import ShopOrdersContainer from '../containers/ShopOrdersContainer';
+import ShopOrderContainer from '../containers/ShopOrderContainer';
 
 const PREFIX = 'Dashboard';
 
@@ -171,7 +173,6 @@ export default function Dashboard(props) {
   })
 
   const defaultDashboard = (
-    <>
     <div className={classes.root}>
       <CssBaseline />
       <main className={classes.content}>
@@ -193,7 +194,7 @@ export default function Dashboard(props) {
             {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Orders />
+                <ShopOrdersContainer />
               </Paper>
             </Grid>
           </Grid>
@@ -203,7 +204,6 @@ export default function Dashboard(props) {
         </Container>
       </main>
     </div>
-    </>
   )
 
   return (
@@ -231,6 +231,12 @@ export default function Dashboard(props) {
       </Route>
       <Route path={`${match.path}/requests`}>
         <QuotesContainer />
+      </Route>
+      <Route path={`${match.path}/orders/:id`}>
+        <ShopOrderContainer />
+      </Route>
+      <Route path={`${match.path}/orders`}>
+        <ShopOrdersContainer />
       </Route>
       <Route path={match.path}>
         {defaultDashboard}
