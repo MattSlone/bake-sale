@@ -12,6 +12,7 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider'
 import { Redirect } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 
@@ -69,44 +70,26 @@ function Copyright() {
   );
 }
 
-export default function SignUp({ userSignUp, userData }) {
+export default function Account(props) {
 
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [street, setStreet] = useState('')
-  const [city, setCity] = useState('')
-  const [state, setState] = useState('')
-  const [zipcode, setZipcode] = useState('')
-  const [seller, setSeller] = useState(0)
+  const [newPassword, setNewPassword] = useState('')
 
   /*useEffect(() => {
     userSignUp()
   }, [])*/
 
   let formData = {
-    firstName: firstName,
-    lastName: lastName,
-    street: street,
-    city: city,
-    state: state,
-    zipcode: zipcode,
     username: username,
     password: password,
-    seller: seller
+    newPassword: newPassword,
   }
 
   const handleSubmit = e => {
     e.preventDefault()
-    userSignUp(formData)
-  }
-
-  if(userData.loggedIn == true) {
-    return (
-      <Redirect to='/' />
-    )
+    //userSignUp(formData)
   }
 
   return (
@@ -117,37 +100,10 @@ export default function SignUp({ userSignUp, userData }) {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign up
+          Edit Account
         </Typography>
         <form className={classes.form} noValidate>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="fname"
-                name="firstName"
-                variant="outlined"
-                required
-                fullWidth
-                id="firstName"
-                label="First Name"
-                value={firstName}
-                onChange={e => setFirstName(e.target.value)}
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lname"
-                value={lastName}
-                onChange={e => setLastName(e.target.value)}
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 variant="outlined"
@@ -162,12 +118,15 @@ export default function SignUp({ userSignUp, userData }) {
               />
             </Grid>
             <Grid item xs={12}>
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
               <TextField
                 variant="outlined"
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label="Current Password"
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -175,62 +134,17 @@ export default function SignUp({ userSignUp, userData }) {
                 onChange={e => setPassword(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="street"
-                label="Street"
-                name="street"
-                autoComplete="street"
-                value={street}
-                onChange={e => setStreet(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="city"
-                label="City"
-                name="city"
-                autoComplete="city"
-                value={city}
-                onChange={e => setCity(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="state"
-                label="State"
-                name="state"
-                autoComplete="state"
-                value={state}
-                onChange={e => setState(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="zipcode"
-                label="Zipcode"
-                name="zipcode"
-                autoComplete="zipcode"
-                value={zipcode}
-                onChange={e => setZipcode(e.target.value)}
-              />
-            </Grid>
             <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value={1} onChange={e => setSeller(e.target.value)} color="primary" />}
-                label="Seller account"
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                name="password"
+                label="New Password"
+                type="password"
+                id="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
               />
             </Grid>
           </Grid>
@@ -242,15 +156,9 @@ export default function SignUp({ userSignUp, userData }) {
             className={classes.submit}
             onClick={e => handleSubmit(e)}
           >
-            Sign Up
+            Save
           </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link component={RouterLink} href="#" variant="body2" to='/signin'>
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
+
         </form>
       </div>
       <Box mt={5}>

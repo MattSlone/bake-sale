@@ -15,6 +15,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
 import { Redirect, Link as RouterLink } from "react-router-dom";
@@ -153,7 +154,18 @@ const Root = styled('div')((
 
   [`& .${classes.routerLinkButton}`]: {
     color: 'black',
-    textDecoration: 'none'
+    textDecoration: 'none',
+    [`:visited`]: {
+      color: 'white'
+    }
+  },
+
+  [`& .${classes.link}`]: {
+    color: 'white !important',
+    textDecoration: 'none !important',
+    [`:visited`]: {
+      color: 'white'
+    }
   },
 
   [`& .${classes.white}`]: {
@@ -166,6 +178,8 @@ const Root = styled('div')((
     alignItems: 'f',
   }
 }));
+
+
 
 export default function PrimarySearchAppBar(props) {
 
@@ -247,12 +261,15 @@ export default function PrimarySearchAppBar(props) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <RouterLink to='/user/orders' className={classes.routerLinkButton}>
-        <MenuItem onClick={handleMenuClose}>My Orders</MenuItem>
+      <RouterLink to='/user/profile' className={classes.routerLinkButton}>
+        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       </RouterLink>
-      
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <RouterLink to='/user/orders' className={classes.routerLinkButton}>
+        <MenuItem onClick={handleMenuClose}>Orders</MenuItem>
+      </RouterLink>
+      <RouterLink to='/user/account' className={classes.routerLinkButton}>
+        <MenuItem onClick={handleMenuClose}>Account</MenuItem>
+      </RouterLink>
       {props.userData.loggedIn ? renderSignOutButton : null}
     </Menu>
   );
@@ -268,8 +285,18 @@ export default function PrimarySearchAppBar(props) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
+      <RouterLink className={classes.routerLinkButton} to='/dashboard'>
+        <MenuItem>
+          <IconButton color="inherit" size="large">
+            <Badge color="secondary">
+              <DashboardIcon />
+            </Badge>
+          </IconButton>
+          <p>Dashboard</p>
+        </MenuItem>
+      </RouterLink>
       <MenuItem ref={cartAnchorRef} onClick={handleCartPopoverOpen}>
-        <IconButton aria-label="show 4 new mails" color="inherit" size="large">
+        <IconButton color="inherit" size="large">
           <Badge badgeContent={props.cart.products.length} color="secondary">
             <ShoppingCartIcon />
           </Badge>
@@ -293,7 +320,7 @@ export default function PrimarySearchAppBar(props) {
           size="large">
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p>User</p>
       </MenuItem>
     </Menu>
   );
@@ -331,6 +358,13 @@ export default function PrimarySearchAppBar(props) {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
+            <RouterLink className={classes.link} to="/dashboard">
+              <IconButton color="inherit" size="large">
+                <Badge color="secondary">
+                  <DashboardIcon />
+                </Badge>
+              </IconButton>
+            </RouterLink>
             <IconButton
               aria-label="show 4 new mails"
               color="inherit"
@@ -372,11 +406,7 @@ export default function PrimarySearchAppBar(props) {
       </AppBar>
       <Popover
         id="mouse-over-popover"
-        className={classes.popover}
-        classes={{
-          paper: classes.paper,
-          root: classes.popoverRoot
-        }}
+        className={classes.popoverRoot}
         open={cartOpen}
         anchorEl={cartAnchorEl}
         anchorReference='none'

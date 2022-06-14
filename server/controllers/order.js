@@ -107,7 +107,7 @@ module.exports = class OrderController {
         }
       })
       if (item.product.custom) {
-        const quote = db.Quote.findOne({ where: { UserId: req.user.id, ProductId: item.product.id } })
+        const quote = await db.Quote.findOne({ where: { UserId: req.user.id, ProductId: item.product.id } })
         total = Number(quote.price)
       } else {
         total = Number(selectedVariation.price)
@@ -146,7 +146,6 @@ module.exports = class OrderController {
       } else if(item.fulfillment == 'shipping') {
         fulfillmentPrice = Number(selectedVariation.shipping)
       }
-
       total += fulfillmentPrice
       console.log(total)
       console.log('serverSidePrice: ', Number(total).toFixed(2))

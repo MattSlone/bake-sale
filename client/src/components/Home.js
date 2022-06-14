@@ -71,13 +71,13 @@ export default function Home(props) {
       theme,
     }
   ) => ({
+    padding: theme.spacing(2),
     [`& .${classes.icon}`]: {
       marginRight: theme.spacing(2),
     },
 
     [`& .${classes.heroContent}`]: {
       backgroundColor: theme.palette.background.paper,
-      padding: theme.spacing(8, 0, 0),
     },
 
     [`& .${classes.heroButtons}`]: {
@@ -85,6 +85,7 @@ export default function Home(props) {
     },
 
     [`& .${classes.cardGrid}`]: {
+      padding: 0,
       paddingTop: (userdata) => theme.spacing(parseInt(`${userdata.loggedIn ? 0 : 8}`)),
       paddingBottom: theme.spacing(8),
     },
@@ -148,9 +149,6 @@ export default function Home(props) {
         {/* Hero unit */}
         <div className={classes.heroContent}>
           <Container maxWidth="sm">
-            <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-              Bake.$ale
-            </Typography>
             {props.userData.loggedIn ? null : <WelcomeHeader />}
           </Container>
         </div>

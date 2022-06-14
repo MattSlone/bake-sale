@@ -28,7 +28,7 @@ const StyledContainer = styled(Container)((
   }
 ) => ({
   [`&.${classes.cardGrid}`]: {
-    paddingTop: theme.spacing(8),
+    paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(8),
   },
 

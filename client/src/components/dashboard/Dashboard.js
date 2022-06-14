@@ -43,15 +43,12 @@ const classes = {
   fixedHeight: `${PREFIX}-fixedHeight`
 };
 
-const StyledSwitch = styled(Switch)((
+const Root = styled('div')((
   {
     theme
   }
 ) => ({
-  [`& .${classes.root}`]: {
-    display: 'flex',
-  },
-
+  display: 'flex',
   [`& .${classes.toolbar}`]: {
     paddingRight: 24, // keep right padding when drawer closed
   },
@@ -115,8 +112,6 @@ const StyledSwitch = styled(Switch)((
     },
   },
 
-  [`& .${classes.appBarSpacer}`]: theme.mixins.toolbar,
-
   [`& .${classes.content}`]: {
     flexGrow: 1,
     //height: '100vh',
@@ -124,12 +119,18 @@ const StyledSwitch = styled(Switch)((
   },
 
   [`& .${classes.container}`]: {
-    paddingTop: theme.spacing(4),
+    paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(4),
   },
 
   [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
+    display: 'flex',
+    overflow: 'auto',
+    flexDirection: 'column',
+  },
+
+  [`& .${classes.noPaddingPaper}`]: {
     display: 'flex',
     overflow: 'auto',
     flexDirection: 'column',
@@ -168,15 +169,14 @@ export default function Dashboard(props) {
   }
 
   useEffect(() => {
-    const UserId = auth.userData.user.success.id
+    const UserId = auth.userData.user.id
     props.getShop({UserId: UserId})
   })
 
   const defaultDashboard = (
-    <div className={classes.root}>
+    <Root>
       <CssBaseline />
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             {/* Chart */}
@@ -193,7 +193,7 @@ export default function Dashboard(props) {
             </Grid>
             {/* Recent Orders */}
             <Grid item xs={12}>
-              <Paper className={classes.paper}>
+              <Paper className={classes.noPaddingPaper}>
                 <ShopOrdersContainer />
               </Paper>
             </Grid>
@@ -203,11 +203,11 @@ export default function Dashboard(props) {
           </Box>
         </Container>
       </main>
-    </div>
+    </Root>
   )
 
   return (
-    <StyledSwitch>
+    <Switch>
       <Route path={`${match.path}/shop/create`}>
         <CreateShopContainer />
       </Route>
@@ -236,11 +236,11 @@ export default function Dashboard(props) {
         <ShopOrderContainer />
       </Route>
       <Route path={`${match.path}/orders`}>
-        <ShopOrdersContainer />
+        <ShopOrdersContainer singlePage={true} />
       </Route>
       <Route path={match.path}>
         {defaultDashboard}
       </Route>
-    </StyledSwitch>
+    </Switch>
   );
 }

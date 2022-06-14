@@ -15,7 +15,7 @@ import Container from '@mui/material/Container';
 import { Redirect } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 
-const PREFIX = 'SignUp';
+const PREFIX = 'Profile';
 
 const classes = {
   paper: `${PREFIX}-paper`,
@@ -69,23 +69,14 @@ function Copyright() {
   );
 }
 
-export default function SignUp({ userSignUp, userData }) {
-
-
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [street, setStreet] = useState('')
-  const [city, setCity] = useState('')
-  const [state, setState] = useState('')
-  const [zipcode, setZipcode] = useState('')
-  const [seller, setSeller] = useState(0)
-
-  /*useEffect(() => {
-    userSignUp()
-  }, [])*/
-
+export default function Profile(props) {
+  const [firstName, setFirstName] = useState(props.user.firstName)
+  const [lastName, setLastName] = useState(props.user.lastName)
+  const [street, setStreet] = useState(props.user.street)
+  const [city, setCity] = useState(props.user.city)
+  const [state, setState] = useState(props.user.state)
+  const [zipcode, setZipcode] = useState(props.user.zipcode)
+  const [seller, setSeller] = useState(props.user.seller)
   let formData = {
     firstName: firstName,
     lastName: lastName,
@@ -93,20 +84,12 @@ export default function SignUp({ userSignUp, userData }) {
     city: city,
     state: state,
     zipcode: zipcode,
-    username: username,
-    password: password,
     seller: seller
   }
 
   const handleSubmit = e => {
     e.preventDefault()
-    userSignUp(formData)
-  }
-
-  if(userData.loggedIn == true) {
-    return (
-      <Redirect to='/' />
-    )
+    props.editProfile(formData)
   }
 
   return (
@@ -117,7 +100,7 @@ export default function SignUp({ userSignUp, userData }) {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign up
+          Edit Profile
         </Typography>
         <form className={classes.form} noValidate>
           <Grid container spacing={2}>
@@ -146,33 +129,6 @@ export default function SignUp({ userSignUp, userData }) {
                 autoComplete="lname"
                 value={lastName}
                 onChange={e => setLastName(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -242,15 +198,8 @@ export default function SignUp({ userSignUp, userData }) {
             className={classes.submit}
             onClick={e => handleSubmit(e)}
           >
-            Sign Up
+            Save
           </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link component={RouterLink} href="#" variant="body2" to='/signin'>
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
         </form>
       </div>
       <Box mt={5}>

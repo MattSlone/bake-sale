@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Carousel from 'react-material-ui-carousel'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../hooks/use-auth'
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -39,8 +39,7 @@ const StyledPaper = styled(Paper)((
     theme
   }
 ) => ({
-  padding: theme.spacing(8),
-  marginTop: theme.spacing(8),
+  padding: theme.spacing(2),
 
   [`& .${classes.personalizationBox}`]: {
     width: '100%',
@@ -74,6 +73,36 @@ const StyledPaper = styled(Paper)((
     marginBottom: theme.spacing(1)
   },
 
+  [`& .${classes.descriptionContainer}`]: {
+    marginTop: theme.spacing(1),
+    padding: theme.spacing(2),
+    [theme.breakpoints.down('md')]: {
+      display: "none"
+    },
+  },
+
+  [`& .${classes.descriptionContainerBottom}`]: {
+    display: "none",
+    marginTop: theme.spacing(1),
+    [theme.breakpoints.down('md')]: {
+      display: "block"
+    },
+  },
+
+  [`& .${classes.descTitle}`]: {
+    fontWeight: 'bold',
+    marginRight: theme.spacing(1)
+  }
+}));
+
+const StyledGrid = styled(Grid)((
+  {
+    theme
+  }
+) => ({
+  [theme.breakpoints.down('md')]: {
+    marginLeft: theme.spacing(2),
+  },
   [`& .${classes.descriptionContainer}`]: {
     marginTop: theme.spacing(1),
     [theme.breakpoints.down('md')]: {
@@ -240,9 +269,11 @@ export default function Product(props)
         <Grid item xs={12} md={4}>
           <Grid container direction="column" className={classes.productAttributes}>
             <Grid item>
-              <Typography gutterBottom variant="h6" component="h4">
-                {props.shop.name}
-              </Typography>
+              <Link to={`/shop/${props.shop.id}`}>
+                <Typography gutterBottom variant="h6" component="h4">
+                  {props.shop.name}
+                </Typography>
+              </Link>
             </Grid>
             <Grid item>
               <Typography gutterBottom variant="h5" component="h2">
@@ -376,7 +407,7 @@ function Item(props)
 function DescriptionContainer({product, classProp}) {
 
   return (
-    <Grid direction="column" spacing={2} container className={classProp}>
+    <StyledGrid direction="column" spacing={2} container className={classProp}>
       <Grid item>
         <Typography className={classes.descTitle}>
           Description:
@@ -393,6 +424,6 @@ function DescriptionContainer({product, classProp}) {
           {product.processingTime} days
         </Typography>
       </Grid>
-    </Grid>
+    </StyledGrid>
   )
 }

@@ -19,6 +19,8 @@ import QuoteContainer from './components/containers/QuoteContainer';
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
 import ResetPassword from './components/ResetPassword';
+import ProfileContainer from './components/containers/ProfileContainer';
+import AccountContainer from './components/containers/AccountContainer';
 
 const PREFIX = 'App';
 
@@ -36,8 +38,12 @@ const StyledBox = styled(Box)((
     display: 'flex',
   },
 
+  [`& .${classes.appBarSpacer}`]: {
+    height: 64
+  },
+
   [`& .${classes.content}`]: {
-    flexGrow: 1
+    flexGrow: 1,
   }
 }));
 
@@ -51,10 +57,13 @@ export default function App() {
           <div className={classes.root}>
             <Drawer />
             <main className={classes.content}>
+              <Box sx={{height: 64}} />
               <Switch>
                 <Route path='/' exact component={HomeContainer} key='/'/>
                 <Route path='/signin' component={SignInContainer} key='/signin'/>
                 <Route path='/signup' component={SignUpContainer}/>
+                <Route path='/user/profile' component={ProfileContainer}/>
+                <Route path='/user/account' component={AccountContainer}/>
                 <Route path='/forgotpassword' component={ForgotPasswordContainer}/>
                 <Route path='/resetpassword' component={ResetPassword}/>
                 <Route path='/signout' component={HomeContainer} key='/'/>

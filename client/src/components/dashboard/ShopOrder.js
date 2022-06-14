@@ -45,7 +45,6 @@ const StyledPaper = styled(Paper)((
 ) => ({
   padding: theme.spacing(2),
   margin: theme.spacing(2),
-  marginTop: theme.spacing(10)
 }));
 
 export default function ShopOrder(props)

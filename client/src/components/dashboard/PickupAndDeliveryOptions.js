@@ -45,9 +45,7 @@ const Root = styled('div')((
   },
 
   [`& .${classes.desktop}`]: {
-    paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
-    paddingLeft: 0,
-    paddingRight: 0
+    padding: theme.spacing(2)
   },
 
   [`& .${classes.mobile}`]: {

@@ -37,7 +37,6 @@ const StyledPaper = styled(Paper)((
   }
 ) => ({
   padding: theme.spacing(2),
-  marginTop: theme.spacing(8),
 
   [`& .${classes.personalizationBox}`]: {
     width: '100%',

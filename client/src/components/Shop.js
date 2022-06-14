@@ -31,13 +31,13 @@ const classes = {
   shopOptionsIcon: `${PREFIX}-shopOptionsIcon`
 };
 
-const StyledCard = styled(Card)((
+const StyledContainer = styled(Container)((
   {
     theme
   }
 ) => ({
   [`& .${classes.cardGrid}`]: {
-    paddingTop: theme.spacing(4),
+    paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(8),
   },
 
@@ -66,7 +66,7 @@ const StyledCard = styled(Card)((
   },
 
   [`& .${classes.header}`]: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(2),
     height: '50%',
     display: 'flex',
     flexDirection: 'column',
@@ -126,7 +126,7 @@ export default function Shop(props) {
   }, [])
 
   return (
-    <Container>
+    <StyledContainer>
       <Header title={shop.name} />
       <Paper className={classes.infoBox}>
         <Typography variant="body1">
@@ -137,7 +137,7 @@ export default function Shop(props) {
         <Grid container spacing={4}>
           {products.map((product) => (
             <Grid item key={product.id} xs={12} sm={6} md={4}>
-              <StyledCard className={classes.card}>
+              <Card className={classes.card}>
                 <CardMedia
                   className={classes.cardMedia}
                   image="https://source.unsplash.com/featured/?baked,goods"
@@ -159,12 +159,12 @@ export default function Shop(props) {
                     </Button>
                   </RouterLink>
                 </CardActions>
-              </StyledCard>
+              </Card>
             </Grid>
           ))}
         </Grid>
       </Container>
-    </Container>
+    </StyledContainer>
   );
 
   

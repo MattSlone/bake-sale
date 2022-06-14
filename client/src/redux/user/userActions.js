@@ -12,7 +12,10 @@ import {
   USER_SIGNOUT_FAILURE,
   FORGOT_PASSWORD_REQUEST,
   FORGOT_PASSWORD_SUCCESS,
-  FORGOT_PASSWORD_FAILURE
+  FORGOT_PASSWORD_FAILURE,
+  EDIT_PROFILE_REQUEST,
+  EDIT_PROFILE_SUCCESS,
+  EDIT_PROFILE_FAILURE
  } from './userTypes'
 
  import { getShop } from '../shop/shopActions'
@@ -74,6 +77,26 @@ export const userSignInSuccess = (user) => {
 export const userSignInFailure = (error) => {
   return {
     type: USER_SIGNIN_FAILURE,
+    payload: error
+  }
+}
+
+// EDIT PROFILE
+export const editProfileRequest = () => {
+  return {
+    type: EDIT_PROFILE_REQUEST
+  }
+}
+
+export const editProfileSuccess = () => {
+  return {
+    type: EDIT_PROFILE_SUCCESS
+  }
+}
+
+export const editProfileFailure = (error) => {
+  return {
+    type: EDIT_PROFILE_FAILURE,
     payload: error
   }
 }
@@ -160,6 +183,23 @@ export const userSignOut = () => {
       dispatch(userSignOutSuccess(res.data))
     } catch(error) {
       dispatch(userSignOutFailure(error.message))
+    }
+  }
+}
+
+export const editProfile = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(editProfileRequest())
+      const res = await axios.post('/api/signin', formData)
+      if(res.data.error[0]) {
+        dispatch(editProfileFailure(res.data.error[0]))
+      }
+      else {
+        dispatch(editProfileSuccess())
+      }
+    } catch(error) {
+      dispatch(editProfileFailure(error.message))
     }
   }
 }

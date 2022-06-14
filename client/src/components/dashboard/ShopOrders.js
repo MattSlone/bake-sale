@@ -21,8 +21,7 @@ const Root = styled('div')((
     theme
   }
 ) => ({
-  marginTop: theme.spacing(8),
-  padding: theme.spacing(3)
+  padding: theme.spacing(2)
 }));
 
 export default function ShopOrders(props) {
@@ -30,6 +29,7 @@ export default function ShopOrders(props) {
 
   useEffect(() => {
     props.getOrders({ forShop: true })
+    console.log(props)
   }, [])
 
   useEffect(() => {
