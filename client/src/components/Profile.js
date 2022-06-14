@@ -89,7 +89,7 @@ export default function Profile(props) {
 
   const handleSubmit = e => {
     e.preventDefault()
-    props.editProfile(formData)
+    props.editUser(formData)
   }
 
   return (

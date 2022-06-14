@@ -94,6 +94,13 @@ function ResponsiveDrawer(props) {
     );
   })
 
+  const handleListItemClick = (category) => {
+    console.log(category)
+    props.getProducts({
+      category: category
+    })
+  }
+
   const handleDrawerToggle = () => {
     console.log('toggling!!!')
     setMobileOpen(!mobileOpen);
@@ -111,10 +118,10 @@ function ResponsiveDrawer(props) {
       {[{key: 'bread', class: 'fas fa-bread-slice', text: 'Bread'},
         {key: 'cakes', class: 'fas fa-birthday-cake', text: 'Cakes'},
         {key: 'candy', class: 'fas fa-candy-cane', text: 'Candy & Chocolate'},
-        {key: 'gluten-free', class: 'fas fa-cloud', text: 'Gluten Free'},
-        {key: 'pies-tarts', class: 'fas fa-stroopwafel', text: 'Pies & Tarts'},
+        {key: 'glutenfree', class: 'fas fa-cloud', text: 'Gluten Free'},
+        {key: 'piestarts', class: 'fas fa-stroopwafel', text: 'Pies & Tarts'},
         {key: 'vegetarian', class: 'fas fa-leaf', text: 'Vegan / Vegetarian'}].map((item, index) => (
-        <ListItem button key={item.key}>
+        <ListItem button key={item.key} onClick={() => handleListItemClick(item.key)}>
           <Icon className={item.class} style={style}/>
           <ListItemText className={classes.listItemText} primary={item.text} />
         </ListItem>

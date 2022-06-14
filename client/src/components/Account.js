@@ -71,9 +71,7 @@ function Copyright() {
 }
 
 export default function Account(props) {
-
-
-  const [username, setUsername] = useState('')
+  const [username, setUsername] = useState(props.user.username)
   const [password, setPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
 
@@ -89,7 +87,9 @@ export default function Account(props) {
 
   const handleSubmit = e => {
     e.preventDefault()
-    //userSignUp(formData)
+    props.editUser(formData)
+    setPassword('')
+    setNewPassword('')
   }
 
   return (

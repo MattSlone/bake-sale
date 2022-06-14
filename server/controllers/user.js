@@ -134,4 +134,34 @@ module.exports = class UserController {
       console.log(err)
     }
   }
+
+  async update (req, res, next) {
+    try {
+      const update = {
+        ...(req.body.firstName && { firstName: req.body.firstName }),
+        ...(req.body.lastName && { lastName: req.body.lastName }),
+        ...(req.body.street && { street: req.body.street }),
+        ...(req.body.city && { city: req.body.city }),
+        ...(req.body.state && { state: req.body.state }),
+        ...(req.body.zipcode && { zipcode: req.body.zipcode }),
+        ...(req.body.seller && { seller: req.body.seller }),
+        ...(req.body.username && { username: req.body.username }),
+        ...(req.body.email && { email: req.body.email }),
+        ...(req.body.newPassword && req.user.validPassword(req.body.password) 
+          && {
+            password: req.body.newPassword
+          }
+        )
+      }
+      await db.User.update(update, { where: { id: req.user.id } });
+      const user = await db.User.findOne({ 
+        where: { id: req.user.id },
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+      })
+      return user
+    }
+    catch (err) {
+      return next(err)
+    }
+  }
 }

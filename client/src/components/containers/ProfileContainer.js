@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import Profile from '../Profile'
-import { editProfile } from '../../redux'
+import { editUser } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -10,7 +10,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    editProfile: (formData) => dispatch(editProfile(formData))
+    editUser: (formData) => dispatch(editUser(formData))
   }
 }
 

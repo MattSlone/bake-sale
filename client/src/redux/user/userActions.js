@@ -13,9 +13,9 @@ import {
   FORGOT_PASSWORD_REQUEST,
   FORGOT_PASSWORD_SUCCESS,
   FORGOT_PASSWORD_FAILURE,
-  EDIT_PROFILE_REQUEST,
-  EDIT_PROFILE_SUCCESS,
-  EDIT_PROFILE_FAILURE
+  EDIT_USER_REQUEST,
+  EDIT_USER_SUCCESS,
+  EDIT_USER_FAILURE
  } from './userTypes'
 
  import { getShop } from '../shop/shopActions'
@@ -82,21 +82,22 @@ export const userSignInFailure = (error) => {
 }
 
 // EDIT PROFILE
-export const editProfileRequest = () => {
+export const editUserRequest = () => {
   return {
-    type: EDIT_PROFILE_REQUEST
+    type: EDIT_USER_REQUEST
   }
 }
 
-export const editProfileSuccess = () => {
+export const editUserSuccess = (user) => {
   return {
-    type: EDIT_PROFILE_SUCCESS
+    type: EDIT_USER_SUCCESS,
+    payload: user
   }
 }
 
-export const editProfileFailure = (error) => {
+export const editUserFailure = (error) => {
   return {
-    type: EDIT_PROFILE_FAILURE,
+    type: EDIT_USER_FAILURE,
     payload: error
   }
 }
@@ -187,19 +188,20 @@ export const userSignOut = () => {
   }
 }
 
-export const editProfile = (formData) => {
+export const editUser = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(editProfileRequest())
-      const res = await axios.post('/api/signin', formData)
+      dispatch(editUserRequest())
+      const res = await axios.post('/api/user/edit', formData)
+      console.log(res.data)
       if(res.data.error[0]) {
-        dispatch(editProfileFailure(res.data.error[0]))
+        dispatch(editUserFailure(res.data.error[0]))
       }
       else {
-        dispatch(editProfileSuccess())
+        dispatch(editUserSuccess(res.data.success))
       }
     } catch(error) {
-      dispatch(editProfileFailure(error.message))
+      dispatch(editUserFailure(error.message))
     }
   }
 }

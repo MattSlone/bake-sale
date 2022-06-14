@@ -32,6 +32,14 @@ module.exports = (app, passport) => {
     })
   })
 
+  app.post('/api/user/edit', async (req, res, next) => {
+    const user = await UserController.update(req, res, next)
+    res.send({
+      error: req.flash('error'),
+      success: user
+    })
+  })
+
   app.get('/api/signout', (req, res, next) => {
     req.logout()
     res.json({ message: 'Successfully signed out' });

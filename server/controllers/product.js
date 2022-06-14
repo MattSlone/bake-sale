@@ -9,6 +9,7 @@ const shop = require('../routes/shop');
 module.exports = class ProductController {
     async create (req, res, next) {
         try {
+            const varieties = req.body.product.custom ? { quantity: 1 } : req.body.product.varieties
             const product = await db.Product.create({
                 name: req.body.product.name,
                 category: req.body.product.category,
@@ -18,7 +19,7 @@ module.exports = class ProductController {
                 automaticRenewal: req.body.product.automaticRenewal,
                 inventory: req.body.product.inventory,
                 personalizationPrompt: req.body.product.personalizationPrompt,
-                Varieties: req.body.product.varieties,
+                Varieties: varieties,
                 Addons: req.body.product.addons,
                 Ingredients: req.body.product.ingredients,
                 ShopId: req.body.shopId,
@@ -102,7 +103,8 @@ module.exports = class ProductController {
             const where = {
                 ...('shop' in req.query && {ShopId: req.query.shop}),
                 ...('products' in req.query && {id: req.query.products}),
-                ...((user.id && !req.query.shop) && {ShopId: shopIds})
+                ...((user.id && !req.query.shop) && {ShopId: shopIds}),
+                ...(req.query.category && { category: req.query.category })
             }
             let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
             let limit = 6

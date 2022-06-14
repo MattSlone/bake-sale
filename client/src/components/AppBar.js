@@ -18,7 +18,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
-import { Redirect, Link as RouterLink } from "react-router-dom";
+import { Redirect, Link as RouterLink, useLocation } from "react-router-dom";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -182,6 +182,7 @@ const Root = styled('div')((
 
 
 export default function PrimarySearchAppBar(props) {
+  const location = useLocation()
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -247,6 +248,13 @@ export default function PrimarySearchAppBar(props) {
     props.removeFromCart(index)
   }
 
+  function handleHomeClick() {
+    console.log(location.pathname)
+    if (location.pathname == "/") {
+      props.getProducts()
+    }
+  }
+
   const renderSignOutButton = (
     <MenuItem onClick={handleSignOutButton}>Sign Out</MenuItem>
   )
@@ -285,7 +293,7 @@ export default function PrimarySearchAppBar(props) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <RouterLink className={classes.routerLinkButton} to='/dashboard'>
+      <RouterLink className={`${classes.routerLinkButton} ${classes.white}`} to='/dashboard'>
         <MenuItem>
           <IconButton color="inherit" size="large">
             <Badge color="secondary">
@@ -338,7 +346,7 @@ export default function PrimarySearchAppBar(props) {
             size="large">
             <MenuIcon />
           </IconButton>
-          <RouterLink to='/' className={`${classes.routerLinkButton} ${classes.white}`}>
+          <RouterLink onClick={handleHomeClick} to='/' className={`${classes.routerLinkButton} ${classes.white}`}>
             <Typography className={classes.title} variant="h6">
               Bake.$ale
             </Typography>
@@ -358,7 +366,7 @@ export default function PrimarySearchAppBar(props) {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <RouterLink className={classes.link} to="/dashboard">
+            <RouterLink className={`${classes.routerLinkButton} ${classes.white}`} to="/dashboard">
               <IconButton color="inherit" size="large">
                 <Badge color="secondary">
                   <DashboardIcon />

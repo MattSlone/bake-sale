@@ -1,6 +1,5 @@
 import { React }  from 'react';
 import { styled } from '@mui/material/styles';
-import Drawer from './components/Drawer'
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
 import SignUpContainer from './components/containers/SignUpContainer'
@@ -21,6 +20,7 @@ import ProvideAuthContainer from './components/containers/ProvideAuthContainer';
 import ResetPassword from './components/ResetPassword';
 import ProfileContainer from './components/containers/ProfileContainer';
 import AccountContainer from './components/containers/AccountContainer';
+import DrawerContainer from './components/containers/DrawerContainer';
 
 const PREFIX = 'App';
 
@@ -55,7 +55,7 @@ export default function App() {
       <Router>
         <StyledBox>
           <div className={classes.root}>
-            <Drawer />
+            <DrawerContainer />
             <main className={classes.content}>
               <Box sx={{height: 64}} />
               <Switch>
