@@ -161,11 +161,8 @@ const Root = styled('div')((
   },
 
   [`& .${classes.link}`]: {
-    color: 'white !important',
-    textDecoration: 'none !important',
-    [`:visited`]: {
-      color: 'white'
-    }
+    color: 'black',
+    textDecoration: 'none'
   },
 
   [`& .${classes.white}`]: {
@@ -185,6 +182,7 @@ export default function PrimarySearchAppBar(props) {
   const location = useLocation()
 
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [search, setSearch] = useState('')
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMount = useIsMount();
 
@@ -255,6 +253,10 @@ export default function PrimarySearchAppBar(props) {
     }
   }
 
+  useEffect(() => {
+    props.getProducts({ search: search })
+  }, [search])
+
   const renderSignOutButton = (
     <MenuItem onClick={handleSignOutButton}>Sign Out</MenuItem>
   )
@@ -269,13 +271,13 @@ export default function PrimarySearchAppBar(props) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <RouterLink to='/user/profile' className={classes.routerLinkButton}>
+      <RouterLink style={{textDecoration: 'none', color: 'black'}} to='/user/profile'>
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       </RouterLink>
-      <RouterLink to='/user/orders' className={classes.routerLinkButton}>
+      <RouterLink to='/user/orders' style={{textDecoration: 'none', color: 'black'}}>
         <MenuItem onClick={handleMenuClose}>Orders</MenuItem>
       </RouterLink>
-      <RouterLink to='/user/account' className={classes.routerLinkButton}>
+      <RouterLink to='/user/account' style={{textDecoration: 'none', color: 'black'}}>
         <MenuItem onClick={handleMenuClose}>Account</MenuItem>
       </RouterLink>
       {props.userData.loggedIn ? renderSignOutButton : null}
@@ -293,7 +295,7 @@ export default function PrimarySearchAppBar(props) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <RouterLink className={`${classes.routerLinkButton} ${classes.white}`} to='/dashboard'>
+      <RouterLink style={{textDecoration: 'none', color: 'black'}} to='/dashboard'>
         <MenuItem>
           <IconButton color="inherit" size="large">
             <Badge color="secondary">
@@ -361,12 +363,14 @@ export default function PrimarySearchAppBar(props) {
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               inputProps={{ 'aria-label': 'search' }}
             />
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <RouterLink className={`${classes.routerLinkButton} ${classes.white}`} to="/dashboard">
+            <RouterLink style={{textDecoration: 'none', color: 'white'}} to="/dashboard">
               <IconButton color="inherit" size="large">
                 <Badge color="secondary">
                   <DashboardIcon />

@@ -72,6 +72,10 @@ export default function ShopOrder(props)
     return `${order.User.street}, ${order.User.city}, ${order.User.state} ${order.User.zipcode}`
   }
 
+  const getShopAddress = () => {
+    return `${order.User.street}, ${order.User.city}, ${order.User.state} ${order.User.zipcode}`
+  }
+
   return ( order ?
     <StyledPaper>
       <Typography sx={{fontWeight: 'bold'}}>

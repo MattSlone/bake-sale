@@ -101,11 +101,13 @@ module.exports = class ProductController {
             const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
             console.log('SHOP IDS: ', shopIds)
             const where = {
-                ...('shop' in req.query && {ShopId: req.query.shop}),
-                ...('products' in req.query && {id: req.query.products}),
+                ...(req.query.shop && {ShopId: req.query.shop}),
+                ...(req.query.products && {id: req.query.products}),
                 ...((user.id && !req.query.shop) && {ShopId: shopIds}),
-                ...(req.query.category && { category: req.query.category })
+                ...(req.query.category && { category: req.query.category }),
+                ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
             }
+            console.log(where)
             let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
             let limit = 6
             const products = await db.Product.findAll({
@@ -152,9 +154,11 @@ module.exports = class ProductController {
             const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
             console.log('SHOP IDS: ', shopIds)
             const where = {
-                ...('shop' in req.query && {ShopId: req.query.shop}),
-                ...('products' in req.query && {id: req.query.products}),
-                ...((user.id && !req.query.shop) && {ShopId: shopIds})
+                ...(req.query.shop && {ShopId: req.query.shop}),
+                ...(req.query.products && {id: req.query.products}),
+                ...((user.id && !req.query.shop) && {ShopId: shopIds}),
+                ...(req.query.category && { category: req.query.category }),
+                ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
             }
             const count = await db.Product.count({ where: where });
             return count
