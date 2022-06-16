@@ -174,7 +174,7 @@ export default function CustomProduct(props)
           indicators={false}
           >
             {
-              items.map( (item, i) => <Item key={i} item={item} /> )
+              items.map( (item, i) => <Item product={product} key={i} item={item} /> )
             }
           </Carousel>
         </Grid>
@@ -263,7 +263,7 @@ function Item(props)
       <Card className={classes.card}>
         <CardMedia
           className={classes.cardMedia}
-          image="https://source.unsplash.com/featured/?baked,goods"
+          image={`/api${props.product.ProductImages[0]?.path}`}
           title="Image title"
         />
       </Card>

@@ -170,6 +170,8 @@ export const setProductEdit = (product) => {
 }
 
 export const createProduct = (formData) => {
+  const imageFormData = formData.imageFormData
+  delete formData.imageFormData
   formData = {
     ...formData,
     product: {
@@ -181,6 +183,10 @@ export const createProduct = (formData) => {
     try {
       dispatch(createProductRequest())
       const res = await axios.post('/api/product/create', formData)
+      if (res.data.success?.id) {
+        imageFormData.append('productId', res.data.success.id)
+        const res2 = await axios.post('/api/product/images', imageFormData)
+      }
       if (res.data.error[0]) {
         dispatch(createProductFailure(res.data.error[0]))
       } else {

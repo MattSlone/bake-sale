@@ -67,14 +67,14 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
 
-app.use(express.json())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-
+app.use(express.json({limit: '50mb'}))
+app.use(bodyParser.json({limit: '50mb'}))
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 webhookApp.use(express.raw({ type: 'application/json' }))
 
 /* Don't worry about these */
 app.use(express.static(path.join(__dirname, '../build')));
+app.use(express.static(path.join(__dirname, '../uploads')))
 
 /* ROUTERS */
 require('./routes/user')(app, passport)

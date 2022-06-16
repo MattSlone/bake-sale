@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         this.Variety = this.hasMany(models.Variety)
         this.Addon = this.hasMany(models.Addon)
         this.Form = this.hasOne(models.Form)
+        this.ProductImage = this.hasMany(models.ProductImage)
         this.Quote = this.hasMany(models.Quote)
     }
   };

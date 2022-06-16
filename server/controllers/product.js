@@ -9,7 +9,7 @@ const shop = require('../routes/shop');
 module.exports = class ProductController {
     async create (req, res, next) {
         try {
-            const varieties = req.body.product.custom ? { quantity: 1 } : req.body.product.varieties
+            const varieties = req.body.product?.custom ? { quantity: 1 } : req.body.product.varieties
             const product = await db.Product.create({
                 name: req.body.product.name,
                 category: req.body.product.category,
@@ -118,6 +118,7 @@ module.exports = class ProductController {
                     db.Ingredient,
                     db.Variety,
                     db.Addon,
+                    db.ProductImage,
                     {
                         association: db.Product.Form,
                         include: [ 
@@ -169,27 +170,39 @@ module.exports = class ProductController {
         }
     }
 
+    async addImages(req, res, next) {
+        try {
+            await db.ProductImage.bulkCreate(
+                req.files.map(file => {
+                    return {
+                        name: file.originalname,
+                        path: file.path,
+                        ProductId: req.body.productId
+                    }
+                })
+            )
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     async update (req, res, next) {
         try {
-
             let product = await db.Product.update(req.body.product,
                 {
                     where: {id: req.body.product.id},
                 }
             );
-
             product = await db.Product.findByPk(req.body.product.id, 
                 {
                     include: [db.Variety, db.Addon, db.Ingredient]
                 }
             );
-
             let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
             await product.setVarieties(varieties.map(variety => variety.id))
             await db.Variety.destroy({
                 where: { ProductId: null }
             })
-
             let addons = await this.upsertAssociation(product, db.Addon, req.body.product.addons)
             await product.setAddons(addons.map(addon => addon.id))
             await db.Addon.destroy({

@@ -3,7 +3,6 @@ import AddProductImages from '../dashboard/AddProductImages'
 import { setProductImagesPreview } from '../../redux'
 
 const mapStateToProps = state => {
-  console.log('images', state)
   return {
     imageFiles: state.product.imageFiles
   }

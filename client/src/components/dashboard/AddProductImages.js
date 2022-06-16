@@ -12,8 +12,10 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
+import { useRouteMatch } from 'react-router-dom';
 import { Input } from '@mui/material';
 import { CardActionArea } from '@mui/material';
+import axios from 'axios'
 
 const PREFIX = 'AddProductImages';
 
@@ -59,11 +61,29 @@ const Root = styled('div')((
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-export default function AddProductImages({ imageFiles, setProductImagesPreview }) {
-
+export default function AddProductImages(props) {
+  const match = useRouteMatch()
   const hiddenFileInput = React.useRef([])
+  const [imageFiles, setImageFiles] = useState(props.imageFiles)
 
-  console.log(imageFiles)
+  useEffect(async () => {
+    if (match.path.includes('edit')) {
+      setImageFiles(
+        await Promise.all(props.product.ProductImages.map(async image => {
+          const res = await axios.get(`/api${image.path}`, { responseType: 'blob' })
+          return {
+            file: res.data,
+            imagePreviewUrl: `/api${image.path}`
+          }
+        }))
+      )
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log(imageFiles)
+    props.setProductImagesPreview(imageFiles)
+  }, [imageFiles])
 
   const handleClick = (event, index) => {
     hiddenFileInput.current[index].click();
@@ -75,12 +95,11 @@ export default function AddProductImages({ imageFiles, setProductImagesPreview }
 
     if (file) {
       reader.onloadend = () => {
-        setProductImagesPreview([...imageFiles, {
+        setImageFiles([...imageFiles, {
           file: file,
           imagePreviewUrl: reader.result
         }]);
       }
-
       reader.readAsDataURL(file)
     }
   };
@@ -97,7 +116,7 @@ export default function AddProductImages({ imageFiles, setProductImagesPreview }
                   <CardActionArea onClick={event => handleClick(event, card)}>
                       <CardMedia
                         className={classes.cardMedia}
-                        image={imageFiles[card-1] ? imageFiles[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
+                        image={imageFiles[card-1]?.imagePreviewUrl ? imageFiles[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
                         title="Image title"
                       />
                     <Input type='file' style={{display: 'none'}} inputRef={el => hiddenFileInput.current[card] = el} onChange={handleChange}/>

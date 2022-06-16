@@ -238,7 +238,7 @@ export default function Product(props)
         setDeliveryCost(Number(res.data.success))
       }
     } else {
-      setDeliveryCost(Number(product.Varieties.find(v => v.quantity == 1).delivery))
+      setDeliveryCost(Number(product.Varieties.find(v => v.quantity == variation).delivery))
     }
   })
 
@@ -261,7 +261,7 @@ export default function Product(props)
           indicators={false}
           >
             {
-              items.map( (item, i) => <Item key={i} item={item} /> )
+              items.map( (item, i) => <Item product={product} key={i} item={item} /> )
             }
           </Carousel>
           <DescriptionContainer product={product} classProp={classes.descriptionContainer} />
@@ -397,7 +397,7 @@ function Item(props)
       <Card className={classes.card}>
         <CardMedia
           className={classes.cardMedia}
-          image="https://source.unsplash.com/featured/?baked,goods"
+          image={`/api${props.product.ProductImages[0]?.path}`}
           title="Image title"
         />
       </Card>

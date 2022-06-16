@@ -1,7 +1,5 @@
 'use strict'
 require('dotenv').config()
-let multer = require('multer');
-let upload = multer();
 const MakeUserController = require('../controllers/user'),
   UserController = new MakeUserController()
 
@@ -114,8 +112,4 @@ module.exports = (app, passport) => {
     }
   );
 */
-
-  app.get('/uploads/:image', async (req, res, next) => {
-    res.sendFile(`./server/uploads/${req.params.image}`)
-  })
 }

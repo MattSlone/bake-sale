@@ -6,6 +6,8 @@ module.exports = {
       username: 'John Doe',
       email: 'example@example.com',
       password: '$2a$10$ANJPNBK3oNKvv2cm/rKLNOqOrDJLp3FA0WKZeZakhkx0l1LldkITK', // abc123456
+      street: '2065 Racimo Drive',
+      city: 'Sarasota',
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

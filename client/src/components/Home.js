@@ -160,7 +160,7 @@ export default function Home(props) {
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}
-                    image="https://source.unsplash.com/featured/?baked,goods"
+                    image={`/api/${card.ProductImages[0]?.path}`}
                     title="Image title"
                   />
                   <CardContent className={classes.cardContent}>

@@ -82,10 +82,7 @@ export default function AddProduct(props) {
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
   let { id } = useParams()
-  console.log(props.product)
   const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
-  
-
   const match = useRouteMatch()
 
   useEffect(() => {
@@ -114,12 +111,29 @@ export default function AddProduct(props) {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
+  const imageFormData = new FormData()
+  
+  useEffect(() => {
+    const files = props.product.imageFiles.map((imageFile, i) => {
+      return {
+        file: imageFile.file,
+        i: i
+      }
+    })
+    if (files[0]?.file) {
+      for (let file of files) {
+        console.log(file.file)
+        imageFormData.append(`photos`, file.file, `images${file.i}`)    
+      }
+    }
+  }, [props.product.imageFiles])
   const formData = {
     product: {
       ...props.product,
       fields: props.product.fields
     },
-    shopId: props.shop.id
+    shopId: props.shop.id,
+    imageFormData: imageFormData
   }
 
   const handleFinish = () => {
@@ -127,7 +141,6 @@ export default function AddProduct(props) {
     if(match.path.includes('edit')) {
       props.editProduct(formData)
     } else {
-      console.log(formData)
       props.createProduct(formData)
     }
   };
@@ -150,7 +163,7 @@ export default function AddProduct(props) {
             <StepContent>
             {(() => {
               switch (activeStep) {
-                case 0: return <AddProductImagesContainer />
+                case 0: return <AddProductImagesContainer product={product} />
                 case 1:
                   return <ListingDetailsContainer />;
                 case 2:

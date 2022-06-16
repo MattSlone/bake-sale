@@ -2,7 +2,10 @@
 
 const UserController = require('../controllers/user'),
   MakeProductController = require('../controllers/product'),
-  ProductController = new MakeProductController()
+  ProductController = new MakeProductController(),
+  multer = require('multer'),
+  upload = multer({ dest: "/uploads"}),
+  path = require('path');
 
 module.exports = (app) => {
   /*app.get('/tenant', UserController.isLoggedIn, (req, res, next) => {
@@ -11,11 +14,25 @@ module.exports = (app) => {
 
   app.post('/api/product/create', async (req, res, next) => {
     try {
-        let response = await ProductController.create(req, res, next)
-        res.send({
-            error: req.flash('error'),
-            success: response
-        })
+      console.log(req.files)
+      let response = await ProductController.create(req, res, next)
+      res.send({
+          error: req.flash('error'),
+          success: response
+      })
+    }
+    catch (err) {
+      next(err)
+    }
+  })
+
+  app.post('/api/product/images', upload.array('photos', 9), async (req, res, next) => {
+    try {
+      let response = await ProductController.addImages(req, res, next)
+      res.send({
+          error: req.flash('error'),
+          success: true
+      })
     }
     catch (err) {
       next(err)
@@ -76,5 +93,26 @@ module.exports = (app) => {
     catch (err) {
       next(err)
     }
+  })
+
+  app.get('/api/uploads/:name', async (req, res, next) => {
+    var options = {
+      root: path.join(__dirname, '../../uploads'),
+      dotfiles: 'deny',
+      headers: {
+        'x-timestamp': Date.now(),
+        'x-sent': true
+      }
+    }
+  
+    var fileName = req.params.name
+    console.log(req.params.name)
+    res.sendFile(fileName, options, function (err) {
+      if (err) {
+        console.log(err)
+      } else {
+        console.log('Sent:', fileName)
+      }
+    })
   })
 }
