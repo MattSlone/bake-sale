@@ -72,9 +72,13 @@ export default function Products(props) {
     props.getProducts({
       shop: props.shop.id
     })
-
-    setProducts(props.product.products)
   }, [])
+
+  useEffect(() => {
+    if (props.product.loading == false) {
+      setProducts(props.product.products)
+    }
+  }, [props.product.loading])
 
   const handleAddProduct = () => {
     history.push('/dashboard/products/add')
