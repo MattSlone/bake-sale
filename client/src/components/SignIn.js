@@ -13,6 +13,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {Redirect,  Link as RouterLink } from "react-router-dom";
+import isEmail from 'validator/lib/isEmail';
+import isByteLength from 'validator/lib/isByteLength';
+import { useAuth } from '../hooks/use-auth';
 
 const PREFIX = 'SignIn';
 
@@ -69,10 +72,10 @@ function Copyright() {
 }
 
 export default function SignIn({ userSignIn, userData }) {
-
-
+  const auth = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [message, setMessage] = useState('')
 
   let formData = {
     username: username,
@@ -81,7 +84,16 @@ export default function SignIn({ userSignIn, userData }) {
 
   const handleSubmit = e => {
     e.preventDefault()
-    userSignIn(formData)
+    if (!isEmail(username)) {
+      setMessage("Invalid email address.")
+      return
+    }
+    if (!isByteLength(password, { min: 5, max: 15 })) {
+      setMessage("Password should be between 5 and 15 characters.")
+      return
+    }
+    setMessage('')
+    auth.userSignIn(formData)
   }
 
   if(userData.loggedIn == true) {
@@ -97,9 +109,6 @@ export default function SignIn({ userSignIn, userData }) {
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
-        <Typography component="h1" variant="h5">
-          {userData.user ? "Welcome, " + userData.user.username + "!" : userData.error}
-        </Typography>
         <form className={classes.form} noValidate>
           <TextField
             variant="outlined"
@@ -110,6 +119,7 @@ export default function SignIn({ userSignIn, userData }) {
             label="Email Address"
             name="email"
             value={username}
+            type="email"
             autoComplete="email"
             autoFocus
             onChange={e => setUsername(e.target.value)}
@@ -127,6 +137,9 @@ export default function SignIn({ userSignIn, userData }) {
             autoComplete="current-password"
             onChange={e => setPassword(e.target.value)}
           />
+          <Typography color="red">
+            {message}
+          </Typography>
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"

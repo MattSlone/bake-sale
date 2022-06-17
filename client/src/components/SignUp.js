@@ -14,6 +14,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { Redirect } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
+import isEmail from 'validator/lib/isEmail';
+import isByteLength from 'validator/lib/isByteLength';
+import isAlpha from 'validator/lib/isAlpha';
+import isEmpty from 'validator/lib/isEmpty'
+import { useAuth } from '../hooks/use-auth';
 
 const PREFIX = 'SignUp';
 
@@ -70,7 +75,7 @@ function Copyright() {
 }
 
 export default function SignUp({ userSignUp, userData }) {
-
+  const auth = useAuth()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -81,10 +86,7 @@ export default function SignUp({ userSignUp, userData }) {
   const [state, setState] = useState('')
   const [zipcode, setZipcode] = useState('')
   const [seller, setSeller] = useState(0)
-
-  /*useEffect(() => {
-    userSignUp()
-  }, [])*/
+  const [message, setMessage] = useState('')
 
   let formData = {
     firstName: firstName,
@@ -100,6 +102,37 @@ export default function SignUp({ userSignUp, userData }) {
 
   const handleSubmit = e => {
     e.preventDefault()
+    for (const field of [
+      { name: 'First name', value: firstName },
+      { name: 'Last name', value: lastName },
+      { name: 'Street', value: street },
+      { name: 'City', value: city },
+      { name: 'State', value: state },
+      { name: 'Zipcode', value: zipcode },
+      { name: 'Email', value: username },
+      { name: 'Password', value: password }
+    ]) {
+      if (!field.value) {
+        setMessage(`${field.name} is required.`)
+        return
+      }
+    }
+    if (!isEmail(username)) {
+      setMessage('Invalid email address')
+      return
+    }
+    if (!isEmail(username)) {
+      setMessage('Invalid email address')
+      return
+    }
+    if (!(firstName && isAlpha(firstName)) | !(lastName && isAlpha(lastName))) {
+      setMessage('Name may only contain letters.')
+      return
+    }
+    if (!isByteLength(password, { min: 5, max: 15 })) {
+      setMessage("Password should be between 5 and 15 characters.")
+      return
+    }
     userSignUp(formData)
   }
 
@@ -232,6 +265,11 @@ export default function SignUp({ userSignUp, userData }) {
                 control={<Checkbox value={1} onChange={e => setSeller(e.target.value)} color="primary" />}
                 label="Seller account"
               />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography color="red">
+                {message}
+              </Typography>
             </Grid>
           </Grid>
           <Button

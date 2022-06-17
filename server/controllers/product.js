@@ -107,7 +107,6 @@ module.exports = class ProductController {
                 ...(req.query.category && { category: req.query.category }),
                 ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
             }
-            console.log(where)
             let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
             let limit = 6
             const products = await db.Product.findAll({

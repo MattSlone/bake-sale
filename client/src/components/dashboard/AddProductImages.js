@@ -64,7 +64,7 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export default function AddProductImages(props) {
   const match = useRouteMatch()
   const hiddenFileInput = React.useRef([])
-  const [imageFiles, setImageFiles] = useState(props.imageFiles)
+  const [imageFiles, setImageFiles] = useState([])
 
   useEffect(async () => {
     if (match.path.includes('edit')) {
@@ -89,7 +89,7 @@ export default function AddProductImages(props) {
     hiddenFileInput.current[index].click();
   };
 
-  const handleChange = event => {
+  const handleChange = (event, key) => {
     let reader = new FileReader
     let file = event.target.files[0]
 
@@ -97,10 +97,14 @@ export default function AddProductImages(props) {
       reader.onloadend = () => {
         setImageFiles([...imageFiles, {
           file: file,
-          imagePreviewUrl: reader.result
+          imagePreviewUrl: reader.result,
         }]);
       }
       reader.readAsDataURL(file)
+    } else {
+      let tempImageFiles = imageFiles.filter((file, i) => i !== key-1)
+      console.log(tempImageFiles)
+      setImageFiles(tempImageFiles)
     }
   };
 
@@ -119,7 +123,7 @@ export default function AddProductImages(props) {
                         image={imageFiles[card-1]?.imagePreviewUrl ? imageFiles[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
                         title="Image title"
                       />
-                    <Input type='file' style={{display: 'none'}} inputRef={el => hiddenFileInput.current[card] = el} onChange={handleChange}/>
+                    <Input type='file' style={{display: 'none'}} inputRef={el => hiddenFileInput.current[card] = el} onChange={(e) => handleChange(e, card)}/>
                   </CardActionArea>
                 </Card>
               </Grid>

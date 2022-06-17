@@ -120,12 +120,13 @@ export default function AddProduct(props) {
         i: i
       }
     })
-    if (files[0]?.file) {
-      for (let file of files) {
-        console.log(file.file)
-        imageFormData.append(`photos`, file.file, `images${file.i}`)    
+    if (files.length > 0 
+        && Object.keys(files[0].file).length > 0
+      ) {
+        for (let file of files) {
+          imageFormData.append(`photos`, file.file, `images${file.i}`)    
+        }
       }
-    }
   }, [props.product.imageFiles])
   const formData = {
     product: {
