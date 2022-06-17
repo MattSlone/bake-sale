@@ -29,14 +29,15 @@ module.exports = class QuoteController {
 
   async list(req, res, next) {
     try {
+      let quotes = [];
       const shop = await db.Shop.findOne({ where: { UserId: req.user.id } })
-      const products = await db.Product.findAll({ where: { ShopId: shop.id } })
+      const products = shop ? await db.Product.findAll({ where: { ShopId: shop.id } }) : []
       const productIds = products.map(product => product.id)
       const where = {
         ...(productIds && {ProductId: productIds}),
         ...(req.query.product && {ProductId: req.query.product})
       }
-      const quotes = await db.Quote.findAll({
+      quotes = await db.Quote.findAll({
         where: where,
         include: [
           {
@@ -56,6 +57,7 @@ module.exports = class QuoteController {
       return quotes
     }
     catch(err) {
+        console.log(err)
         return err
     }
   }
