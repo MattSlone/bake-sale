@@ -9,13 +9,16 @@ module.exports = (passport) => {
     done(null, user.id);
   });
 
-  passport.deserializeUser(async (id, done) => {
-    try {
-      let user = await User.findByPk(id)
+  passport.deserializeUser((id, done) => {
+    User.findByPk(id).then((user, err) => {
+      if (err) {
+        return done(err)
+      }
+      if (!user) {
+        return done(new Error('user not found'));
+      }
       done(null, user);
-    } catch (err) {
-      done(err)
-    }
+    })
   });
 
   passport.use('local-signup', new LocalStrategy({
@@ -58,6 +61,7 @@ module.exports = (passport) => {
       if(!valid) {
         return done(null, false, { message: 'Incorrect password.' }); // code 5 (incorrect password)
       }
+      console.log('good to go: ', user.id)
       return done(null, user);
     } catch(err) {
       return done(err);

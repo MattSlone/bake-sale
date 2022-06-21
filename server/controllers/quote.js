@@ -96,12 +96,12 @@ module.exports = class QuoteController {
       const requestedStatus = await db.QuoteStatus.findOne({ where: { status: 'requested' } })
       const quotedStatus = await db.QuoteStatus.findOne({ where: { status: 'quoted' } })
       let quote = await db.Quote.findByPk(req.body.QuoteId)
+      console.log(quote, req.body)
       if (quote.UserId === req.user.id && quote.QuoteStatusId === requestedStatus.id) {
         quote.price = req.body.price
         console.log(req.body.price, quote.price)
         quote.QuoteStatusId = quotedStatus.id
         await quote.save()
-        console.log('FTER SAVFU:', quote.price)
         this.sendQuotedEmail(quote)
       }
     } catch (err) {

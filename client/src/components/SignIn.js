@@ -84,6 +84,15 @@ export default function SignIn({ userSignIn, userData }) {
 
   const handleSubmit = e => {
     e.preventDefault()
+    for (const field of [
+      { name: 'Email', value: username },
+      { name: 'Password', value: password }
+    ]) {
+      if (!field.value) {
+        setMessage(`${field.name} is required.`)
+        return
+      }
+    }
     if (!isEmail(username)) {
       setMessage("Invalid email address.")
       return

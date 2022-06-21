@@ -12,7 +12,10 @@ import {
   USER_SIGNOUT_FAILURE,
   EDIT_USER_REQUEST,
   EDIT_USER_SUCCESS,
-  EDIT_USER_FAILURE
+  EDIT_USER_FAILURE,
+  GET_FORMATTED_ADDRESS_FAILURE,
+  GET_FORMATTED_ADDRESS_SUCCESS,
+  GET_FORMATTED_ADDRESS_REQUEST
  } from './userTypes'
 
 const initialState = {
@@ -27,6 +30,7 @@ const initialState = {
   state: '',
   zipcode: '',
   seller: false,
+  validAddress: false,
   error: '',
 }
 
@@ -109,6 +113,31 @@ const userReducer = (state = initialState, action) => {
     }
     case EDIT_USER_FAILURE: return {
       loading: false,
+      error: action.payload
+    }
+    case GET_FORMATTED_ADDRESS_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case GET_FORMATTED_ADDRESS_SUCCESS: return {
+      loggedIn: true,
+      ...state,
+      loading: false,
+      street: action.payload.street_number + ' ' + action.payload.route,
+      city: action.payload.locality,
+      state: action.payload.administrative_area_level_1,
+      zipcode: action.payload.postal_code,
+      validAddress: true,
+      error: ''
+    }
+    case GET_FORMATTED_ADDRESS_FAILURE: return {
+      ...state,
+      loading: false,
+      street: '',
+      city: '',
+      state: '',
+      zipcode: '',
+      validAddress: false,
       error: action.payload
     }
     default: return state

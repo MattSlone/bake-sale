@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -74,7 +74,7 @@ function Copyright() {
   );
 }
 
-export default function SignUp({ userSignUp, userData }) {
+export default function SignUp(props) {
   const auth = useAuth()
 
   const [username, setUsername] = useState('')
@@ -87,6 +87,7 @@ export default function SignUp({ userSignUp, userData }) {
   const [zipcode, setZipcode] = useState('')
   const [seller, setSeller] = useState(0)
   const [message, setMessage] = useState('')
+  const [validAddress, setValidAddress] = useState(false)
 
   let formData = {
     firstName: firstName,
@@ -100,43 +101,71 @@ export default function SignUp({ userSignUp, userData }) {
     seller: seller
   }
 
-  const handleSubmit = e => {
-    e.preventDefault()
-    for (const field of [
-      { name: 'First name', value: firstName },
-      { name: 'Last name', value: lastName },
-      { name: 'Street', value: street },
-      { name: 'City', value: city },
-      { name: 'State', value: state },
-      { name: 'Zipcode', value: zipcode },
-      { name: 'Email', value: username },
-      { name: 'Password', value: password }
-    ]) {
-      if (!field.value) {
-        setMessage(`${field.name} is required.`)
-        return
-      }
-    }
-    if (!isEmail(username)) {
-      setMessage('Invalid email address')
-      return
-    }
-    if (!isEmail(username)) {
-      setMessage('Invalid email address')
-      return
-    }
-    if (!(firstName && isAlpha(firstName)) | !(lastName && isAlpha(lastName))) {
-      setMessage('Name may only contain letters.')
-      return
-    }
-    if (!isByteLength(password, { min: 5, max: 15 })) {
-      setMessage("Password should be between 5 and 15 characters.")
-      return
-    }
-    userSignUp(formData)
+  const getFormattedAddress = () => {
+    props.getFormattedAddress(
+      `${street} ${city}, ${state} ${zipcode}`
+    )
   }
 
-  if(userData.loggedIn == true) {
+  useEffect(() => {
+    if (auth.userData.loading === false && auth.userData.validAddress === true) {
+      setStreet(props.userData.street)
+      setCity(props.userData.city)
+      setState(props.userData.state)
+      setZipcode(props.userData.zipcode)
+      setValidAddress(true)
+    } else {
+      setValidAddress(false)
+      if (auth.userData.error) {
+        setMessage(auth.userData.error)
+      }
+    }
+  }, [auth.userData.loading])
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    setMessage('')
+    getFormattedAddress()
+  }
+
+  useEffect(() => {
+    if (validAddress) {
+      for (const field of [
+        { name: 'First name', value: firstName },
+        { name: 'Last name', value: lastName },
+        { name: 'Street', value: street },
+        { name: 'City', value: city },
+        { name: 'State', value: state },
+        { name: 'Zipcode', value: zipcode },
+        { name: 'Email', value: username },
+        { name: 'Password', value: password }
+      ]) {
+        if (!field.value) {
+          setMessage(`${field.name} is required.`)
+          return
+        }
+      }
+      if (!isEmail(username)) {
+        setMessage('Invalid email address')
+        return
+      }
+      if (!isEmail(username)) {
+        setMessage('Invalid email address')
+        return
+      }
+      if (!(firstName && isAlpha(firstName)) | !(lastName && isAlpha(lastName))) {
+        setMessage('Name may only contain letters.')
+        return
+      }
+      if (!isByteLength(password, { min: 5, max: 15 })) {
+        setMessage("Password should be between 5 and 15 characters.")
+        return
+      }
+      auth.userSignUp(formData)
+    }
+  }, [validAddress])
+
+  if(auth.userData.loggedIn == true) {
     return (
       <Redirect to='/' />
     )

@@ -138,6 +138,10 @@ const Root = styled('div')((
     },
   },
 
+  [`& .${classes.filterWhite}`]: {
+    filter: 'invert(98%) sepia(31%) saturate(146%) hue-rotate(187deg) brightness(117%) contrast(100%)'
+  },
+
   [`& .${classes.sectionDesktop}`]: {
     display: 'none',
     [theme.breakpoints.up('md')]: {
@@ -167,6 +171,10 @@ const Root = styled('div')((
 
   [`& .${classes.white}`]: {
     color: 'white'
+  },
+
+  [`& .${classes.logo}`]: {
+    height: '45px'
   },
 
   [`& .${classes.popoverRoot}`]: {
@@ -348,10 +356,9 @@ export default function PrimarySearchAppBar(props) {
             size="large">
             <MenuIcon />
           </IconButton>
-          <RouterLink onClick={handleHomeClick} to='/' className={`${classes.routerLinkButton} ${classes.white}`}>
-            <Typography className={classes.title} variant="h6">
-              Bake.$ale
-            </Typography>
+          <RouterLink  onClick={handleHomeClick} to='/' className={`${classes.routerLinkButton} ${classes.white} ${classes.logo}`}>
+            <img height="45px" src="/assets/images/logow.svg"
+            />
           </RouterLink>
           <div className={classes.search}>
             <div className={classes.searchIcon}>

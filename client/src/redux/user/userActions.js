@@ -15,7 +15,10 @@ import {
   FORGOT_PASSWORD_FAILURE,
   EDIT_USER_REQUEST,
   EDIT_USER_SUCCESS,
-  EDIT_USER_FAILURE
+  EDIT_USER_FAILURE,
+  GET_FORMATTED_ADDRESS_FAILURE,
+  GET_FORMATTED_ADDRESS_SUCCESS,
+  GET_FORMATTED_ADDRESS_REQUEST
  } from './userTypes'
 
  import { getShop } from '../shop/shopActions'
@@ -123,10 +126,46 @@ export const userSignOutFailure = (error) => {
   }
 }
 
+export const getFormattedAddressRequest = () => {
+  return {
+    type: GET_FORMATTED_ADDRESS_REQUEST
+  }
+}
+
+export const getFormattedAddressSuccess = (address) => {
+  const addressComponents = Object.fromEntries(address.filter(
+    component => {
+      const types = component.types.filter(type => [
+        'street_number',
+        'route',
+        'locality',
+        'administrative_area_level_1',
+        'postal_code'].includes(type))
+        return types.length > 0
+    }
+  ).map(component => [component.types[0], component.long_name]))
+  if (Object.keys(addressComponents).length < 5) {
+    return async (dispatch) => {
+      dispatch(getFormattedAddressFailure("There was an issue validating your address."))
+    }
+  }
+  return {
+    type: GET_FORMATTED_ADDRESS_SUCCESS,
+    payload: addressComponents
+  }
+}
+
+export const getFormattedAddressFailure = (error) => {
+  return {
+    type: GET_FORMATTED_ADDRESS_FAILURE,
+    payload: error
+  }
+}
+
 export const userSignUp = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(userSignUpRequest)
+      dispatch(userSignUpRequest())
       const res = await axios.post('/api/signup', formData)
       if(res.data.error[0]) {
         dispatch(userSignInFailure(res.data.error[0]))
@@ -150,6 +189,7 @@ export const userSignIn = (formData) => {
         dispatch(userSignInFailure(res.data.error[0]))
       }
       else {
+        console.log(res.data)
         dispatch(getShop({ UserId: res.data.success.id }))
         dispatch(userSignInSuccess(res.data))
       }
@@ -202,6 +242,28 @@ export const editUser = (formData) => {
       }
     } catch(error) {
       dispatch(editUserFailure(error.message))
+    }
+  }
+}
+
+export const getFormattedAddress = (formData) => {
+  console.log(formData)
+  return async (dispatch) => {
+    try {
+      dispatch(getFormattedAddressRequest())
+      const res = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${formData}&key=AIzaSyACELINjQLeOcaE9QQQso_1mu3eG6wnnmw`
+        )
+      if(res.error_message) {
+        dispatch(getFormattedAddressFailure(res.error_message))
+      } else if (res.data.status != "OK") {
+        dispatch(getFormattedAddressFailure("There was an issue validating your address."))
+      }
+      else {
+        dispatch(getFormattedAddressSuccess(res.data.results[0].address_components))
+      }
+    } catch(error) {
+      dispatch(getFormattedAddressFailure(error.message))
     }
   }
 }
