@@ -43,13 +43,22 @@ module.exports = (app, passport) => {
     res.json({ message: 'Successfully signed out' });
   })
 
-  app.post('/api/signin', passport.authenticate('local', { failureRedirect: '/api/signin', failureFlash: true}),
+  app.post('/api/signin', MakeUserController.validateSignIn, passport.authenticate('local', { failureRedirect: '/api/signin', failureFlash: true}),
   async (req, res) => {
     res.send({
       error: false,
       success: req.user
     })
   })
+
+  app.get('/api/signin', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+      success: false
+    })
+  })
+
+  
   
   app.post('/api/signup', passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
   async (req, res) => {

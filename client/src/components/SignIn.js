@@ -149,10 +149,6 @@ export default function SignIn({ userSignIn, userData }) {
           <Typography color="red">
             {message}
           </Typography>
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
           <Button
             type="submit"
             fullWidth

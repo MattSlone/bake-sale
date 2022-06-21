@@ -4,7 +4,8 @@ const User = require('../models/user'),
   db = require('../models/index'),
   Email = require('email-templates'),
   nodemailer = require('nodemailer'),
-  jwt = require('jsonwebtoken')
+  jwt = require('jsonwebtoken'),
+  validator = require('validator')
 
 module.exports = class UserController {
   /* static async isAdmin (req, res, next) {
@@ -162,6 +163,41 @@ module.exports = class UserController {
     }
     catch (err) {
       return next(err)
+    }
+  }
+
+  static async validateSignIn(req, res, next) {
+    try {
+      for (const field of [
+        { name: 'Email', value: req.body.username },
+        { name: 'Password', value: req.body.password }
+      ]) {
+        if (!field.value) {
+          req.flash('error', `${field.name} is required.`)
+          res.redirect('/api/signin')
+        }
+      }
+      if (!validator.isEmail(req.body.username)) {
+        req.flash('error', "Invalid email address.")
+        res.redirect('/api/signin')
+      }
+      if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })) {
+        req.flash('error', "Password should be between 5 and 15 characters.")
+        res.redirect('/api/signin')
+      }
+      next()
+    } catch (err) {
+      console.log(err)
+      req.flash('error', "There was a problem signing in.")
+      res.redirect('/api/signin')
+    }
+  }
+
+  async validateSignUp(req, res, next) {
+    try {
+
+    } catch (err) {
+      return "There was error signing up."
     }
   }
 }

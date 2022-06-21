@@ -183,7 +183,7 @@ export const userSignUp = (formData) => {
 export const userSignIn = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(userSignInRequest)
+      dispatch(userSignInRequest())
       const res = await axios.post('/api/signin', formData)
       if(res.data.error[0]) {
         dispatch(userSignInFailure(res.data.error[0]))
