@@ -15,7 +15,8 @@ import {
   EDIT_USER_FAILURE,
   GET_FORMATTED_ADDRESS_FAILURE,
   GET_FORMATTED_ADDRESS_SUCCESS,
-  GET_FORMATTED_ADDRESS_REQUEST
+  GET_FORMATTED_ADDRESS_REQUEST,
+  RESET_USER_ERROR
  } from './userTypes'
 
 const initialState = {
@@ -92,6 +93,10 @@ const userReducer = (state = initialState, action) => {
       ...state,
       loading: false,
       error: action.payload
+    }
+    case RESET_USER_ERROR: return {
+      ...state,
+      error: ''
     }
     case EDIT_USER_REQUEST: return {
       ...state,

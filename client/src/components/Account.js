@@ -80,9 +80,9 @@ export default function Account(props) {
   const [newPassword, setNewPassword] = useState('')
   const [message, setMessage] = useState('')
 
-  /*useEffect(() => {
-    userSignUp()
-  }, [])*/
+  useEffect(() => {
+    auth.resetUserError()
+  }, [])
 
   let formData = {
     username: username,

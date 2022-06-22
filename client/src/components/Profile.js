@@ -97,6 +97,10 @@ export default function Profile(props) {
   }
 
   useEffect(() => {
+    auth.resetUserError()
+  }, [])
+
+  useEffect(() => {
     if (auth.userData.loading === false && auth.userData.validAddress === true) {
       setStreet(auth.userData.street)
       setCity(auth.userData.city)

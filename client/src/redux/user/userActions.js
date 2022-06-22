@@ -18,7 +18,8 @@ import {
   EDIT_USER_FAILURE,
   GET_FORMATTED_ADDRESS_FAILURE,
   GET_FORMATTED_ADDRESS_SUCCESS,
-  GET_FORMATTED_ADDRESS_REQUEST
+  GET_FORMATTED_ADDRESS_REQUEST,
+  RESET_USER_ERROR
  } from './userTypes'
 
  import { getShop } from '../shop/shopActions'
@@ -102,6 +103,12 @@ export const editUserFailure = (error) => {
   return {
     type: EDIT_USER_FAILURE,
     payload: error
+  }
+}
+
+export const resetUserError = () => {
+  return {
+    type: RESET_USER_ERROR
   }
 }
 

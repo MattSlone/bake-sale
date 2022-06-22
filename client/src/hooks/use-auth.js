@@ -4,12 +4,13 @@ import React, { useState, useEffect, useContext, createContext } from "react";
 const authContext = createContext();
 // Provider component that wraps your app and makes auth object ...
 // ... available to any child component that calls useAuth().
-export function ProvideAuth({ children, userData, userSignIn, userSignUp, userSignOut }) {
+export function ProvideAuth({ children, userData, userSignIn, userSignUp, userSignOut, resetUserError }) {
   const auth = {
     userData,
     userSignIn,
     userSignUp,
-    userSignOut
+    userSignOut,
+    resetUserError
   }
   return <authContext.Provider value={auth}>{children}</authContext.Provider>;
 }
