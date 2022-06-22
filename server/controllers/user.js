@@ -30,7 +30,7 @@ module.exports = class UserController {
     }
     else {
       req.flash('error', 'Not logged in.')
-      res.redirect('/api')
+      res.redirect('/api/signin')
     }
   }
 

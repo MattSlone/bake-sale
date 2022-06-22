@@ -12,7 +12,9 @@ module.exports = (app, passport) => {
     })
   })
 
-  app.get('/api/user', async (req, res, next) => {
+  app.get('/api/user',
+  MakeUserController.isLoggedIn,
+  async (req, res, next) => {
     try {
       let user = await UserController.read(req, res, next)
       res.send({
@@ -30,7 +32,10 @@ module.exports = (app, passport) => {
     })
   })
 
-  app.post('/api/user/edit', MakeUserController.validateEditUser, async (req, res, next) => {
+  app.post('/api/user/edit',
+  MakeUserController.isLoggedIn,
+  MakeUserController.validateEditUser, 
+  async (req, res, next) => {
     const user = await UserController.update(req, res, next)
     res.send({
       success: user
@@ -43,7 +48,9 @@ module.exports = (app, passport) => {
     })
   })
 
-  app.post('/api/user/address/components', async (req, res, next) => {
+  app.post('/api/user/address/components',
+  MakeUserController.isLoggedIn,
+  async (req, res, next) => {
     const addressComponents = await GMaps.getFormattedAddress(req)
     if (typeof addressComponents == 'string') {
       req.flash('error', 'There was an issue validating your address.')
