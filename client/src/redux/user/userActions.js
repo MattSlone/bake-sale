@@ -132,23 +132,7 @@ export const getFormattedAddressRequest = () => {
   }
 }
 
-export const getFormattedAddressSuccess = (address) => {
-  const addressComponents = Object.fromEntries(address.filter(
-    component => {
-      const types = component.types.filter(type => [
-        'street_number',
-        'route',
-        'locality',
-        'administrative_area_level_1',
-        'postal_code'].includes(type))
-        return types.length > 0
-    }
-  ).map(component => [component.types[0], component.long_name]))
-  if (Object.keys(addressComponents).length < 5) {
-    return async (dispatch) => {
-      dispatch(getFormattedAddressFailure("There was an issue validating your address."))
-    }
-  }
+export const getFormattedAddressSuccess = (addressComponents) => {
   return {
     type: GET_FORMATTED_ADDRESS_SUCCESS,
     payload: addressComponents
@@ -234,8 +218,8 @@ export const editUser = (formData) => {
       dispatch(editUserRequest())
       const res = await axios.post('/api/user/edit', formData)
       console.log(res.data)
-      if(res.data.error[0]) {
-        dispatch(editUserFailure(res.data.error[0]))
+      if('error' in res.data) {
+        dispatch(editUserFailure(res.data.error))
       }
       else {
         dispatch(editUserSuccess(res.data.success))
@@ -247,20 +231,15 @@ export const editUser = (formData) => {
 }
 
 export const getFormattedAddress = (formData) => {
-  console.log(formData)
   return async (dispatch) => {
     try {
       dispatch(getFormattedAddressRequest())
-      const res = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${formData}&key=AIzaSyACELINjQLeOcaE9QQQso_1mu3eG6wnnmw`
-        )
-      if(res.error_message) {
-        dispatch(getFormattedAddressFailure(res.error_message))
-      } else if (res.data.status != "OK") {
-        dispatch(getFormattedAddressFailure("There was an issue validating your address."))
+      const res = await axios.post('/api/user/address/components', formData)
+      if(res.data.error) {
+        dispatch(getFormattedAddressFailure(res.data.error))
       }
       else {
-        dispatch(getFormattedAddressSuccess(res.data.results[0].address_components))
+        dispatch(getFormattedAddressSuccess(res.data.success))
       }
     } catch(error) {
       dispatch(getFormattedAddressFailure(error.message))

@@ -1,5 +1,6 @@
 'use strict'
 require('dotenv').config()
+const GMaps = require('../lib/gmaps')
 const User = require('../models/user'),
   db = require('../models/index'),
   Email = require('email-templates'),
@@ -145,12 +146,12 @@ module.exports = class UserController {
         ...(req.body.city && { city: req.body.city }),
         ...(req.body.state && { state: req.body.state }),
         ...(req.body.zipcode && { zipcode: req.body.zipcode }),
-        ...(req.body.seller && { seller: req.body.seller }),
+        ...('seller' in req.body && { seller: req.body.seller }),
         ...(req.body.username && { username: req.body.username }),
         ...(req.body.email && { email: req.body.email }),
         ...(req.body.newPassword && req.user.validPassword(req.body.password) 
           && {
-            password: req.body.newPassword
+            password: await db.User.generateHash(req.body.newPassword)
           }
         )
       }
@@ -175,15 +176,18 @@ module.exports = class UserController {
         if (!field.value) {
           req.flash('error', `${field.name} is required.`)
           res.redirect('/api/signin')
+          return
         }
       }
       if (!validator.isEmail(req.body.username)) {
         req.flash('error', "Invalid email address.")
         res.redirect('/api/signin')
+        return
       }
       if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })) {
         req.flash('error', "Password should be between 5 and 15 characters.")
         res.redirect('/api/signin')
+        return
       }
       next()
     } catch (err) {
@@ -193,11 +197,131 @@ module.exports = class UserController {
     }
   }
 
-  async validateSignUp(req, res, next) {
+  static async validateSignUp(req, res, next) {
     try {
-
+      const addressComponents = await GMaps.getFormattedAddress(req)
+      if (typeof addressComponents == 'string') {
+        req.flash('error', 'There was an issue validating your address.')
+        res.redirect('/api/signup')
+        return
+      }
+      for (const field of [
+        { name: 'First name', value: req.body.firstName },
+        { name: 'Last name', value: req.body.lastName },
+        { name: 'Street', value: req.body.street },
+        { name: 'City', value: req.body.city },
+        { name: 'State', value: req.body.state },
+        { name: 'Zipcode', value: req.body.zipcode },
+        { name: 'Email', value: req.body.username },
+        { name: 'Password', value: req.body.password }
+      ]) {
+        if (!field.value) {
+          req.flash('error', `${field.name} is required.`)
+          res.redirect('/api/signup')
+          return
+        }
+      }
+      if (!validator.isEmail(req.body.username)) {
+        req.flash('error', 'Invalid email address')
+        res.redirect('/api/signup')
+        return
+      }
+      if (
+        !(req.body.firstName && validator.isAlpha(req.body.firstName)) 
+        || !(req.body.lastName && validator.isAlpha(req.body.lastName))
+      ) {
+        req.flash('error', 'Name may only contain letters.')
+        res.redirect('/api/signup')
+        return
+      }
+      if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })) {
+        req.flash('error', "Password should be between 5 and 15 characters.")
+        res.redirect('/api/signup')
+        return
+      }
+      next()
     } catch (err) {
-      return "There was error signing up."
+      req.flash('error', "There was an error signing up.")
+      res.redirect('/api/signup')
+    }
+  }
+
+  static async validateEditUser(req, res, next) {
+    try {
+      if (req.body.username) {
+        console.log(req.body.username)
+        await UserController.validateEditAccount(req, res, next)
+        return
+      }
+      const addressComponents = await GMaps.getFormattedAddress(req)
+      if (typeof addressComponents == 'string') {
+        req.flash('error', 'There was an issue validating your address.')
+        res.redirect('/api/user/edit')
+        return
+      }
+      for (const field of [
+        { name: 'First name', value: req.body.firstName },
+        { name: 'Last name', value: req.body.lastName },
+        { name: 'Street', value: req.body.street },
+        { name: 'City', value: req.body.city },
+        { name: 'State', value: req.body.state },
+        { name: 'Zipcode', value: req.body.zipcode }
+      ]) {
+        if (!field.value) {
+          req.flash('error', `${field.name} is required.`)
+          res.redirect('/api/user/edit')
+          return
+        }
+      }
+      if (
+        !(req.body.firstName && validator.isAlpha(req.body.firstName)) 
+        || !(req.body.lastName && validator.isAlpha(req.body.lastName))
+      ) {
+        req.flash('error', 'Name may only contain letters.')
+        res.redirect('/api/user/edit')
+        return
+      }
+      next()
+    } catch (err) {
+      console.log(err)
+      req.flash('error', "There was an error signing up.")
+      res.redirect('/api/user/edit')
+    }
+  }
+
+  static async validateEditAccount(req, res, next) {
+    try {
+      for (const field of [
+        { name: 'Email', value: req.body.username },
+        { name: 'Password', value: req.body.password }
+      ]) {
+        if (!field.value) {
+          req.flash('error', `${field.name} is required.`)
+          res.redirect('/api/user/edit')
+          return
+        }
+      }
+      if (!validator.isEmail(req.body.username)) {
+        req.flash('error', 'Invalid email address')
+        res.redirect('/api/user/edit')
+        return
+      }
+      if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })
+        || !validator.isByteLength(req.body.newPassword, { min: 5, max: 15 })) {
+        req.flash('error', "Password should be between 5 and 15 characters.")
+        res.redirect('/api/user/edit')
+        return
+      }
+      if (!(await req.user.validPassword(req.body.password))) {
+        console.log('INVALID PASSWORDDDD')
+        req.flash('error', "Invalid Password")
+        res.redirect('/api/user/edit')
+        return
+      }
+      next()
+    } catch (err) {
+      req.flash('error', "There was an error signing up.")
+      res.redirect('/api/user/edit')
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -15,6 +15,9 @@ import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider'
 import { Redirect } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
+import { useAuth } from '../hooks/use-auth';
+import isEmail from 'validator/lib/isEmail';
+import isByteLength from 'validator/lib/isByteLength';
 
 const PREFIX = 'SignUp';
 
@@ -71,9 +74,11 @@ function Copyright() {
 }
 
 export default function Account(props) {
+  const auth = useAuth()
   const [username, setUsername] = useState(props.user.username)
   const [password, setPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [message, setMessage] = useState('')
 
   /*useEffect(() => {
     userSignUp()
@@ -82,11 +87,38 @@ export default function Account(props) {
   let formData = {
     username: username,
     password: password,
-    newPassword: newPassword,
+    newPassword: newPassword
   }
+
+  useEffect(() => {
+    if (auth.userData.loading === false) {
+      if (auth.userData.error) {
+        setMessage(auth.userData.error)
+      } else {
+        setMessage("Your changes have been saved.")
+      }
+    }
+  }, [auth.userData.loading])
 
   const handleSubmit = e => {
     e.preventDefault()
+    for (const field of [
+      { name: 'Email', value: username },
+      { name: 'Password', value: password }
+    ]) {
+      if (!field.value) {
+        setMessage(`${field.name} is required.`)
+        return
+      }
+    }
+    if (!isEmail(username)) {
+      setMessage('Invalid email address')
+      return
+    }
+    if (!isByteLength(password, { min: 5, max: 15 })) {
+      setMessage("Password should be between 5 and 15 characters.")
+      return
+    }
     props.editUser(formData)
     setPassword('')
     setNewPassword('')
@@ -146,6 +178,11 @@ export default function Account(props) {
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography color="red">
+                {message}
+              </Typography>
             </Grid>
           </Grid>
           <Button

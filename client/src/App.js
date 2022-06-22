@@ -68,7 +68,7 @@ export default function App() {
                 <Route path='/shop/:id' children={<ShopContainer />} />
                 <Route path='/signout' component={HomeContainer} key='/' beforeEnter/>
                 <Route path={["/dashboard", "/checkout", "/user"]}>
-                  {auth.userData.user?.success?.id ?
+                  {auth.userData.loggedIn ?
                     <Switch>
                       <Route path='/dashboard' component={DashboardContainer} />
                       <Route path='/checkout' component={CheckoutContainer} />

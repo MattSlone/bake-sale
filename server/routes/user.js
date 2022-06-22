@@ -1,7 +1,8 @@
 'use strict'
 require('dotenv').config()
 const MakeUserController = require('../controllers/user'),
-  UserController = new MakeUserController()
+  UserController = new MakeUserController(),
+  GMaps = require('../lib/gmaps')
 
 module.exports = (app, passport) => {
   app.get('/api/signin', (req, res, next) => {
@@ -26,15 +27,37 @@ module.exports = (app, passport) => {
   app.get('/api/signup', (req, res, next) => {
     res.send({
       error: req.flash('error'),
-      success: req.user
     })
   })
 
-  app.post('/api/user/edit', async (req, res, next) => {
+  app.post('/api/user/edit', MakeUserController.validateEditUser, async (req, res, next) => {
     const user = await UserController.update(req, res, next)
     res.send({
-      error: req.flash('error'),
       success: user
+    })
+  })
+
+  app.get('/api/user/edit', (req, res, next) => {
+    res.send({
+      error: req.flash('error')
+    })
+  })
+
+  app.post('/api/user/address/components', async (req, res, next) => {
+    const addressComponents = await GMaps.getFormattedAddress(req)
+    if (typeof addressComponents == 'string') {
+      req.flash('error', 'There was an issue validating your address.')
+      res.redirect('/api/user/address/components')
+      return
+    }
+    res.send({
+      success: addressComponents
+    })
+  })
+
+  app.get('/api/user/address/components', (req, res, next) => {
+    res.send({
+      error: req.flash('error')
     })
   })
 
@@ -60,7 +83,7 @@ module.exports = (app, passport) => {
 
   
   
-  app.post('/api/signup', passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
+  app.post('/api/signup', MakeUserController.validateSignUp, passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
   async (req, res) => {
     try {
       await UserController.sendSignUpEmail(req)

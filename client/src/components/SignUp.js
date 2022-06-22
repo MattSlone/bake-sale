@@ -102,9 +102,7 @@ export default function SignUp(props) {
   }
 
   const getFormattedAddress = () => {
-    props.getFormattedAddress(
-      `${street} ${city}, ${state} ${zipcode}`
-    )
+    props.getFormattedAddress(formData)
   }
 
   useEffect(() => {
@@ -149,11 +147,7 @@ export default function SignUp(props) {
         setMessage('Invalid email address')
         return
       }
-      if (!isEmail(username)) {
-        setMessage('Invalid email address')
-        return
-      }
-      if (!(firstName && isAlpha(firstName)) | !(lastName && isAlpha(lastName))) {
+      if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
         setMessage('Name may only contain letters.')
         return
       }

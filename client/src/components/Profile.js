@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -14,6 +14,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { Redirect } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
+import { useAuth } from '../hooks/use-auth';
+import isAlpha from 'validator/lib/isAlpha';
 
 const PREFIX = 'Profile';
 
@@ -70,6 +72,7 @@ function Copyright() {
 }
 
 export default function Profile(props) {
+  const auth = useAuth()
   const [firstName, setFirstName] = useState(props.user.firstName)
   const [lastName, setLastName] = useState(props.user.lastName)
   const [street, setStreet] = useState(props.user.street)
@@ -77,6 +80,8 @@ export default function Profile(props) {
   const [state, setState] = useState(props.user.state)
   const [zipcode, setZipcode] = useState(props.user.zipcode)
   const [seller, setSeller] = useState(props.user.seller)
+  const [validAddress, setValidAddress] = useState(false)
+  const [message, setMessage] = useState('')
   let formData = {
     firstName: firstName,
     lastName: lastName,
@@ -87,10 +92,54 @@ export default function Profile(props) {
     seller: seller
   }
 
+  const getFormattedAddress = () => {
+    props.getFormattedAddress(formData)
+  }
+
+  useEffect(() => {
+    if (auth.userData.loading === false && auth.userData.validAddress === true) {
+      setStreet(auth.userData.street)
+      setCity(auth.userData.city)
+      setState(auth.userData.state)
+      setZipcode(auth.userData.zipcode)
+      setValidAddress(true)
+    } else {
+      setValidAddress(false)
+      if (auth.userData.error) {
+        setMessage(auth.userData.error)
+      }
+    }
+  }, [auth.userData.loading])
+
   const handleSubmit = e => {
     e.preventDefault()
-    props.editUser(formData)
+    setMessage('')
+    getFormattedAddress()
   }
+
+  useEffect(() => {
+    if (validAddress) {
+      for (const field of [
+        { name: 'First name', value: firstName },
+        { name: 'Last name', value: lastName },
+        { name: 'Street', value: street },
+        { name: 'City', value: city },
+        { name: 'State', value: state },
+        { name: 'Zipcode', value: zipcode },
+      ]) {
+        if (!field.value) {
+          setMessage(`${field.name} is required.`)
+          return
+        }
+      }
+      if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
+        setMessage('Name may only contain letters.')
+        return
+      }
+      props.editUser(formData)
+      setMessage('Your changes have been saved')
+    }
+  }, [validAddress])
 
   return (
     <StyledContainer component="main" maxWidth="xs">
@@ -185,9 +234,14 @@ export default function Profile(props) {
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel
-                control={<Checkbox value={1} onChange={e => setSeller(e.target.value)} color="primary" />}
+                control={<Checkbox checked={seller} onChange={e => setSeller(e.target.checked)} color="primary" />}
                 label="Seller account"
               />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography color="red">
+                {message}
+              </Typography>
             </Grid>
           </Grid>
           <Button

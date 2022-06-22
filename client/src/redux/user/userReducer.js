@@ -99,6 +99,7 @@ const userReducer = (state = initialState, action) => {
     }
     case EDIT_USER_SUCCESS: return {
       loggedIn: true,
+      loading: false,
       user: action.payload,
       email: action.payload.email,
       username: action.payload.username,
@@ -112,6 +113,7 @@ const userReducer = (state = initialState, action) => {
       error: ''
     }
     case EDIT_USER_FAILURE: return {
+      ...state,
       loading: false,
       error: action.payload
     }

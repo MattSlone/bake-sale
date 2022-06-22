@@ -1,6 +1,7 @@
 require('dotenv').config()
 const db = require('../models/index')
 const fetch = require('node-fetch')
+const axios = require('axios') // i forgot how fetch works and im lazy don't judge me
 
 const MILES_MULTIPLE = 0.000621371
 
@@ -36,4 +37,46 @@ module.exports = class GMaps {
   static convertMetersToMiles(meters) {
     return (meters * MILES_MULTIPLE)
   }
+
+  static async getFormattedAddress(req) {
+    try {
+      const address = `${req.body.street} ${req.body.city}, ${req.body.state} ${req.body.zipcode}`
+      const res = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyACELINjQLeOcaE9QQQso_1mu3eG6wnnmw`
+        )
+      if(res.error_message) {
+        return res.error_message
+      } else if (res.data.status != "OK") {
+        return "There was an issue validating your address."
+      }
+      else {
+        const addressComponents = this.convertFormattedAddressToObject(
+          res.data.results[0].address_components
+        )
+        return addressComponents
+      }
+    } catch (error) {
+      return error.message
+    }
+  }
+
+  static convertFormattedAddressToObject(addressComponentsArray) {
+    const addressComponents = Object.fromEntries(addressComponentsArray.filter(
+      component => {
+        const types = component.types.filter(type => [
+          'street_number',
+          'route',
+          'locality',
+          'administrative_area_level_1',
+          'postal_code'].includes(type))
+          return types.length > 0
+      }
+    ).map(component => [component.types[0], component.long_name]))
+    if (Object.keys(addressComponents).length < 5) {
+      return "There was an issue validating your address."
+    }
+    return addressComponents
+  }
 }
+
+
