@@ -8,8 +8,10 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { Redirect, useLocation } from "react-router-dom";
+import Link from '@mui/material/Link'
+import { Redirect, useLocation, Link as RouterLink } from "react-router-dom";
 import axios from 'axios'
+import isByteLength from 'validator/lib/isByteLength';
 
 const PREFIX = 'ResetPassword';
 
@@ -63,22 +65,45 @@ export default function ResetPassword() {
   const [message, setMessage] = useState('')
   const query = useQuery()
   const token = query.get('token')
-  console.log(token)
+  const [showSignIn, setShowSignIn] = useState(false)
 
   let formData = {
     password: password,
     token: token
   }
 
+  const validate = () => {
+    for (const field of [
+      { name: 'Password', value: password },
+      { name: 'Token', value: token }
+    ]) {
+      console.log(field.value)
+      if (!field.value) {
+        setMessage(`${field.name} is required.`)
+        return false
+      }
+    }
+    if (!isByteLength(password, { min: 5, max: 15 })) {
+      setMessage("Password should be between 5 and 15 characters.")
+      return
+    }
+    return true
+  }
+
   const handleSubmit = async e => {
     try {
       e.preventDefault()
-      setMessage("Loading...")
-      const res = await axios.post('/api/resetpassword', formData)
-      if (!res || res.data.error[0]) {
-        setMessage("There was a problem resetting your password.")
-      } else {
-        setMessage("Your password has been reset.")
+      const validated = validate()
+      if (validated) {
+        setMessage("Loading...")
+        const res = await axios.post('/api/resetpassword', formData)
+        if (!res || res.data.error) {
+          setMessage(res.data.error)
+        } else {
+          setPassword("")
+          setMessage("Your password has been reset.")
+          setShowSignIn(true)
+        }
       }
     } catch (err) {
       console.log(err)
@@ -124,7 +149,12 @@ export default function ResetPassword() {
             Submit
           </Button>
           <Typography>
-            {message}
+            <span style={{color: 'red'}}>{`${message} `}</span>
+            {showSignIn ? 
+            <Link component={RouterLink} href="#" to='/signin'>
+              Sign in
+            </Link>
+            : ''}
           </Typography>
         </form>
       </div>

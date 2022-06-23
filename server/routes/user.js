@@ -87,8 +87,6 @@ module.exports = (app, passport) => {
     })
   })
 
-  
-  
   app.post('/api/signup', UserController.validateSignUp, passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
   async (req, res) => {
     try {
@@ -102,11 +100,10 @@ module.exports = (app, passport) => {
     }
   })
 
-  app.post("/api/forgotpassword", async (req, res, next) => {
+  app.post("/api/forgotpassword", UserController.validateForgotPassword, async (req, res, next) => {
     try {
       await (new UserController).forgotPassword(req, res, next)
       res.send({
-        error: req.flash('error'),
         success: true
       })
     } catch (err) {
@@ -114,12 +111,16 @@ module.exports = (app, passport) => {
     }
   })
 
-  app.post("/api/resetpassword", async (req, res, next) => {
+  app.get('/api/forgotpassword', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+    })
+  })
+
+  app.post("/api/resetpassword", UserController.validateResetPassword, async (req, res, next) => {
     try {
-      console.log('in route')
       await (new UserController).resetPassword(req, res, next)
       res.send({
-        error: req.flash('error'),
         success: true
       })
     } catch (err) {
@@ -129,6 +130,12 @@ module.exports = (app, passport) => {
         success: false
       })
     }
+  })
+
+  app.get('/api/resetpassword', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+    })
   })
 
 /* DEBUGGER

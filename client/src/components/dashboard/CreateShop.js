@@ -169,7 +169,7 @@ export default function CreateShop(props) {
     allowPickups: props.shop.allowPickups,
     contact: props.shop.contact,
     area: props.shop.area,
-    user: auth.userData.user.success.id
+    user: auth.userData.user.id
   }
 
   const handleCreateShop = e => {

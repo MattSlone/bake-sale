@@ -86,7 +86,9 @@ module.exports = class UserController {
           time: Date(),
           userId: user.id,
         }
-        const token = jwt.sign(data, process.env.JWT_SECRET_KEY);
+        const token = jwt.sign(data, process.env.JWT_SECRET_KEY, {
+          expiresIn: '15m'
+        });
         const transporter = nodemailer.createTransport({
           host: 'smtp.zoho.com',
           port: 465,
@@ -322,6 +324,63 @@ module.exports = class UserController {
     } catch (err) {
       req.flash('error', "There was an error signing up.")
       res.redirect('/api/user/edit')
+    }
+  }
+
+  static async validateForgotPassword(req, res, next) {
+    try {
+      for (const field of [
+        { name: 'Email', value: req.body.email },
+      ]) {
+        if (!field.value) {
+          req.flash('error', `${field.name} is required.`)
+          res.redirect('/api/forgotpassword')
+          return
+        }
+      }
+      if (!validator.isEmail(req.body.email)) {
+        req.flash('error', "Invalid email address.")
+        res.redirect('/api/forgotpassword')
+        return
+      }
+      next()
+    } catch (err) {
+      console.log(err)
+      req.flash('error', "There was a problem validating your email.")
+      res.redirect('/api/forgotpassword')
+      return
+    }
+  }
+
+  static async validateResetPassword(req, res, next) {
+    try {
+      for (const field of [
+        { name: 'Password', value: req.body.password },
+      ]) {
+        if (!field.value) {
+          req.flash('error', `${field.name} is required.`)
+          res.redirect('/api/resetpassword')
+          return
+        }
+      }
+      if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })) {
+        req.flash('error', "Password should be between 5 and 15 characters.")
+        res.redirect('/api/resetpassword')
+        return
+      }
+      const token = req.body.token
+      const verified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      if (!verified) {
+        req.flash('error', "Invalid token.")
+        res.redirect('/api/resetpassword')
+        return
+      }
+      next()
+    } catch (err) {
+      console.log(err)
+      req.flash('error', "There was a problem resetting your password.")
+      res.redirect('/api/resetpassword')
+      return
     }
   }
 }

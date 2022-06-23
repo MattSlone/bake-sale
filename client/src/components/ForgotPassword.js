@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { Redirect } from "react-router-dom";
 import axios from 'axios'
+import isEmail from 'validator/lib/isEmail';
 
 const PREFIX = 'SignUp';
 
@@ -52,7 +53,7 @@ const StyledContainer = styled(Container)((
   }
 }));
 
-export default function ForgotPassword({ forgotPassword }) {
+export default function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
 
@@ -60,15 +61,39 @@ export default function ForgotPassword({ forgotPassword }) {
     email: email
   }
 
+  const validate = () => {
+    console.log(email)
+    for (const field of [
+      { name: 'Email', value: email }
+    ]) {
+      if (!field.value) {
+        setMessage(`${field.name} is required.`)
+        return false
+      }
+    }
+    if (!isEmail(email)) {
+      setMessage('Invalid Email Address.')
+      return false
+    }
+    
+    return true
+  }
+
   const handleSubmit = async e => {
     try {
       e.preventDefault()
       setMessage()
-      const res = await axios.post('/api/forgotpassword', formData)
-      if (!res || res.data.error[0]) {
-        setMessage("There was a problem resetting your password.")
-      } else {
-        setMessage("Check your email for a link to reset your password.")
+      const valid = validate()
+      if (valid) {
+        const res = await axios.post('/api/forgotpassword', formData)
+        if (!res || res.data.error) {
+          setMessage(res.data.error)
+        } else {
+          setMessage(
+            "If an associated account exists, you will receive a link to reset \
+            your password at the email provided."
+          )
+        }
       }
     } catch (err) {
       console.log(err)
@@ -111,7 +136,7 @@ export default function ForgotPassword({ forgotPassword }) {
           >
             Submit
           </Button>
-          <Typography>
+          <Typography color="red">
             {message}
           </Typography>
         </form>

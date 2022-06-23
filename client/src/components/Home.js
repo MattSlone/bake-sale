@@ -143,7 +143,7 @@ export default function Home(props) {
   )
 
   return ( 
-    <Root userdata={props.userData}>
+    <Root>
       <CssBaseline />
       <main>
         {/* Hero unit */}

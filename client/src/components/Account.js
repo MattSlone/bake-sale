@@ -94,8 +94,6 @@ export default function Account(props) {
     if (auth.userData.loading === false) {
       if (auth.userData.error) {
         setMessage(auth.userData.error)
-      } else {
-        setMessage("Your changes have been saved.")
       }
     }
   }, [auth.userData.loading])
@@ -120,6 +118,7 @@ export default function Account(props) {
       return
     }
     props.editUser(formData)
+    setMessage("Your changes have been saved.")
     setPassword('')
     setNewPassword('')
   }
