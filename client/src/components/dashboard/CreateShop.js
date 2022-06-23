@@ -41,6 +41,8 @@ const Root = styled('div')((
     width: '100%',
   },
 
+  padding: theme.spacing(2),
+
   [`& .${classes.backButton}`]: {
     marginRight: theme.spacing(1),
   },
@@ -49,8 +51,6 @@ const Root = styled('div')((
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
-
-  [`& .${classes.appBarSpacer}`]: theme.mixins.toolbar,
 
   [`& .${classes.content}`]: {
     flexGrow: 1,
@@ -186,9 +186,7 @@ export default function CreateShop(props) {
 
   return (
     <Root className={classes.root}>
-      <CssBaseline />
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((label) => (
             <Step key={label}>
@@ -224,9 +222,7 @@ export default function CreateShop(props) {
                   </Typography>
                   {(() => {
                     switch (activeStep) {
-                      case 0: return <>
-                                      <Container component="main" maxWidth="xs">
-                                        <TextField
+                      case 0: return <TextField
                                         variant="outlined"
                                         margin="normal"
                                         required
@@ -238,8 +234,6 @@ export default function CreateShop(props) {
                                         autoFocus
                                         onChange={e => setShopName(e.target.value)}
                                       />
-                                      </Container>
-                                    </>;
                       case 1: return <>
                                       <Container component="main" maxWidth="xs">
                                         <InputLabel id="state-select-label">State</InputLabel>

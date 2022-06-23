@@ -21,8 +21,7 @@ const Root = styled('div')((
     theme
   }
 ) => ({
-  marginTop: theme.spacing(8),
-  padding: theme.spacing(3)
+  padding: theme.spacing(2)
 }));
 
 export default function Quotes(props) {
