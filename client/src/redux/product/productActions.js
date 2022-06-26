@@ -264,6 +264,7 @@ export const resetProduct = (custom = false) => {
 }
 
 export const editProduct = (formData) => {
+  console.log(formData)
   formData = {
     ...formData,
     product: {

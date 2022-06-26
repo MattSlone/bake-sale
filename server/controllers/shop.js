@@ -33,29 +33,67 @@ module.exports = class ShopController {
     }
   }
 
+  async validateGetShop(req, res) {
+    try {
+      if (!(req.query.id || req.query.UserId)) {
+        return false
+      }
+      const shop = await db.Shop.findOne({ where: { UserId: req.user.id } })
+      if (req.query.forOrder) {
+        const order = await db.Order.findOne({
+          where: {
+            UserId: req.user.id
+          },
+          include: [
+            {
+              model: db.Product,
+              where: {
+                ShopId: req.query.id ? req.query.id : shop.id
+              }
+            }
+          ]
+        })
+        if (!order?.id) {
+          return false
+        }
+      }
+      return true
+    } catch (err) {
+      req.flash('error', 'Shop not found.')
+    }
+  }
+
   async read(req, res, next) {
     try {
       let shop = null
-      const include = [db.PickupSchedule]
-      if (req.query.UserId && req.user.id && req.user.id == req.query.UserId) { // Is the users shop
-        shop = await db.Shop.findOne({ 
-          where: { UserId:  req.query.UserId},
-          include: [...include, db.PickupAddress, db.ShopContact]
-        });
-      } else if (req.query.forOrder) {
-        shop = await db.Shop.findOne({
-          attributes: ['name'],
-          include: [...include, db.PickupAddress, db.ShopContact]
-        });
-      } else {
-        shop = await db.Shop.findByPk(req.query.id, {
-          include: include
-        });
+      const valid = await this.validateGetShop(req)
+      if (!valid) {
+        req.flash('error', 'Shop not found.')
+        return
       }
+      const include = [
+        db.PickupSchedule,
+        ...[(req.query.UserId || req.query.forOrder) 
+          && db.PickupAddress],
+        ...[(req.query.UserId || req.query.forOrder) 
+          && db.ShopContact]
+      ]
+      const where = {
+        ...(req.query.UserId && { UserId: req.user.id }),
+        ...(req.query.id && { id: req.query.id })
+      }
+      const attributes = [
+        ...[req.query.forOrder && 'name']
+      ]
+      shop = await db.Shop.findOne({
+        ...(!(attributes[0] == undefined) && { attributes: attributes }),
+        include: include,
+        where: where
+      });
       return shop
     }
     catch (err) {
-      return next(err)
+      req.flash('error', "Shop not found.")
     }
   }
 

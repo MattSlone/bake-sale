@@ -8,10 +8,10 @@ module.exports = (app) => {
 
   app.get('/api/shop', async (req, res, next) => {
     try {
-        let response = await ShopController.read(req, res, next)
+        let shop = await ShopController.read(req, res, next)
         res.send({
             error: req.flash('error'),
-            success: response
+            ...(shop && { success: shop })
         })
     }
     catch (err) {

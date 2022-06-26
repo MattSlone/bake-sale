@@ -7,6 +7,7 @@ import {
     EDIT_SHOP_FAILURE,
     SET_DELIVERY_AREA,
     SET_SHOP,
+    SET_VALID_SHOP,
     GET_LAT_LNG_REQUEST,
     GET_LAT_LNG_SUCCESS,
     GET_LAT_LNG_FAILURE,
@@ -22,19 +23,23 @@ import {
     CREATE_STRIPE_ACCOUNT_FAILURE,
     CHECK_STRIPE_DETAILS_SUBMITTED_REQUEST,
     CHECK_STRIPE_DETAILS_SUBMITTED_SUCCESS,
-    CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE
+    CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE,
+    GET_FORMATTED_SHOP_ADDRESS_FAILURE,
+    GET_FORMATTED_SHOP_ADDRESS_SUCCESS,
+    GET_FORMATTED_SHOP_ADDRESS_REQUEST
    } from './shopTypes'
   
   const initialState = {
     id: 0,
     name: '',
-    state: '',
-    allowPickups: true,
+    valid: false,
+    allowPickups: false,
     pickupAddress: {
       street: '',
       city: '',
       state: 'FL',
       zipcode: '',
+      validAddress: false
     },
     contact: {
       phone: '',
@@ -59,17 +64,23 @@ import {
     },
     stripeAccountLink: '',
     stripeAccountId: '',
-    stripeDetailsSubmitted: false
+    stripeDetailsSubmitted: false,
+    error: ''
   }
   
   const shopReducer = (state = initialState, action) => {
     switch(action.type) {
+      case SET_VALID_SHOP: return {
+        ...state,
+        valid: action.payload
+      }
       case GET_LAT_LNG_REQUEST: return {
         ...state,
         loading: true
       }
       case GET_LAT_LNG_SUCCESS: return {
         ...state,
+        loading: false,
         area:{
           ...state.area,
           lat: action.payload.lat,
@@ -84,6 +95,7 @@ import {
           lat: '',
           lng: ''
         },
+        loading: false,
         error: action.payload
       }
       case CREATE_STRIPE_ACCOUNT_REQUEST: return {
@@ -93,11 +105,13 @@ import {
       case CREATE_STRIPE_ACCOUNT_SUCCESS: return {
         ...state,
         stripeAccountLink: action.payload,
+        loading: false,
         error: ''
       }
       case CREATE_STRIPE_ACCOUNT_FAILURE: return {
         ...state,
-        error: action.payload
+        error: action.payload,
+        loading: false
       }
       case CHECK_STRIPE_DETAILS_SUBMITTED_REQUEST: return {
         ...state,
@@ -106,10 +120,12 @@ import {
       case CHECK_STRIPE_DETAILS_SUBMITTED_SUCCESS: return {
         ...state,
         stripeDetailsSubmitted: action.payload,
+        loading: false,
         error: ''
       }
       case CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE: return {
         ...state,
+        loading: false,
         error: action.payload
       }
       case SET_DELIVERY_AREA: return {
@@ -141,7 +157,6 @@ import {
       case SET_SHOP: return {
         ...state,
         name: action.payload.name,
-        state: action.payload.state
       }
       case CREATE_SHOP_REQUEST: return {
         ...state,
@@ -151,7 +166,6 @@ import {
         ...state,
         id: action.payload.success.id,
         name: action.payload.success.name,
-        state: action.payload.success.state,
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
         loading: false,
@@ -178,7 +192,6 @@ import {
         ...state,
         id: action.payload.success.id,
         name: action.payload.success.name,
-        state: action.payload.success.state,
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
         loading: false,
@@ -195,10 +208,12 @@ import {
         error: ''
       }
       case GET_SHOP_FAILURE: return {
+        ...state,
         error: action.payload
       }
       case GET_SHOP_FAILURE_NOT_FOUND: return {
-        ...state
+        ...state,
+        error: ''
       }
       case EDIT_SHOP_REQUEST: return {
         ...state,
@@ -208,7 +223,6 @@ import {
         ...state,
         id: action.payload.success.id,
         name: action.payload.success.name,
-        state: action.payload.success.state,
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
         loading: false,
@@ -226,6 +240,35 @@ import {
       }
       case EDIT_SHOP_FAILURE: return {
         shop: '',
+        error: action.payload
+      }
+      case GET_FORMATTED_SHOP_ADDRESS_REQUEST: return {
+        ...state,
+        loading: true
+      }
+      case GET_FORMATTED_SHOP_ADDRESS_SUCCESS: return {
+        ...state,
+        loggedIn: true,
+        loading: false,
+        pickupAddress: {
+          street: action.payload.street_number + ' ' + action.payload.route,
+          city: action.payload.locality,
+          state: action.payload.administrative_area_level_1,
+          zipcode: action.payload.postal_code,
+          validAddress: true
+        },
+        error: ''
+      }
+      case GET_FORMATTED_SHOP_ADDRESS_FAILURE: return {
+        ...state,
+        loading: false,
+        pickupAddress: {
+          street: '',
+          city: '',
+          state: '',
+          zipcode: '',
+          validAddress: false
+        },
         error: action.payload
       }
       default: return state

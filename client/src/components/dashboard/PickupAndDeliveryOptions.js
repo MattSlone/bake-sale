@@ -20,7 +20,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import { setContact } from '../../redux';
+import isByteLength from 'validator/lib/isByteLength';
+import isEmail from 'validator/lib/isEmail';
+import isMobilePhone from 'validator/lib/isMobilePhone';
+import { any } from 'prop-types';
 
 
 const PREFIX = 'PickupAndDeliveryOptions';
@@ -90,46 +93,109 @@ export default function PickupAndDeliveryOptions(props) {
   const [location, setLocation] = useState(props.shop.area.location)
   const [street, setStreet] = useState(props.shop.pickupAddress.street)
   const [city, setCity] = useState(props.shop.pickupAddress.city)
+  const [state, setState] = useState(props.shop.pickupAddress.state)
   const [zipcode, setZipcode] = useState(props.shop.pickupAddress.zipcode)
   const [pickup, setPickup] = useState(props.shop.allowPickups)
   const [contactType, setContactType] = useState('none')
   const [phone, setPhone] = useState(props.shop.contact.phone)
   const [email, setEmail] = useState(props.shop.contact.email)
-
+  const [tempMessage, setTempMessage] = useState('')
+  const [message, setMessage] = useState('')
   const [pickupSchedule, setPickupSchedule] = useState(props.shop.pickupSchedule);
-
   const [pickupScheduleChecked, setPickupScheduleChecked] = useState({
-    Monday: Boolean(pickupSchedule.find(day => day.day == 'Monday' && day.start !== day.end)),
-    Tuesday: Boolean(pickupSchedule.find(day => day.day == 'Tuesday' && day.start !== day.end)),
-    Wednesday: Boolean(pickupSchedule.find(day => day.day == 'Wednesday' && day.start !== day.end)),
-    Thursday: Boolean(pickupSchedule.find(day => day.day == 'Thursday' && day.start !== day.end)),
-    Friday: Boolean(pickupSchedule.find(day => day.day == 'Friday' && day.start !== day.end)),
-    Saturday: Boolean(pickupSchedule.find(day => day.day == 'Saturday' && day.start !== day.end)),
-    Sunday: Boolean(pickupSchedule.find(day => day.day == 'Sunday' && day.start !== day.end))
+    Monday: Boolean(pickupSchedule.find(window => window.day == 'Monday' && window.start !== window.end)),
+    Tuesday: Boolean(pickupSchedule.find(window => window.day == 'Tuesday' && window.start !== window.end)),
+    Wednesday: Boolean(pickupSchedule.find(window => window.day == 'Wednesday' && window.start !== window.end)),
+    Thursday: Boolean(pickupSchedule.find(window => window.day == 'Thursday' && window.start !== window.end)),
+    Friday: Boolean(pickupSchedule.find(window => window.day == 'Friday' && window.start !== window.end)),
+    Saturday: Boolean(pickupSchedule.find(window => window.day == 'Saturday' && window.start !== window.end)),
+    Sunday: Boolean(pickupSchedule.find(window => window.day == 'Sunday' && window.start !== window.end))
   })
 
   useEffect(() => {
-    props.setPickupAddress({
-      ...props.shop.pickupAddress,
-      street: street,
-      city: city,
-      state: 'FL',
-      zipcode: zipcode,
-      allowPickups: pickup
-    })
-  }, [pickup, street, city, zipcode])
+    if (activeStep == 0 && props.shop.loading == false && props.shop.pickupAddress.validAddress) {
+      for (const field of [
+        { name: 'Street', value: street },
+        { name: 'City', value: city },
+        { name: 'State', value: state },
+        { name: 'Zipcode', value: zipcode }
+      ]) {
+        if (!field.value) {
+          setMessage(`${field.name} is required.`)
+          props.setValidShop(false)
+          return
+        }
+      }
+      setMessage('')
+      props.setValidShop(true)
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    } else if (props.shop.error) {
+      setMessage(props.shop.error)
+    }
+  }, [props.shop.loading])
 
+  /*
+  pickupSchedule: [
+      {day: 'Sunday', start: "12:00", end: "12:00"},
+      {day: 'Monday', start: "12:00", end: "12:00"},
+      {day: 'Tuesday', start: "12:00", end: "12:00"},
+      {day: 'Wednesday', start: "12:00", end: "12:00"},
+      {day: 'Thursday', start: "12:00", end: "12:00"},
+      {day: 'Friday', start: "12:00", end: "12:00"},
+      {day: 'Saturday', start: "12:00", end: "12:00"}
+    ],
+  */
   useEffect(() => {
+    if (pickup && Object.keys(pickupScheduleChecked).filter((day) => {
+      if (pickupScheduleChecked[day]) {
+        const window = pickupSchedule.find(window => window.day == day)
+        return window && window.start != window.end
+      }
+      return false
+    }).length == 0) {
+      setTempMessage('You must provide at least one window of time in a week if you allow pickups.')
+      props.setValidShop(false)
+      return
+    }
+    setTempMessage('')
+    props.setValidShop(true)
     props.setPickupSchedule(pickupSchedule)
-  }, [pickupSchedule])
+  }, [pickupSchedule, pickupScheduleChecked, pickup])
 
   useEffect(() => {
+    setMessage('')
+    setTempMessage('')
+    const fields = [
+      ...[(contactType == 'email' || contactType == 'both') && { name: "Email", value: email }],
+      ...[(contactType == 'phone' || contactType == 'both') && { name: "Phone", value: phone }]
+    ].filter(field => field)
+    console.log(fields)
+    for (const field of fields) {
+      if (!field.value) {
+        setTempMessage(`${field.name} is required.`)
+        props.setValidShop(false)
+        return
+      }
+    }
+    if ((contactType == 'both' || contactType == 'phone') && !isMobilePhone(phone, "en-US")) {
+      setTempMessage(`Invalid phone number`)
+      props.setValidShop(false)
+      return
+    }
+    if ((contactType == 'both' || contactType == 'email') && !isEmail(email)) {
+      setTempMessage(`Invalid Email.`)
+      props.setValidShop(false)
+      return
+    }
+    console.log('hereeee')
+    setTempMessage('')
+    props.setValidShop(true)
     props.setContact({
       ...props.shop.contact,
       phone: phone,
       email: email
     })
-  }, [phone, email])
+  }, [phone, email, contactType])
 
   useEffect(() => {
     if (phone && email) {
@@ -144,22 +210,45 @@ export default function PickupAndDeliveryOptions(props) {
   }, [])
 
   const handlePickupScheduleCheckedChange = (event) => {
+    if(!event.target.checked) {
+      const tempPickupSchedule = pickupSchedule.map((window) => {
+        if (window.day == event.target.name) {
+          window.start = "12:00"
+          window.end = "12:00"
+          return window
+        }
+        return window
+      })
+      setPickupSchedule(tempPickupSchedule)
+    }
     setPickupScheduleChecked({ ...pickupScheduleChecked, [event.target.name]: event.target.checked});
   };
 
   const handlePickupDayTimeChange = (event, index, type) => {
     let newPickupSchedule = [...pickupSchedule]
-
     newPickupSchedule[index] = {
       ...newPickupSchedule[index],
       [type]: event.target.value
     }
-
     setPickupSchedule(newPickupSchedule);
   };
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    if (activeStep == 0) {
+      props.getFormattedShopAddress({
+        street: street,
+        city: city,
+        state: 'FL',
+        zipcode: zipcode
+      })
+    } else {
+      if (props.shop.valid) {
+        setMessage('')
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      } else {
+        setMessage(tempMessage)
+      }
+    }
   };
 
   const handleBack = () => {
@@ -212,7 +301,6 @@ export default function PickupAndDeliveryOptions(props) {
   const handleSelectContactType = (event) => {
     let type = event.target.value
     setContactType(type);
-
     if (type == 'phone') {
       setEmail('');
     } else if (type == 'email') {
@@ -275,7 +363,7 @@ export default function PickupAndDeliveryOptions(props) {
                           className={classes.addressField}
                           id="outlined"
                           label="State"
-                          value='FL'
+                          value={state}
                           disabled
                           variant="outlined"
                         />
@@ -499,6 +587,9 @@ export default function PickupAndDeliveryOptions(props) {
               }
             })()}
               <div className={classes.actionsContainer}>
+                <Typography color="red">
+                  {message}
+                </Typography>
                 <div>
                   <Button
                     disabled={activeStep === 0}

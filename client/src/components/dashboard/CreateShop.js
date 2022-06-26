@@ -6,11 +6,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+import isByteLength from 'validator/lib/isByteLength';
 import AddProductContainer from '../containers/AddProductContainer';
 import Grid from '@mui/material/Grid';
 import { stateList } from './stateList';
@@ -75,13 +71,12 @@ const Root = styled('div')((
 function getSteps(edit) {
   let steps = [
     'Name your shop',
-    'Select your state',
     'Pickup/Delivery Options',
     'Setup Payment Account',
     'Add product(s)'
   ];
   if(edit) {
-    steps.splice(3, 2)
+    steps.splice(2, 2)
   }
   return steps
 }
@@ -91,12 +86,10 @@ function getStepContent(stepIndex) {
     case 0:
       return 'Choose a name for your shop.';
     case 1:
-      return 'Select the state you will be selling in.';
-    case 2:
       return 'Configure your pickup and delivery preferences';
-    case 3:
+    case 2:
         return 'Setup your Stripe Payments account';
-    case 4:
+    case 3:
       return 'Add a product to your shop';
     default:
       return 'Unknown stepIndex';
@@ -108,7 +101,6 @@ export default function CreateShop(props) {
 
   const auth = useAuth();
   const history = useHistory();
-  const location = useLocation();
 
   let edit = match.path.includes('edit')
 
@@ -116,19 +108,30 @@ export default function CreateShop(props) {
   const [shopName, setShopName] = useState(props.shop.name)
   const [state, setState] = useState(props.shop.state)
   const [activeStep, setActiveStep] = useState(0);
+  const [tempMessage, setTempMessage] = useState('')
+  const [message, setMessage] = useState('')
 
-  // wait for update then set shop
   useEffect(() => {
-    if(shopName && state) {
-      props.setShop({
-        name: shopName,
-        state: state
-      })
+    for (const field of [
+      { name: 'Shop Name', value: shopName }
+    ]) {
+      if (!field.value) {
+        setTempMessage(`${field.name} is required.`)
+        props.setValidShop(false)
+        return
+      }
     }
-  }, [shopName, state])
-
-  useEffect(() => {
-  }, [props.shop.created])
+    if (!isByteLength(shopName, { max: 15 })) {
+      setTempMessage("Shop names may have a max of 15 characters.")
+      props.setValidShop(false)
+      return
+    }
+    setTempMessage('')
+    props.setValidShop(true)
+    props.setShop({
+      name: shopName
+    })
+  }, [shopName])
 
   if(edit && !props.shop.created) {
     history.push("/dashboard/shop/create");
@@ -136,20 +139,28 @@ export default function CreateShop(props) {
 
   useEffect(() => {
     if (window.location.href.includes('stripe')) {
-      setActiveStep(3)
+      setActiveStep(2)
     }
   }, [])
 
   const handleNext = (e) => {
-    if(edit) {
-      if (activeStep === steps.length - 1) {
-        handleEditShop(e)
+    if (props.shop.valid) {
+      setMessage('')
+      if(edit) {
+        if (activeStep === steps.length - 1) {
+          handleEditShop(e)
+        }
       }
+      else if (activeStep === 1) {
+        handleCreateShop(e)
+      }
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    } else if (tempMessage) {
+      setMessage(tempMessage)
+      setTempMessage('')
+    } else if (props.shop.error) {
+      setMessage(props.shop.error)
     }
-    else if (activeStep === 2) {
-      handleCreateShop(e)
-    }
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
   const handleBack = () => {
@@ -234,30 +245,15 @@ export default function CreateShop(props) {
                                         autoFocus
                                         onChange={e => setShopName(e.target.value)}
                                       />
-                      case 1: return <>
-                                      <Container component="main" maxWidth="xs">
-                                        <InputLabel id="state-select-label">State</InputLabel>
-                                        <Select
-                                          labelId="state-select-label"
-                                          id="state-select"
-                                          value={state}
-                                          displayEmpty
-                                          required
-                                          fullWidth
-                                          onChange={e => setState(e.target.value)}
-                                        >
-                                          {stateList.map((item) => (
-                                            <MenuItem key={item.Code} value={item.Code}>{item.State}</MenuItem>
-                                          ))}
-                                        </Select>
-                                      </Container>
-                                      </>;
-                      case 2: return <PickupAndDeliveryOptionsContainer />
-                      case 3: return <SetupPaymentAccountContainer />
-                      case 4: return <AddProductContainer />
+                      case 1: return <PickupAndDeliveryOptionsContainer />
+                      case 2: return <SetupPaymentAccountContainer />
+                      case 3: return <AddProductContainer />
                       default: return "";
                     }
                   })()}
+                  <Typography color="red">
+                    {message}
+                  </Typography>
                   <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
                   <div>
                     <Button
@@ -267,8 +263,8 @@ export default function CreateShop(props) {
                     >
                       Back
                     </Button>
-                    {!(activeStep === 3) || props.shop.stripeDetailsSubmitted ?
-                    <Link to={match.path + (activeStep === 2 ? '/stripe' : '')}>
+                    {!(activeStep === 2) || props.shop.stripeDetailsSubmitted ?
+                    <Link to={match.path + (activeStep === 1 ? '/stripe' : '')}>
                       <Button variant="contained" color="primary" onClick={handleNext}>
                         {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                       </Button>

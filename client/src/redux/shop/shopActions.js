@@ -9,6 +9,7 @@ import {
     EDIT_SHOP_FAILURE,
     SET_DELIVERY_AREA,
     SET_SHOP,
+    SET_VALID_SHOP,
     GET_LAT_LNG_REQUEST,
     GET_LAT_LNG_SUCCESS,
     GET_LAT_LNG_FAILURE,
@@ -24,7 +25,10 @@ import {
     CREATE_STRIPE_ACCOUNT_FAILURE,
     CHECK_STRIPE_DETAILS_SUBMITTED_REQUEST,
     CHECK_STRIPE_DETAILS_SUBMITTED_SUCCESS,
-    CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE
+    CHECK_STRIPE_DETAILS_SUBMITTED_FAILURE,
+    GET_FORMATTED_SHOP_ADDRESS_FAILURE,
+    GET_FORMATTED_SHOP_ADDRESS_SUCCESS,
+    GET_FORMATTED_SHOP_ADDRESS_REQUEST
  } from './shopTypes'
 
 export const setDeliveryArea = (area) => {
@@ -59,6 +63,13 @@ export const setShop = (shop) => {
   return {
     type: SET_SHOP,
     payload: shop
+  }
+}
+
+export const setValidShop = (status) => {
+  return {
+    type: SET_VALID_SHOP,
+    payload: status
   }
 }
 
@@ -225,17 +236,54 @@ export const checkStripeDetailsSubmittedFailure = (error) => {
   }
 }
 
+export const getFormattedShopAddressRequest = () => {
+  return {
+    type: GET_FORMATTED_SHOP_ADDRESS_REQUEST
+  }
+}
+
+export const getFormattedShopAddressSuccess = (addressComponents) => {
+  return {
+    type: GET_FORMATTED_SHOP_ADDRESS_SUCCESS,
+    payload: addressComponents
+  }
+}
+
+export const getFormattedShopAddressFailure = (error) => {
+  return {
+    type: GET_FORMATTED_SHOP_ADDRESS_FAILURE,
+    payload: error
+  }
+}
+
+export const getFormattedShopAddress = (formData) => {
+  return async (dispatch) => {
+    try {
+      dispatch(getFormattedShopAddressRequest())
+      const res = await axios.post('/api/user/address/components', formData)
+      if(res.data.error) {
+        dispatch(getFormattedShopAddressFailure(res.data.error))
+      }
+      else {
+        dispatch(getFormattedShopAddressSuccess(res.data.success))
+      }
+    } catch(error) {
+      dispatch(getFormattedShopAddressFailure(error.message))
+    }
+  }
+}
+
 export const getShop = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(getShopRequest)
+      dispatch(getShopRequest())
       const res = await axios.get('/api/shop', {
         params: formData
       })
       if(res.data.error[0]) {
-        dispatch(getShopFailure(res.data.error[0]))
+        dispatch(getShopFailure(res.data.error))
       }
-      else if(res.data.success == null) {
+      else if(!res.data.success) {
         dispatch(getShopFailureNotFound())
       }
       else {

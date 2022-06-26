@@ -96,7 +96,8 @@ export default function AddProduct(props) {
         custom: false,
         varieties: product.Varieties,
         ingredients: product.Ingredients,
-        addons: product.Addons
+        addons: product.Addons,
+        fields: []
       })
     } else {
       props.resetProduct()
