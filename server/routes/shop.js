@@ -22,26 +22,46 @@ module.exports = (app) => {
   app.post('/api/shop/stripe/create', async (req, res, next) => {
     try {
         let response = await ShopController.createStripeAccount(req, res, next)
-        res.send({
-            error: req.flash('error'),
+        if (response) {
+          res.send({
             success: response
-        })
+          })
+        }
     }
     catch (err) {
-      next(err)
+      req.flash('error', err)
+      res.redirect('/api/shop/stripe/create')
     }
   })
 
-  app.post('/api/shop/stripe/checkDetailsSubmitted', async (req, res, next) => {
+  app.get('/api/shop/stripe/create', async (req, res, next) => {
     try {
-        let response = await ShopController.checkDetailsSubmitted(req, res, next)
-        res.send({
-            error: req.flash('error'),
-            success: response
-        })
+      res.send({
+        error: req.flash('error')
+      })
     }
     catch (err) {
-      next(err)
+      console.log(err)
+    }
+  })
+
+  app.post('/api/shop/stripe/checkDetailsSubmitted',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
+    try {
+      console.log('in route')
+      let response = await ShopController.checkDetailsSubmitted(req, res, next)
+      console.log(response)
+      res.send({
+        error: req.flash('error'),
+        success: response
+      })
+    }
+    catch (err) {
+      res.send({
+        error: req.flash('error'),
+        success: false
+    })
     }
   })
 

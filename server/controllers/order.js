@@ -142,9 +142,16 @@ module.exports = class OrderController {
       let fulfillmentPrice = 0.0
       if (item.fulfillment == 'delivery') {
         if (selectedVariation.deliveryFeeType == 'mile') {
-          const shop = await db.Shop.findByPk(item.product.ShopId)
-          const latLng = await GMaps.getLatLng(req.user)
-          const distance = GMaps.haversine_distance(latLng, { lat: shop.lat, lng: shop.lng })
+          const shop = await db.Shop.findByPk(item.product.ShopId, {
+            include: {
+              model: db.PickupAddress,
+              attributes: ['lat', 'lng']
+            }
+          })
+          const distance = GMaps.haversine_distance(
+            { lat: req.user.lat, lng: req.user.lng },
+            { lat: shop.PickupAddress.lat, lng: shop.PickupAddress.lng }
+          )
           fulfillmentPrice = Number(selectedVariation.delivery) * (distance * 0.000621371)
         } else {
           fulfillmentPrice = Number(selectedVariation.delivery)

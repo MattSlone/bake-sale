@@ -48,9 +48,9 @@ module.exports = (app, passport) => {
   })
 
   app.post('/api/user/address/components',
-  UserController.isLoggedIn,
   async (req, res, next) => {
     const addressComponents = await GMaps.getFormattedAddress(req)
+    console.log(addressComponents)
     if (typeof addressComponents == 'string') {
       req.flash('error', 'There was an issue validating your address.')
       res.redirect('/api/user/address/components')

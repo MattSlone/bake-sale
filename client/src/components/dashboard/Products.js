@@ -58,10 +58,12 @@ const StyledContainer = styled(Container)((
 }));
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const ACTIVE_SHOP_STATUS = 1
 
 export default function Products(props) {
 
   const [products, setProducts] = useState(props.product.products)
+  const [message, setMessage] = useState('')
   const history = useHistory()
 
   if(!props.shop.id) {
@@ -72,6 +74,12 @@ export default function Products(props) {
     props.getProducts({
       shop: props.shop.id
     })
+    if (props.shop.status !== ACTIVE_SHOP_STATUS) {
+      setMessage(
+        'Your products will not be visible to customers until you\'ve created \
+        a payment account.'
+      )
+    }
   }, [])
 
   useEffect(() => {
@@ -90,6 +98,11 @@ export default function Products(props) {
 
   return (
     <StyledContainer spacing={2} className={classes.cardGrid} maxWidth="lg">
+      {message ?
+        <Typography style={{marginBottom: '1em'}} color="red">
+          {message}
+        </Typography>
+      : ''}
       <Grid container spacing={4}>
         <Grid item xs={12} sm={6} md={4}>
           <Card className={classes.card} onClick={handleAddProduct}>

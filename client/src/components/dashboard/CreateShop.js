@@ -14,6 +14,7 @@ import { useAuth } from '../../hooks/use-auth'
 import { useHistory, useLocation, Switch, Route, Redirect, Link, useRouteMatch } from "react-router-dom";
 import PickupAndDeliveryOptionsContainer from '../containers/PickupAndDeliveryOptionsContainer';
 import SetupPaymentAccountContainer from '../containers/SetupPaymentAccountContainer';
+import { editShop } from '../../redux';
 
 const PREFIX = 'CreateShop';
 
@@ -25,7 +26,8 @@ const classes = {
   content: `${PREFIX}-content`,
   submit: `${PREFIX}-submit`,
   formControl: `${PREFIX}-formControl`,
-  routerLink: `${PREFIX}-routerLink`
+  routerLink: `${PREFIX}-routerLink`,
+  stepLabel: `${PREFIX}-stepLabel`,
 };
 
 const Root = styled('div')((
@@ -35,6 +37,11 @@ const Root = styled('div')((
 ) => ({
   [`&.${classes.root}`]: {
     width: '100%',
+  },
+
+  [`& .${classes.stepLabel}`]: {
+    cursor: 'pointer',
+    pointerEvents: 'all !important'
   },
 
   padding: theme.spacing(2),
@@ -73,10 +80,9 @@ function getSteps(edit) {
     'Name your shop',
     'Pickup/Delivery Options',
     'Setup Payment Account',
-    'Add product(s)'
   ];
   if(edit) {
-    steps.splice(2, 2)
+    steps.splice(3, 1)
   }
   return steps
 }
@@ -89,49 +95,44 @@ function getStepContent(stepIndex) {
       return 'Configure your pickup and delivery preferences';
     case 2:
         return 'Setup your Stripe Payments account';
-    case 3:
-      return 'Add a product to your shop';
     default:
-      return 'Unknown stepIndex';
+      return 'Nuh uh';
   }
 }
 
 export default function CreateShop(props) {
   const match = useRouteMatch();
-
+  const edit = match.path.includes('edit')
   const auth = useAuth();
   const history = useHistory();
-
-  let edit = match.path.includes('edit')
-
   const steps = getSteps(edit);
   const [shopName, setShopName] = useState(props.shop.name)
   const [state, setState] = useState(props.shop.state)
   const [activeStep, setActiveStep] = useState(0);
-  const [tempMessage, setTempMessage] = useState('')
   const [message, setMessage] = useState('')
+  const [childStep, setChildStep] = useState(0)
+  const [childStepsLength, setChildStepsLength] = useState(1)
+  const [validPickupAndDelivery, setValidPickupAndDelivery] = useState(false)
+  const [readyEditShop, setReadyEditShop] = useState({ready: false})
 
-  useEffect(() => {
+  const validateShopName = () => {
     for (const field of [
       { name: 'Shop Name', value: shopName }
     ]) {
       if (!field.value) {
-        setTempMessage(`${field.name} is required.`)
-        props.setValidShop(false)
-        return
+        setMessage(`${field.name} is required.`)
+        return false
       }
     }
     if (!isByteLength(shopName, { max: 15 })) {
-      setTempMessage("Shop names may have a max of 15 characters.")
-      props.setValidShop(false)
-      return
+      setMessage("Shop names may have a max of 15 characters.")
+      return false
     }
-    setTempMessage('')
-    props.setValidShop(true)
     props.setShop({
       name: shopName
     })
-  }, [shopName])
+    return true
+  }
 
   if(edit && !props.shop.created) {
     history.push("/dashboard/shop/create");
@@ -144,22 +145,12 @@ export default function CreateShop(props) {
   }, [])
 
   const handleNext = (e) => {
-    if (props.shop.valid) {
-      setMessage('')
-      if(edit) {
-        if (activeStep === steps.length - 1) {
-          handleEditShop(e)
-        }
-      }
-      else if (activeStep === 1) {
+    if (validate()) {
+      if (activeStep === 1) {
+        console.log('handling create shop...')
         handleCreateShop(e)
       }
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    } else if (tempMessage) {
-      setMessage(tempMessage)
-      setTempMessage('')
-    } else if (props.shop.error) {
-      setMessage(props.shop.error)
     }
   };
 
@@ -174,7 +165,6 @@ export default function CreateShop(props) {
   let formData = {
     id: props.shop.id,
     name: shopName,
-    state: state,
     pickupAddress: props.shop.pickupAddress,
     pickupSchedule: props.shop.pickupSchedule,
     allowPickups: props.shop.allowPickups,
@@ -183,25 +173,76 @@ export default function CreateShop(props) {
     user: auth.userData.user.id
   }
 
+  const editShop = () => {
+    props.editShop(formData)
+  }
+
+  useEffect(() => {
+    if (edit && readyEditShop.ready) {
+      editShop()
+    }
+  }, [readyEditShop])
+
   const handleCreateShop = e => {
     e.preventDefault()
-    if (!props.shop.id) {
+    if (!props.shop.id && props.shop.valid) {
+      console.log('creating shop now')
       props.createShop(formData)
     }
   }
 
-  const handleEditShop = e => {
-    e.preventDefault()
-    props.editShop(formData)
+  const validate = () => {
+    let valid = false
+    props.setValidShop(false)
+    setMessage('')
+    console.log(activeStep)
+    switch (activeStep) {
+      case 0:
+        valid = validateShopName()
+        break
+      case 1:
+        valid = validPickupAndDelivery
+        console.log(valid)
+        break
+      default:
+        valid = true
+        break
+    }
+    console.log(valid)
+    if (valid) {
+      if (edit) {
+        props.editShop(formData)
+      }
+      props.setValidShop(true)
+    }
+    return valid
+  }
+
+  useEffect(() => {
+    console.log(activeStep, childStep)
+  }, [activeStep, childStep])
+
+  const handleGoToStep = (i) => {
+    if (validate()) {
+      if (i == 0) {
+        setChildStep(0)
+      }
+      setActiveStep(i)
+    } else if (props.shop.error) {
+      setMessage(props.shop.error)
+    }
   }
 
   return (
     <Root className={classes.root}>
       <main className={classes.content}>
         <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map((label) => (
+          {steps.map((label, i) => (
             <Step key={label}>
-              <StepLabel>{label}</StepLabel>
+              {edit ?
+                <StepLabel className={classes.stepLabel} onClick={(e) => handleGoToStep(i)}>{label}</StepLabel>
+              : <StepLabel>{label}</StepLabel>
+              }
             </Step>
           ))}
         </Stepper>
@@ -228,26 +269,33 @@ export default function CreateShop(props) {
             <form className={classes.form} noValidate>
               {(
                 <div>
-                  <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
+                  <Typography component="h1" variant="h2" align="center" color="textPrimary">
                     {match.path.includes('edit') ? 'Edit your shop' : 'Create your shop'}
                   </Typography>
                   {(() => {
                     switch (activeStep) {
-                      case 0: return <TextField
-                                        variant="outlined"
-                                        margin="normal"
-                                        required
-                                        fullWidth
-                                        id="name"
-                                        label="Shop Name"
-                                        name="name"
-                                        value={shopName}
-                                        autoFocus
-                                        onChange={e => setShopName(e.target.value)}
-                                      />
-                      case 1: return <PickupAndDeliveryOptionsContainer />
+                      case 0: 
+                        return <TextField
+                          variant="outlined"
+                          margin="normal"
+                          required
+                          fullWidth
+                          id="name"
+                          label="Shop Name"
+                          name="name"
+                          value={shopName}
+                          autoFocus
+                          onChange={e => setShopName(e.target.value)}
+                        />
+                      case 1: return <PickupAndDeliveryOptionsContainer
+                        setChildStep={setChildStep}
+                        childStep={childStep}
+                        setChildStepsLength={setChildStepsLength}
+                        setParentMessage={setMessage}
+                        setReadyEditShop={setReadyEditShop}
+                        setValidPickupAndDelivery={setValidPickupAndDelivery}
+                      />
                       case 2: return <SetupPaymentAccountContainer />
-                      case 3: return <AddProductContainer />
                       default: return "";
                     }
                   })()}
@@ -255,22 +303,26 @@ export default function CreateShop(props) {
                     {message}
                   </Typography>
                   <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
-                  <div>
-                    <Button
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      className={classes.backButton}
-                    >
-                      Back
-                    </Button>
-                    {!(activeStep === 2) || props.shop.stripeDetailsSubmitted ?
-                    <Link to={match.path + (activeStep === 1 ? '/stripe' : '')}>
-                      <Button variant="contained" color="primary" onClick={handleNext}>
-                        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                      </Button>
-                    </Link>
-                    : ''}   
-                  </div>
+                    <div>
+                      { childStep == 0 ?
+                        <Button
+                          disabled={activeStep === 0}
+                          onClick={handleBack}
+                          className={classes.backButton}
+                        >
+                          Back
+                        </Button>
+                      : '' }
+                      {(edit && childStep == 0) || childStep == childStepsLength - 1 ?
+                        !(activeStep === 2) || props.shop.stripeDetailsSubmitted ?
+                        <Link to={match.path + (activeStep === 1 ? '/stripe' : '')}>
+                          <Button variant="contained" color="primary" onClick={handleNext}>
+                            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                          </Button>
+                        </Link>
+                        : ''
+                      : ''}   
+                    </div>
                 </div>
               )}
             </form>

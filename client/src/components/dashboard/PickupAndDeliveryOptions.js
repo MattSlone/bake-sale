@@ -5,14 +5,12 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 import Paper from '@mui/material/Paper';
-import { Input, TextField, Typography } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import SearchIcon from '@mui/icons-material/Search';
-import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-import { useRouteMatch, useParams } from "react-router-dom";
-import { GoogleMap, LoadScript, Circle } from '@react-google-maps/api';
+import { useRouteMatch } from "react-router-dom";
+import { GoogleMap, Circle } from '@react-google-maps/api';
 import Grid from '@mui/material/Grid';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -20,11 +18,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import isByteLength from 'validator/lib/isByteLength';
 import isEmail from 'validator/lib/isEmail';
 import isMobilePhone from 'validator/lib/isMobilePhone';
-import { any } from 'prop-types';
-
+import { setValidShop } from '../../redux';
+import axios from 'axios'
 
 const PREFIX = 'PickupAndDeliveryOptions';
 
@@ -35,7 +32,8 @@ const classes = {
   button: `${PREFIX}-button`,
   actionsContainer: `${PREFIX}-actionsContainer`,
   resetContainer: `${PREFIX}-resetContainer`,
-  fullWidth: `${PREFIX}-fullWidth`
+  fullWidth: `${PREFIX}-fullWidth`,
+  stepLabel: `${PREFIX}-stepLabel`
 };
 
 const Root = styled('div')((
@@ -43,8 +41,16 @@ const Root = styled('div')((
     theme
   }
 ) => ({
-  [`&.${classes.root}`]: {
-    maxWidth: '100%',
+  maxWidth: '100%',
+
+  [`& .${classes.radiusInput}`]: {
+    margin: "0.5em 0",
+    width: '100%'
+  },
+
+  [`& .${classes.stepLabel}`]: {
+    cursor: 'pointer',
+    pointerEvents: 'all !important'
   },
 
   [`& .${classes.desktop}`]: {
@@ -76,11 +82,12 @@ const Root = styled('div')((
 }));
 
 function getSteps() {
-  return ['Set your address',
-          'Configure pickup options',
-          'Configure contact options',
-          'Determine delivery area'
-        ];
+  return {
+    address: 'Set your address',
+    pickups: 'Configure pickup options',
+    contact: 'Configure contact options',
+    delivery: 'Determine delivery area'
+  }
 }
 
 export default function PickupAndDeliveryOptions(props) {
@@ -88,9 +95,8 @@ export default function PickupAndDeliveryOptions(props) {
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
   const match = useRouteMatch()
-
+  const edit = match.path.includes('edit')
   const [circle, setCircle] = useState('')
-  const [location, setLocation] = useState(props.shop.area.location)
   const [street, setStreet] = useState(props.shop.pickupAddress.street)
   const [city, setCity] = useState(props.shop.pickupAddress.city)
   const [state, setState] = useState(props.shop.pickupAddress.state)
@@ -99,7 +105,6 @@ export default function PickupAndDeliveryOptions(props) {
   const [contactType, setContactType] = useState('none')
   const [phone, setPhone] = useState(props.shop.contact.phone)
   const [email, setEmail] = useState(props.shop.contact.email)
-  const [tempMessage, setTempMessage] = useState('')
   const [message, setMessage] = useState('')
   const [pickupSchedule, setPickupSchedule] = useState(props.shop.pickupSchedule);
   const [pickupScheduleChecked, setPickupScheduleChecked] = useState({
@@ -111,41 +116,61 @@ export default function PickupAndDeliveryOptions(props) {
     Saturday: Boolean(pickupSchedule.find(window => window.day == 'Saturday' && window.start !== window.end)),
     Sunday: Boolean(pickupSchedule.find(window => window.day == 'Sunday' && window.start !== window.end))
   })
+  const [radius, setRadius] = useState(props.shop.pickupAddress.radius)
+  const [validAddress, setValidAddress] = useState(edit ? {valid: true} : {valid: false})
+  const [validPickupSchedule, setValidPickupSchedule] = useState(edit ? {valid: true} : {valid: false})
+  const [validShopContact, setValidShopContact] = useState(edit ? {valid: true} : {valid: false})
+  const [validDeliveryArea, setValidDeliveryArea] = useState(edit ? {valid: true} : {valid: false})
 
   useEffect(() => {
-    if (activeStep == 0 && props.shop.loading == false && props.shop.pickupAddress.validAddress) {
-      for (const field of [
-        { name: 'Street', value: street },
-        { name: 'City', value: city },
-        { name: 'State', value: state },
-        { name: 'Zipcode', value: zipcode }
-      ]) {
-        if (!field.value) {
-          setMessage(`${field.name} is required.`)
-          props.setValidShop(false)
-          return
-        }
-      }
-      setMessage('')
-      props.setValidShop(true)
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    } else if (props.shop.error) {
-      setMessage(props.shop.error)
+    console.log(
+      'validating for parent...:',
+      validAddress,
+      validPickupSchedule,
+      validShopContact,
+      validDeliveryArea
+    )
+    if ([
+      validAddress,
+      validPickupSchedule,
+      validShopContact,
+      validDeliveryArea
+    ].every(validator => validator.valid == true)) {
+      props.setValidPickupAndDelivery(true)
     }
-  }, [props.shop.loading])
+  }, [validAddress, validPickupSchedule, validShopContact, validDeliveryArea])
 
-  /*
-  pickupSchedule: [
+  const validateAddressFields = () => {
+    let rtn = {
+      error: '',
+      success: false
+    }
+    for (const field of [
+      { name: 'Street', value: street },
+      { name: 'City', value: city },
+      { name: 'State', value: state },
+      { name: 'Zipcode', value: zipcode }
+    ]) {
+      if (!field.value) {
+        rtn.error = `${field.name} is required.`
+        return rtn
+      }
+    }
+    rtn.success = true
+    return rtn
+  }
+
+  const validatePickupSchedule = () => {
+    /*
+    pickupSchedule: [
       {day: 'Sunday', start: "12:00", end: "12:00"},
-      {day: 'Monday', start: "12:00", end: "12:00"},
-      {day: 'Tuesday', start: "12:00", end: "12:00"},
-      {day: 'Wednesday', start: "12:00", end: "12:00"},
-      {day: 'Thursday', start: "12:00", end: "12:00"},
-      {day: 'Friday', start: "12:00", end: "12:00"},
-      {day: 'Saturday', start: "12:00", end: "12:00"}
-    ],
-  */
-  useEffect(() => {
+      ...
+    ]
+    */
+    let rtn = {
+      error: '',
+      success: false
+    }
     if (pickup && Object.keys(pickupScheduleChecked).filter((day) => {
       if (pickupScheduleChecked[day]) {
         const window = pickupSchedule.find(window => window.day == day)
@@ -153,51 +178,162 @@ export default function PickupAndDeliveryOptions(props) {
       }
       return false
     }).length == 0) {
-      setTempMessage('You must provide at least one window of time in a week if you allow pickups.')
-      props.setValidShop(false)
-      return
+      rtn.error = 'You must provide at least one window of time in a week if you allow pickups.'
+      return rtn
     }
-    setTempMessage('')
-    props.setValidShop(true)
-    props.setPickupSchedule(pickupSchedule)
-  }, [pickupSchedule, pickupScheduleChecked, pickup])
+    rtn.success = true
+    return rtn
+  }
 
-  useEffect(() => {
-    setMessage('')
-    setTempMessage('')
+  const validateShopContact = () => {
+    let rtn = {
+      error: '',
+      success: false
+    }
     const fields = [
       ...[(contactType == 'email' || contactType == 'both') && { name: "Email", value: email }],
       ...[(contactType == 'phone' || contactType == 'both') && { name: "Phone", value: phone }]
     ].filter(field => field)
-    console.log(fields)
     for (const field of fields) {
       if (!field.value) {
-        setTempMessage(`${field.name} is required.`)
-        props.setValidShop(false)
-        return
+        rtn.error = `${field.name} is required.`
+        return rtn
       }
     }
+    if (contactType == 'none' && pickup) {
+      rtn.error = `A contact method must be provided if you allow pickups.`
+      return rtn
+    }
     if ((contactType == 'both' || contactType == 'phone') && !isMobilePhone(phone, "en-US")) {
-      setTempMessage(`Invalid phone number`)
-      props.setValidShop(false)
-      return
+      rtn.error = `Invalid phone number`
+      return rtn
     }
     if ((contactType == 'both' || contactType == 'email') && !isEmail(email)) {
-      setTempMessage(`Invalid Email.`)
-      props.setValidShop(false)
-      return
+      rtn.error = `Invalid Email.`
+      return rtn
     }
-    console.log('hereeee')
-    setTempMessage('')
-    props.setValidShop(true)
-    props.setContact({
-      ...props.shop.contact,
-      phone: phone,
-      email: email
-    })
-  }, [phone, email, contactType])
+    rtn.success = true
+    return rtn
+  }
 
+  const getFormattedShopAddress = async (formData) => {
+    let rtn = {
+      error: '',
+      success: false
+    }
+    try {
+      const res = await axios.post('/api/user/address/components', formData)
+      if(res.data.error) {
+        rtn.error = res.data.error[0]
+        return rtn
+      }
+      props.getFormattedShopAddressSuccess(res.data.success)
+      rtn.success = true
+      return rtn
+    } catch(error) {
+      rtn.error = error
+      return rtn
+    }
+  }
+
+  const validateAddress = async () => {
+    let rtn = {
+      error: '',
+      success: false
+    }
+    let validFields = validateAddressFields()
+    if (validFields.success) {
+      let newValidAddress = await getFormattedShopAddress({
+        street: street,
+        city: city,
+        state: 'Florida',
+        zipcode: zipcode
+      })
+      if (!newValidAddress.success) {
+        if (newValidAddress.error) {
+          rtn.error = newValidAddress.error
+        }
+      } else {
+        rtn.success = true
+      }
+    } else {
+      rtn.error = validFields.error
+    }
+    return rtn
+  }
+
+  const validate = async () => {
+    try {
+      setMessage('')
+      props.setValidPickupAndDelivery(false)
+      let valid = { error: '', success: false }
+      switch (activeStep) {
+        case 0:
+          valid = await validateAddress()
+          if (valid.success) {
+            setValidAddress({valid: true})
+          } else {
+            setValidAddress({valid: false})
+          }
+          break
+        case 1:
+          valid = validatePickupSchedule()
+          if (valid.success) {
+            props.setPickupSchedule({
+              schedule: pickupSchedule,
+              allowPickups: pickup
+            })
+            setValidPickupSchedule({valid: true})
+          } else {
+            setValidPickupSchedule({valid: false})
+          }
+          break
+        case 2:
+          valid = validateShopContact()
+          if (valid.success) {
+            props.setContact({
+              ...props.shop.contact,
+              phone: phone,
+              email: email
+            })
+            setValidShopContact({valid: true})
+          } else {
+            setValidShopContact({valid: false})
+          }
+          break
+        case 3:
+          valid = validateDeliveryArea()
+          if (valid.success) {
+            props.setDeliveryArea({
+              radius: circle.radius,
+              lat: circle.center.lat(),
+              lng: circle.center.lng()
+            })
+            setValidDeliveryArea({valid: true})
+          } else {
+            setValidDeliveryArea({valid: false})
+          }
+          break
+        default:
+          valid = {error: '', success: false }
+      }
+      if (valid.success) {
+        props.setReadyEditShop({ready: true})
+        return true
+      } else if (valid.error) {
+        props.setReadyEditShop({ready: false})
+        setMessage(valid.error)
+      }
+    } catch (err) {
+      return false
+    }
+  }
+
+  // Initialize some stuff
   useEffect(() => {
+    setMessage('')
+    props.setParentMessage('')
+    props.setChildStepsLength(Object.keys(steps).length)
     if (phone && email) {
       setContactType('both')
     } else if (phone) {
@@ -233,29 +369,24 @@ export default function PickupAndDeliveryOptions(props) {
     setPickupSchedule(newPickupSchedule);
   };
 
-  const handleNext = () => {
-    if (activeStep == 0) {
-      props.getFormattedShopAddress({
-        street: street,
-        city: city,
-        state: 'FL',
-        zipcode: zipcode
-      })
-    } else {
-      if (props.shop.valid) {
-        setMessage('')
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-      } else {
-        setMessage(tempMessage)
-      }
+  useEffect(() => {
+    setActiveStep(props.childStep)
+  }, [props.childStep])
+
+  const handleNext = async () => {
+    if (await validate()) {
+      props.setChildStep((prevActiveStep) => prevActiveStep + 1);
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
   };
 
-  const handleBack = () => {
+  const handleBack = async () => {
+    props.setChildStep((prevActiveStep) => prevActiveStep - 1)
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   const handleReset = () => {
+    props.setChildStep(0)
     setActiveStep(0);
   };
   const matches = useMediaQuery('(min-width:600px)');
@@ -272,59 +403,81 @@ export default function PickupAndDeliveryOptions(props) {
     fillColor: '#FF0000',
     fillOpacity: 0.35,
     clickable: false,
-    draggable:false,
-    editable: true,
+    draggable: false,
+    editable: false,
     visible: true,
-    radius: props.shop.area.radius,
+    radius: radius,
     zIndex: 1
   }
 
-  const handleMapSave = (() => {
-    if(circle) {
-      props.setDeliveryArea({
-        radius: circle.radius,
-        lat: circle.center.lat(),
-        lng: circle.center.lng(),
-        location: location,
-      })
+  useEffect(() => {
+    if (activeStep == 3) {
+      validate()
     }
-  })
-
-  const handleButtonClick = (e) => {
-    props.getLatLngFromAddress(location)
+  }, [radius, circle])
+  const validateDeliveryArea = () => {
+    console.log('validating delivery area...')
+    let rtn = {
+      error: '',
+      success: false
+    }
+    if(circle) {
+      if (!(radius >= 0)) {
+        rtn.error = "Radius must be at least 0."
+        return rtn
+      }
+    } else {
+      rtn.error = "Map has not rendered."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
   }
 
   const handlePickupCheckboxChange = (event) => {
-    setPickup(event.target.checked);
-  };
+    setPickup(event.target.checked)
+  }
 
   const handleSelectContactType = (event) => {
     let type = event.target.value
-    setContactType(type);
+    setContactType(type)
     if (type == 'phone') {
-      setEmail('');
+      setEmail('')
     } else if (type == 'email') {
-      setPhone('');
+      setPhone('')
     } else if (type == 'none') {
-      setPhone('');
-      setEmail('');
+      setPhone('')
+      setEmail('')
     }
-  };
+  }
 
   const handlePhoneChange = (event) => {
-    setPhone(event.target.value);
-  };
+    setPhone(event.target.value)
+  }
 
   const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
+    setEmail(event.target.value)
+  }
+
+  useEffect(() => {
+    setMessage('')
+  }, [activeStep])
+
+  const handleGoToStep = async (i) => {
+    setActiveStep(i)
+    props.setChildStep(i)
+  }
 
   return (
     <Root className={classes.root}>
       <Stepper classes={matches ? {root: classes.desktop} : {root: classes.mobile}} activeStep={activeStep} orientation="vertical">
-        {steps.map((label, index) => (
+        {Object.values(steps).map((label, index) => (
           <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+            {edit ? 
+              <StepLabel onClick={(e) => handleGoToStep(index)} className={classes.stepLabel}>{label}</StepLabel>
+            :
+              <StepLabel>{label}</StepLabel>
+            }
             <StepContent>
             {(() => {
               switch (activeStep) {
@@ -332,7 +485,7 @@ export default function PickupAndDeliveryOptions(props) {
                   <Grid alignItems="center" container spacing={2} className={classes.root} direction="column">
                     <Grid item xs={12} md={8}>
                       <Typography>
-                        Enter the address of your home/kitchen. This should be the location at which customers can pickup orders (if you allow pickups). 
+                        Enter the address of your home or kitchen. This should be the location at which customers can pickup orders (if you allow pickups). 
                         It will not be published to customers until an order is confirmed and paid for. It will also be used in the calculation of "By the mile" 
                         delivery fees for your products, should you choose that fee structure when creating a product. You can edit this in the future.
                       </Typography>
@@ -342,7 +495,6 @@ export default function PickupAndDeliveryOptions(props) {
                         <TextField
                           className={classes.addressField}
                           value={street}
-                          id="outlined"
                           label="Street"
                           variant="outlined"
                           onChange={(e) => {setStreet(e.target.value)}}
@@ -352,7 +504,6 @@ export default function PickupAndDeliveryOptions(props) {
                         <TextField
                           className={classes.addressField}
                           value={city}
-                          id="outlined"
                           label="City"
                           variant="outlined"
                           onChange={(e) => {setCity(e.target.value)}}
@@ -361,7 +512,6 @@ export default function PickupAndDeliveryOptions(props) {
                       <Grid item>
                         <TextField
                           className={classes.addressField}
-                          id="outlined"
                           label="State"
                           value={state}
                           disabled
@@ -372,7 +522,6 @@ export default function PickupAndDeliveryOptions(props) {
                         <TextField
                           className={classes.addressField}
                           value={zipcode}
-                          id="outlined"
                           label="Zipcode"
                           variant="outlined"
                           onChange={(e) => {setZipcode(e.target.value)}}
@@ -494,7 +643,6 @@ export default function PickupAndDeliveryOptions(props) {
                           <TextField
                             className={classes.fullWidth}
                             value={phone}
-                            id="outlined"
                             label="Phone"
                             variant="outlined"
                             onChange={handlePhoneChange}
@@ -505,7 +653,6 @@ export default function PickupAndDeliveryOptions(props) {
                           <TextField
                             className={classes.fullWidth}
                             value={email}
-                            id="outlined"
                             label="Email"
                             variant="outlined"
                             onChange={handleEmailChange}
@@ -529,54 +676,42 @@ export default function PickupAndDeliveryOptions(props) {
                           </Grid>
                           <Grid item>
                             <Typography>
-                              Above the map to the right, you can search for a location or address in the search box, and 
-                              the map will move to this location. You can then further adjust your search area by moving the circle and adjusting its 
-                              size. Be sure to click the save button below the map to finalize your delivery area.
+                              You can choose the delivery radius using the input under the map to the right.
+                              You can zoom in on the map to see where the radius ends. The map sves automatically
+                              so once you're done you can go to the next step.
                             </Typography>
                           </Grid>
                         </Grid>
                       </Grid>
                       <Grid item>
                         <Grid container direction="column">
-                          <Grid item container>
-                            <Grid item className={classes.flexGrow}>
-                              <TextField className={classes.addressField}
-                                placeholder="Enter a delivery area"
-                                value={location}
-                                onChange={(e) => {setLocation(e.target.value)}}
-                              />
-                            </Grid>
-                            <Grid item>
-                              <IconButton color="primary" size="medium" onClick={handleButtonClick}><SearchIcon /></IconButton>
-                            </Grid>
-                          </Grid>
                           <Grid container alignItems="center" item direction="column">
                             <GoogleMap
                               mapContainerStyle={containerStyle}
                               center={{
-                                lat: props.shop.area.lat,
-                                lng: props.shop.area.lng
+                                lat: props.shop.pickupAddress.lat,
+                                lng: props.shop.pickupAddress.lng
                               }}
                               zoom={10}
                             >
                               <Circle
                               onLoad={circle => {setCircle(circle)}}
                               center={{
-                                lat: props.shop.area.lat,
-                                lng: props.shop.area.lng
+                                lat: props.shop.pickupAddress.lat,
+                                lng: props.shop.pickupAddress.lng
                               }}
                               options={circleOptions}
                             />
                             </GoogleMap>
-                            <Button
-                              className={classes.fullWidth}
-                              variant="contained"
-                              size="large"
-                              color="primary"
-                              onClick={() => {handleMapSave()}}
-                            >
-                              Save
-                            </Button>
+                            <TextField
+                              variant='outlined'
+                              label="radius"
+                              style={{width: '100%', marginTop: '0.5em'}}
+                              inputProps={{min: 0, style: { textAlign: 'center' }}} 
+                              type="number"
+                              value={Number(radius)}
+                              onChange={(e) => {setRadius(Number(e.target.value))}}
+                            />
                           </Grid>
                         </Grid>
                       </Grid> 
@@ -599,7 +734,7 @@ export default function PickupAndDeliveryOptions(props) {
                     Back
                   </Button>
                   {(() => {
-                    if (activeStep === steps.length - 1) {
+                    if (activeStep === Object.keys(steps).length - 1) {
                       return ''
                     } else {
                       return <Button
@@ -618,7 +753,7 @@ export default function PickupAndDeliveryOptions(props) {
           </Step>
         ))}
       </Stepper>
-      {activeStep === steps.length && (
+      {activeStep === Object.keys(steps).length && (
         <Paper square elevation={0} className={classes.resetContainer}>
           <Typography>All steps completed - you&apos;re finished</Typography>
           <Button onClick={handleReset} className={classes.button}>

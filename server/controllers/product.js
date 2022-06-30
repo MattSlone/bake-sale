@@ -56,13 +56,24 @@ module.exports = class ProductController {
     }
 
     async getLocalShopIds(user) {
-        try { 
-            const latLng = await GMaps.getLatLng(user)
-            console.log('LATLG: ', latLng)
-            const shops = await db.Shop.findAll()
-            const shopIds = latLng?.lat ? (await Promise.all(
-                shops.map(async shop => (await GMaps.haversine_distance(latLng, { lat: shop.lat, lng: shop.lng }) < shop.radius) ? shop.id : false)))
-                    .filter(shop => shop !== false) : []
+        try {
+            const shops = await db.Shop.findAll({
+                include: {
+                    model: db.PickupAddress,
+                    attributes: ['lat', 'lng', 'radius']
+                }
+            })
+            const shopIds = await Promise.all(
+                shops.map(async shop => {
+                    const distance = await GMaps.haversine_distance(
+                        { lat: user.lat, lng: user.lng },
+                        { lat: shop.PickupAddress.lat, lng: shop.PickupAddress.lng }
+                    )
+                    if (distance < shop.PickupAddress.radius) {
+                        return shop.id
+                    }
+                    return false
+                }).filter(shop => shop !== false))
             return shopIds
         } catch (err) {
             console.log(err)
@@ -74,7 +85,12 @@ module.exports = class ProductController {
             const product = await db.Product.findOne({
                 where: { id: productId }
             })
-            const shop = await db.Shop.findByPk(product.ShopId)
+            const shop = await db.Shop.findByPk(product.ShopId, {
+                include: {
+                    model: db.PickupAddress,
+                    attributes: ['lat', 'lng']
+                }
+            })
             if (product.custom) {
                 quantity = 1
             }
@@ -84,8 +100,10 @@ module.exports = class ProductController {
                     quantity: quantity 
                 }
             })
-            const latLng = await GMaps.getLatLng(user)
-            const distance_meters = GMaps.haversine_distance(latLng, { lat: shop.lat, lng: shop.lng })
+            const distance_meters = GMaps.haversine_distance(
+                { lat: user.lat, lng: user.lng },
+                { lat: shop.PickupAddress.lat, lng: shop.PickupAddress.lng }
+            )
             const miles = GMaps.convertMetersToMiles(distance_meters)
             const fulfillmentPrice = variation.delivery * miles
             return fulfillmentPrice

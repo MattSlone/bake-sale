@@ -81,8 +81,8 @@ export default function Dashboard(props) {
   }
 
   useEffect(() => {
-    props.getShop({ UserId: auth.userData.user.success.id})
-  })
+    props.getShop({ UserId: auth.userData.user})
+  }, [])
 
   const defaultDashboard = (
     <Root>

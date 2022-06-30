@@ -130,10 +130,12 @@ const userReducer = (state = initialState, action) => {
       loggedIn: true,
       ...state,
       loading: false,
-      street: action.payload.street_number + ' ' + action.payload.route,
+      street: action.payload.name,
       city: action.payload.locality,
-      state: action.payload.administrative_area_level_1,
+      state: action.payload.region,
       zipcode: action.payload.postal_code,
+      lat: action.payload.latitude,
+      lng: action.payload.longitude,
       validAddress: true,
       error: ''
     }
@@ -144,6 +146,8 @@ const userReducer = (state = initialState, action) => {
       city: '',
       state: '',
       zipcode: '',
+      lat: '',
+      lng: '',
       validAddress: false,
       error: action.payload
     }

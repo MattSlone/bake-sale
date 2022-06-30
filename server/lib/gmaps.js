@@ -19,21 +19,6 @@ module.exports = class GMaps {
     return d_meters;
   }
 
-  static async getLatLng(user) {
-    try {
-      console.log(user)
-      const address = `${user.street} ${user.city}, ${user.state} ${user.zipcode}`
-      const url =`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.GMAPS_KEY}`
-      const response = await fetch(url)
-      const data = await response.json();
-      const latLng = data.results[0]?.geometry?.location
-      return latLng
-    } catch (err) {
-      console.log(err)
-    }
-    
-  }
-
   static convertMetersToMiles(meters) {
     return (meters * MILES_MULTIPLE)
   }
@@ -41,38 +26,44 @@ module.exports = class GMaps {
   static async getFormattedAddress(req) {
     try {
       const address = `${req.body.street} ${req.body.city}, ${req.body.state} ${req.body.zipcode}`
-      const res = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyACELINjQLeOcaE9QQQso_1mu3eG6wnnmw`
-        )
-      if(res.error_message) {
-        return res.error_message
-      } else if (res.data.status != "OK") {
-        return "There was an issue validating your address."
+      const params = {
+        query: address,
+        access_key: process.env.POSITION_STACK_API_KEY,
+      }
+      const res = await axios.get(`http://api.positionstack.com/v1/forward`, { params })
+      if(res.error) {
+        return res.error.message
+      }
+      if(res.data.error) {
+        return res.data.error.message
       }
       else {
-        const addressComponents = this.convertFormattedAddressToObject(
-          res.data.results[0].address_components
-        )
-        return addressComponents
+        if (res.data.data[0].type !== 'address') {
+          return "Invalid Address."
+        }
+        return res.data.data[0]
       }
     } catch (error) {
-      return error.message
+      return error
     }
   }
 
+  /**
+   * For Google Maps GeoCoding API if ever decide to use again
+  **/
   static convertFormattedAddressToObject(addressComponentsArray) {
     const addressComponents = Object.fromEntries(addressComponentsArray.filter(
       component => {
+        // these tyes are wrong, they were right at some point tho...
         const types = component.types.filter(type => [
-          'street_number',
-          'route',
+          'name',
           'locality',
-          'administrative_area_level_1',
+          'region',
           'postal_code'].includes(type))
           return types.length > 0
       }
     ).map(component => [component.types[0], component.long_name]))
-    if (Object.keys(addressComponents).length < 5) {
+    if (Object.keys(addressComponents).length < 4) {
       return "There was an issue validating your address."
     }
     return addressComponents

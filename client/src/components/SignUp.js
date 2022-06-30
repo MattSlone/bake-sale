@@ -84,6 +84,8 @@ export default function SignUp(props) {
   const [street, setStreet] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
+  const [lat, setLat] = useState(0)
+  const [lng, setLng] = useState(0)
   const [zipcode, setZipcode] = useState('')
   const [seller, setSeller] = useState(0)
   const [message, setMessage] = useState('')
@@ -95,6 +97,8 @@ export default function SignUp(props) {
     street: street,
     city: city,
     state: state,
+    lat: lat,
+    lng: lng,
     zipcode: zipcode,
     username: username,
     password: password,
@@ -111,6 +115,8 @@ export default function SignUp(props) {
       setCity(props.userData.city)
       setState(props.userData.state)
       setZipcode(props.userData.zipcode)
+      setLat(props.userData.lat)
+      setLng(props.userData.lng)
       setValidAddress(true)
     } else {
       setValidAddress(false)

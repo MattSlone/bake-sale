@@ -34,11 +34,15 @@ import {
     name: '',
     valid: false,
     allowPickups: false,
+    status: '',
     pickupAddress: {
       street: '',
       city: '',
-      state: 'FL',
+      state: 'Florida',
       zipcode: '',
+      radius: 10000,
+      lat: -3.745,
+      lng: -38.523,
       validAddress: false
     },
     contact: {
@@ -56,12 +60,6 @@ import {
     ],
     loading: false,
     created: false,
-    area: {
-      location: '',
-      radius: 30000,
-      lat: -3.745,
-      lng: -38.523
-    },
     stripeAccountLink: '',
     stripeAccountId: '',
     stripeDetailsSubmitted: false,
@@ -73,30 +71,6 @@ import {
       case SET_VALID_SHOP: return {
         ...state,
         valid: action.payload
-      }
-      case GET_LAT_LNG_REQUEST: return {
-        ...state,
-        loading: true
-      }
-      case GET_LAT_LNG_SUCCESS: return {
-        ...state,
-        loading: false,
-        area:{
-          ...state.area,
-          lat: action.payload.lat,
-          lng: action.payload.lng
-        },
-        error: ''
-      }
-      case GET_LAT_LNG_FAILURE: return {
-        ...state,
-        area:{
-          ...state.area,
-          lat: '',
-          lng: ''
-        },
-        loading: false,
-        error: action.payload
       }
       case CREATE_STRIPE_ACCOUNT_REQUEST: return {
         ...state,
@@ -130,29 +104,21 @@ import {
       }
       case SET_DELIVERY_AREA: return {
         ...state,
-        area: action.payload
+        pickupAddress: {
+          ...state.pickupAddress,
+          lat: action.payload.lat,
+          lng: action.payload.lng,
+          radius: action.payload.radius
+        }
       }
       case SET_CONTACT: return {
         ...state,
         contact: action.payload
       }
-      case SET_PICKUP_ADDRESS: return {
-        ...state,
-        allowPickups: action.payload.allowPickups,
-        pickupAddress: {
-          street: action.payload.street,
-          city: action.payload.city,
-          state: action.payload.state,
-          zipcode: action.payload.zipcode
-        }
-      }
       case SET_PICKUP_SCHEDULE: return {
         ...state,
-        pickupSchedule: action.payload
-      }
-      case SET_PICKUP_SCHEDULE: return {
-        ...state,
-        contact: action.payload
+        pickupSchedule: action.payload.schedule,
+        allowPickups: action.payload.allowPickups
       }
       case SET_SHOP: return {
         ...state,
@@ -169,19 +135,15 @@ import {
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
         loading: false,
-        area: {
-          location: action.payload.success.location,
-          radius: action.payload.success.radius,
-          lat: action.payload.success.lat,
-          lng: action.payload.success.lng
-        },
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
+        status: action.payload.success.ShopStatusId,
         created: true,
         error: ''
       }
       case CREATE_SHOP_FAILURE: return {
         ...state,
+        loading: false,
         error: action.payload
       }
       case GET_SHOP_REQUEST: return {
@@ -195,24 +157,21 @@ import {
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
         loading: false,
-        area: {
-          location: action.payload.success.location,
-          radius: action.payload.success.radius,
-          lat: action.payload.success.lat,
-          lng: action.payload.success.lng
-        },
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
         created: true,
+        status: action.payload.success.ShopStatusId,
         stripeAccountId: action.payload.success.stripeAccountId,
         error: ''
       }
       case GET_SHOP_FAILURE: return {
         ...state,
+        loading: false,
         error: action.payload
       }
       case GET_SHOP_FAILURE_NOT_FOUND: return {
         ...state,
+        loading: false,
         error: ''
       }
       case EDIT_SHOP_REQUEST: return {
@@ -226,13 +185,6 @@ import {
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
         loading: false,
-        created: false,
-        area: {
-          location: action.payload.success.location,
-          radius: action.payload.success.radius,
-          lat: action.payload.success.lat,
-          lng: action.payload.success.lng
-        },
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
         created: true,
@@ -240,6 +192,7 @@ import {
       }
       case EDIT_SHOP_FAILURE: return {
         shop: '',
+        loading: false,
         error: action.payload
       }
       case GET_FORMATTED_SHOP_ADDRESS_REQUEST: return {
@@ -248,13 +201,15 @@ import {
       }
       case GET_FORMATTED_SHOP_ADDRESS_SUCCESS: return {
         ...state,
-        loggedIn: true,
         loading: false,
         pickupAddress: {
-          street: action.payload.street_number + ' ' + action.payload.route,
+          ...state.pickupAddress,
+          street: action.payload.name,
           city: action.payload.locality,
-          state: action.payload.administrative_area_level_1,
+          state: action.payload.region,
           zipcode: action.payload.postal_code,
+          lat: action.payload.latitude,
+          lng: action.payload.longitude,
           validAddress: true
         },
         error: ''
@@ -262,14 +217,18 @@ import {
       case GET_FORMATTED_SHOP_ADDRESS_FAILURE: return {
         ...state,
         loading: false,
+        valid: false,
         pickupAddress: {
+          ...state.pickupAddress,
           street: '',
           city: '',
           state: '',
           zipcode: '',
+          lat: '',
+          lng: '',
           validAddress: false
         },
-        error: action.payload
+        error: action.payload.length > 0 ? action.payload : 'There was an issue validating your address.'
       }
       default: return state
     }

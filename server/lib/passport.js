@@ -35,6 +35,8 @@ module.exports = (passport) => {
           city: req.body.city,
           state: req.body.state,
           zipcode: req.body.zipcode,
+          lat: req.body.lat,
+          lng: req.body.lng,
           seller: req.body.seller,
           email: username,
           password: await User.generateHash(password),

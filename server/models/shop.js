@@ -19,11 +19,6 @@ module.exports = (sequelize, DataTypes) => {
   };
   Shop.init({
     name: DataTypes.STRING,
-    state: DataTypes.STRING,
-    location: DataTypes.STRING,
-    radius: DataTypes.INTEGER,
-    lat: DataTypes.FLOAT,
-    lng: DataTypes.FLOAT,
     allowPickups: DataTypes.BOOLEAN,
     stripeAccountId: DataTypes.STRING
   }, {

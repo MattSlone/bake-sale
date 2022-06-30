@@ -251,7 +251,6 @@ module.exports = class UserController {
   static async validateEditUser(req, res, next) {
     try {
       if (req.body.username) {
-        console.log(req.body.username)
         await UserController.validateEditAccount(req, res, next)
         return
       }

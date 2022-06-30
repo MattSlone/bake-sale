@@ -7,18 +7,16 @@ const db = require('../models/index'),
 module.exports = class ShopController {
   async create (req, res, next) {
     try {
+      const inactiveStatus = await db.ShopStatus.findOne({ where: { status: 'inactive' } })
       const shop = await db.Shop.create({
           name: req.body.name,
           state: req.body.state,
-          location: req.body.area.location,
           allowPickups: req.body.allowPickups,
-          radius: req.body.area.radius,
-          lat: req.body.area.lat,
-          lng: req.body.area.lng,
-          UserId: req.body.user,
+          UserId: req.user.id,
           PickupAddress: req.body.pickupAddress,
           PickupSchedules: req.body.pickupSchedule,
           ShopContact: req.body.contact,
+          ShopStatusId: inactiveStatus.id
       }, {
         include: [
           db.PickupAddress,
@@ -73,7 +71,7 @@ module.exports = class ShopController {
       }
       const include = [
         db.PickupSchedule,
-        ...[(req.query.UserId || req.query.forOrder) 
+        ...[(req.query.UserId || req.query.forOrder)
           && db.PickupAddress],
         ...[(req.query.UserId || req.query.forOrder) 
           && db.ShopContact]
@@ -90,6 +88,7 @@ module.exports = class ShopController {
         include: include,
         where: where
       });
+      console.log(shop)
       return shop
     }
     catch (err) {
@@ -110,7 +109,7 @@ module.exports = class ShopController {
             include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
         }
       );
-
+      console.log(req.body.pickupAddress)
       let pickupAddresses = await this.upsertAssociation(shop, db.PickupAddress, [req.body.pickupAddress])
       await shop.setPickupAddress(pickupAddresses.map(address => address.id))
       await db.PickupAddress.destroy({
@@ -159,31 +158,38 @@ module.exports = class ShopController {
 
   async createStripeAccount(req, res, next) {
     try {
-      const shop = await db.Shop.findByPk(req.body.shopId)
-      let accountId = shop.stripeAccountId
-
-      if (!accountId) {
-        const account = await StripeAPI.createAccount()
-        accountId = account.id
-        shop.stripeAccountId = accountId
-        await shop.save()
+      const shop = await db.Shop.findOne({ where: { UserId: req.user.id } })
+      if (shop) {
+        let accountId = shop.stripeAccountId
+        if (!accountId) {
+          const account = await StripeAPI.createAccount()
+          accountId = account.id
+          shop.stripeAccountId = accountId
+          await shop.save()
+        }
+        const accountLink = await StripeAPI.createAccountLink(accountId, req.body.edit)
+        return accountLink.url
       }
-      
-      const accountLink = await StripeAPI.createAccountLink(accountId)
-      return accountLink.url
+      req.flash('error', 'A shop is not associated with this user account.')
+      res.redirect('/api/shop/stripe/create')
+      return
     }
     catch (err) {
-      return next(err)
+      req.flash('error', 'An error occured while reaching Stripe.')
+      res.redirect('/api/shop/stripe/create')
+      return
     }
   }
 
   async checkDetailsSubmitted(req, res, next) {
     try {
-      const detailsSubmitted = await StripeAPI.checkDetailsSubmitted(req.body.accountId)
+      const detailsSubmitted = await StripeAPI.checkDetailsSubmitted(req.user.id)
+      console.log("DETAILS SUBMITTED: ", detailsSubmitted)
       return detailsSubmitted
     }
     catch (err) {
-      return next(err)
+      console.log(err)
+      req.flash('error')
     }
   }
 

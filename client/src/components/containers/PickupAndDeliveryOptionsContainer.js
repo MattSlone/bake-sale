@@ -1,12 +1,12 @@
 import { connect } from 'react-redux'
 import PickupAndDeliveryOptions from '../dashboard/PickupAndDeliveryOptions'
-import { 
-  getLatLngFromAddress, 
+import {
   setDeliveryArea, 
   setPickupAddress, 
   setPickupSchedule,
   setContact,
   getFormattedShopAddress,
+  getFormattedShopAddressSuccess,
   setValidShop
  } from '../../redux'
 
@@ -22,8 +22,8 @@ const mapDispatchToProps = dispatch => {
     setPickupAddress: (pickupAddress) => dispatch(setPickupAddress(pickupAddress)),
     setPickupSchedule: (schedule) => dispatch(setPickupSchedule(schedule)),
     setContact: (contact) => dispatch(setContact(contact)),
-    getLatLngFromAddress: (formData) => dispatch(getLatLngFromAddress(formData)),
     getFormattedShopAddress: (formData) => dispatch(getFormattedShopAddress(formData)),
+    getFormattedShopAddressSuccess: (formData) => dispatch(getFormattedShopAddressSuccess(formData)),
     setValidShop: (status) => dispatch(setValidShop(status))
   }
 }

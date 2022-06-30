@@ -10,9 +10,6 @@ import {
     SET_DELIVERY_AREA,
     SET_SHOP,
     SET_VALID_SHOP,
-    GET_LAT_LNG_REQUEST,
-    GET_LAT_LNG_SUCCESS,
-    GET_LAT_LNG_FAILURE,
     GET_SHOP_REQUEST,
     GET_SHOP_SUCCESS,
     GET_SHOP_FAILURE,
@@ -73,26 +70,6 @@ export const setValidShop = (status) => {
   }
 }
 
-export const getLatLngRequest = () => {
-  return {
-    type: GET_LAT_LNG_REQUEST
-  }
-}
-
-export const getLatLngSuccess = (latlng) => {
-  return {
-    type: GET_LAT_LNG_SUCCESS,
-    payload: latlng
-  }
-}
-
-export const getLatLngFailure = (error) => {
-  return {
-    type: GET_LAT_LNG_FAILURE,
-    payload: error
-  }
-}
-
 // CREATE
 export const createShopRequest = () => {
   return {
@@ -117,7 +94,7 @@ export const createShopFailure = (error) => {
 export const createShop = (formData) => {
   return async (dispatch) => {
     try {
-      dispatch(createShopRequest)
+      dispatch(createShopRequest())
       const res = await axios.post('/api/shop/create', formData)
       if(res.data.error[0]) {
         dispatch(createShopFailure(res.data.error[0]))
@@ -153,9 +130,10 @@ export const editShopFailure = (error) => {
 }
 
 export const editShop = (formData) => {
+  console.log(formData)
   return async (dispatch) => {
     try {
-      dispatch(editShopRequest)
+      dispatch(editShopRequest())
       const res = await axios.post('/api/shop/update', formData)
       if(res.data.error[0]) {
         dispatch(editShopFailure(res.data.error[0]))
@@ -259,6 +237,7 @@ export const getFormattedShopAddressFailure = (error) => {
 export const getFormattedShopAddress = (formData) => {
   return async (dispatch) => {
     try {
+      console.log('getting formatted shop address client side')
       dispatch(getFormattedShopAddressRequest())
       const res = await axios.post('/api/user/address/components', formData)
       if(res.data.error) {
@@ -295,41 +274,22 @@ export const getShop = (formData) => {
   }
 }
 
-export const getLatLngFromAddress = (formData) => {
-  console.log(formData)
-  return async (dispatch) => {
-    try {
-      dispatch(getLatLngRequest)
-      const res = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${formData}&key=AIzaSyACELINjQLeOcaE9QQQso_1mu3eG6wnnmw`
-        )
-      if(res.error_message) {
-        dispatch(getLatLngFailure(res.error_message))
-      }
-      else {
-        dispatch(getLatLngSuccess(res.data.results[0].geometry.location))
-      }
-    } catch(error) {
-      dispatch(getLatLngFailure(error.message))
-    }
-  }
-}
-
-export const createStripeAccount = (shopId) => {
+export const createStripeAccount = (shopId, edit) => {
   return async (dispatch) => {
     try {
       dispatch(createStripeAccountRequest())
       const res = await axios.post('/api/shop/stripe/create', {
-        shopId: shopId
+        shopId: shopId,
+        edit: edit
       })
-      if(res.error_message) {
-        dispatch(createStripeAccountFailure(res.error_message))
+      if (res.data.error) {
+        dispatch(createStripeAccountFailure(res.data.error[0]))
       }
       else {
         dispatch(createStripeAccountSuccess(res.data.success))
       }
     } catch(error) {
-      dispatch(createStripeAccountFailure(error.message))
+      dispatch(createStripeAccountFailure(error))
     }
   }
 }
@@ -337,6 +297,7 @@ export const createStripeAccount = (shopId) => {
 export const checkStripeDetailsSubmitted = (accountId) => {
   return async (dispatch) => {
     try {
+      console.log('checking stripe details for: ', accountId)
       dispatch(checkStripeDetailsSubmittedRequest())
       const res = await axios.post('/api/shop/stripe/checkDetailsSubmitted', {
         accountId: accountId
@@ -345,6 +306,7 @@ export const checkStripeDetailsSubmitted = (accountId) => {
         dispatch(checkStripeDetailsSubmittedFailure(res.error_message))
       }
       else {
+        console.log(res.data.success)
         dispatch(checkStripeDetailsSubmittedSuccess(res.data.success))
       }
     } catch(error) {

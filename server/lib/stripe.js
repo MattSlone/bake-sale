@@ -14,12 +14,13 @@ module.exports = class StripeAPI {
     }    
   }
 
-  async createAccountLink (account) {
+  async createAccountLink (account, edit) {
     try {
+      const urlString = edit ? 'edit' : 'create'
       const accountLink = await stripe.accountLinks.create({
         account: account,
-        refresh_url: 'http://localhost:3000/dashboard/shop/create/stripe/reauth',
-        return_url: 'http://localhost:3000/dashboard/shop/create/stripe/return',
+        refresh_url: `http://localhost:3000/dashboard/shop/${urlString}/stripe/reauth`,
+        return_url: `http://localhost:3000/dashboard/shop/${urlString}/stripe/return`,
         type: 'account_onboarding',
       });
       return accountLink
@@ -28,10 +29,19 @@ module.exports = class StripeAPI {
     }
   }
 
-  async checkDetailsSubmitted (id) {
+  async checkDetailsSubmitted (userId) {
     try {
-      const account = await stripe.accounts.retrieve(id)
-      return account.details_submitted
+      const shop = await db.Shop.findOne({ where: { UserId: userId } })
+      if (shop?.stripeAccountId) {
+        const activeShopStatus = await db.ShopStatus.findOne({ where: { status: 'active' } })
+        const account = await stripe.accounts.retrieve(shop.stripeAccountId)
+        if (account.details_submitted && shop.ShopStatusId != activeShopStatus.id) {
+          shop.ShopStatusId = activeShopStatus.id
+          await shop.save()
+        }
+        return account.details_submitted
+      }
+      return false
     } catch (err) {
       return err
     }
