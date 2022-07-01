@@ -96,9 +96,6 @@ module.exports = class ShopController {
           return
         }
       }
-      console.log('maybeeeeeeeEEEEEEEEE', req.body.contact)
-      console.log('maybeeeeeeeEEEEEEEEE2', (req.body.contact.type == 'both' || req.body.contact.type == 'phone'))
-      console.log('maybeeeeeeeEEEEEEEEE3', !validator.isMobilePhone(req.body.contact.phone, "en-US"))
       if ((req.body.contact.type == 'both' || req.body.contact.type == 'phone')
         && !validator.isMobilePhone(req.body.contact.phone, "en-US")
       ) {
@@ -120,7 +117,6 @@ module.exports = class ShopController {
         res.redirect('/api/shop/create')
         return
       }
-      console.log('winner!')
       const addressComponents = await GMaps.getFormattedAddress(req.body.pickupAddress)
       if (typeof addressComponents == 'string') {
         req.flash('error', 'There was an issue validating your address.')
