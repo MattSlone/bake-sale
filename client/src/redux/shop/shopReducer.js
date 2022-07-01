@@ -8,14 +8,10 @@ import {
     SET_DELIVERY_AREA,
     SET_SHOP,
     SET_VALID_SHOP,
-    GET_LAT_LNG_REQUEST,
-    GET_LAT_LNG_SUCCESS,
-    GET_LAT_LNG_FAILURE,
     GET_SHOP_REQUEST,
     GET_SHOP_SUCCESS,
     GET_SHOP_FAILURE,
     GET_SHOP_FAILURE_NOT_FOUND,
-    SET_PICKUP_ADDRESS,
     SET_PICKUP_SCHEDULE,
     SET_CONTACT,
     CREATE_STRIPE_ACCOUNT_REQUEST,
@@ -47,7 +43,8 @@ import {
     },
     contact: {
       phone: '',
-      email: ''
+      email: '',
+      type: 'none'
     },
     pickupSchedule: [
       {day: 'Sunday', start: "12:00", end: "12:00"},

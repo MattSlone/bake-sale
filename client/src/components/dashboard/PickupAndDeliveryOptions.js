@@ -294,7 +294,8 @@ export default function PickupAndDeliveryOptions(props) {
             props.setContact({
               ...props.shop.contact,
               phone: phone,
-              email: email
+              email: email,
+              type: contactType
             })
             setValidShopContact({valid: true})
           } else {

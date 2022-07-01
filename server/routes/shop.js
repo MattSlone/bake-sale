@@ -1,14 +1,13 @@
 'use strict';
 
 const UserController = require('../controllers/user'),
-  MakeShopController = require('../controllers/shop'),
-  ShopController = new MakeShopController()
+  ShopController = require('../controllers/shop')
 
 module.exports = (app) => {
 
   app.get('/api/shop', async (req, res, next) => {
     try {
-        let shop = await ShopController.read(req, res, next)
+        let shop = await (new ShopController).read(req, res, next)
         res.send({
             error: req.flash('error'),
             ...(shop && { success: shop })
@@ -19,9 +18,11 @@ module.exports = (app) => {
     }
   })
 
-  app.post('/api/shop/stripe/create', async (req, res, next) => {
+  app.post('/api/shop/stripe/create',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
     try {
-        let response = await ShopController.createStripeAccount(req, res, next)
+        let response = await (new ShopController).createStripeAccount(req, res, next)
         if (response) {
           res.send({
             success: response
@@ -34,7 +35,9 @@ module.exports = (app) => {
     }
   })
 
-  app.get('/api/shop/stripe/create', async (req, res, next) => {
+  app.get('/api/shop/stripe/create',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
     try {
       res.send({
         error: req.flash('error')
@@ -50,7 +53,7 @@ module.exports = (app) => {
   async (req, res, next) => {
     try {
       console.log('in route')
-      let response = await ShopController.checkDetailsSubmitted(req, res, next)
+      let response = await (new ShopController).checkDetailsSubmitted(req, res, next)
       console.log(response)
       res.send({
         error: req.flash('error'),
@@ -65,26 +68,38 @@ module.exports = (app) => {
     }
   })
 
-  app.post('/api/shop/create', async (req, res, next) => {
+  app.post('/api/shop/create',
+  UserController.isLoggedIn,
+  ShopController.validateCreateOrEditShop,
+  async (req, res, next) => {
     try {
-        let shop = await ShopController.create(req, res, next)
-        res.send({
-            error: req.flash('error'),
-            success: shop
-        })
+      let shop = await (new ShopController).create(req, res, next)
+      res.send({
+          success: shop
+      })
     }
     catch (err) {
-      next(err)
+      req.flash('error', err)
+      res.redirect('/api/shop/create')
     }
   })
 
-  app.post('/api/shop/update', async (req, res, next) => {
+  app.get('/api/shop/create', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+      success: false
+    })
+  })
+
+  app.post('/api/shop/update',
+  UserController.isLoggedIn,
+  ShopController.validateCreateOrEditShop,
+  async (req, res, next) => {
     try {
-        let shop = await ShopController.update(req, res, next)
-        res.send({
-            error: req.flash('error'),
-            success: shop
-        })
+      let shop = await (new ShopController).update(req, res, next)
+      res.send({
+          success: shop
+      })
     }
     catch (err) {
       next(err)

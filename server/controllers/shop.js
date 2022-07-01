@@ -2,7 +2,9 @@
 
 const db = require('../models/index'),
   MakeStripeAPI = require('../lib/stripe'),
-  StripeAPI = new MakeStripeAPI()
+  StripeAPI = new MakeStripeAPI(),
+  GMaps = require('../lib/gmaps'),
+  validator = require('validator')
 
 module.exports = class ShopController {
   async create (req, res, next) {
@@ -61,6 +63,78 @@ module.exports = class ShopController {
     }
   }
 
+  static async validateCreateOrEditShop(req, res, next) {
+    try {
+      for (const field of [
+        { name: 'Shop Name', value: req.body.name },
+        { name: 'Street', value: req.body.pickupAddress.street },
+        { name: 'City', value: req.body.pickupAddress.city },
+        { name: 'State', value: req.body.pickupAddress.state },
+        { name: 'Zipcode', value: req.body.pickupAddress.zipcode },
+        { name: 'Pickup Schedule', value: req.body.pickupSchedule }
+        
+      ]) {
+        if (!field.value) {
+          console.log(field)
+          req.flash('error', `${field.name} is required.`)
+          res.redirect('/api/shop/create')
+          return
+        }
+      }
+      if (req.body.allowPickups) {
+        if (req.body.contact.type == 'none') {
+          req.flash('error', 'A contact method must be provided if you allow pickups.')
+          res.redirect('/api/shop/create')
+          return
+        }
+        if(
+          !req.body.pickupSchedule.map(day => day.start !== day.end)
+            .some(window => window == true)
+        ) {
+          req.flash('error', 'You must provide at least one window of time in a week if you allow pickups.')
+          res.redirect('/api/shop/create')
+          return
+        }
+      }
+      console.log('maybeeeeeeeEEEEEEEEE', req.body.contact)
+      console.log('maybeeeeeeeEEEEEEEEE2', (req.body.contact.type == 'both' || req.body.contact.type == 'phone'))
+      console.log('maybeeeeeeeEEEEEEEEE3', !validator.isMobilePhone(req.body.contact.phone, "en-US"))
+      if ((req.body.contact.type == 'both' || req.body.contact.type == 'phone')
+        && !validator.isMobilePhone(req.body.contact.phone, "en-US")
+      ) {
+        req.flash('error', 'Invalid phone number')
+        res.redirect('/api/shop/create')
+        return
+      }
+      
+      if ((req.body.contact.type == 'both' || req.body.contact.type == 'email')
+        && !validator.isEmail(req.body.contact.email)
+      ) {
+        req.flash('error', 'Invalid Email.')
+        res.redirect('/api/shop/create')
+        return
+      }
+      console.log('or here...', req.body.pickupAddress)
+      if (!(req.body.pickupAddress.radius >= 0)) {
+        req.flash('error', 'Radius must be at least 0.')
+        res.redirect('/api/shop/create')
+        return
+      }
+      console.log('winner!')
+      const addressComponents = await GMaps.getFormattedAddress(req.body.pickupAddress)
+      if (typeof addressComponents == 'string') {
+        req.flash('error', 'There was an issue validating your address.')
+        res.redirect('/api/shop/create')
+        return
+      }
+      next()
+    } catch (err) {
+      req.flash('error', err)
+      res.redirect('/api/shop/create')
+      return
+    }
+  }
+
   async read(req, res, next) {
     try {
       let shop = null
@@ -88,7 +162,6 @@ module.exports = class ShopController {
         include: include,
         where: where
       });
-      console.log(shop)
       return shop
     }
     catch (err) {
@@ -109,7 +182,6 @@ module.exports = class ShopController {
             include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
         }
       );
-      console.log(req.body.pickupAddress)
       let pickupAddresses = await this.upsertAssociation(shop, db.PickupAddress, [req.body.pickupAddress])
       await shop.setPickupAddress(pickupAddresses.map(address => address.id))
       await db.PickupAddress.destroy({

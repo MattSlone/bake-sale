@@ -195,20 +195,17 @@ export default function CreateShop(props) {
     let valid = false
     props.setValidShop(false)
     setMessage('')
-    console.log(activeStep)
     switch (activeStep) {
       case 0:
         valid = validateShopName()
         break
       case 1:
         valid = validPickupAndDelivery
-        console.log(valid)
         break
       default:
         valid = true
         break
     }
-    console.log(valid)
     if (valid) {
       if (edit) {
         props.editShop(formData)

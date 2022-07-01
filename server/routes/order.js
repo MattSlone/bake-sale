@@ -10,7 +10,6 @@ module.exports = (app, webhookApp) => {
       if (req.user) {
         console.log('user is logged in!!!')
         let response = await OrderController.list(req, res, next)
-        console.log('RESPONSEEEEE: ', response)
         res.send({
           error: req.flash('error'),
           success: response

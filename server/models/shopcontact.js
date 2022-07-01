@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   ShopContact.init({
+    type: DataTypes.STRING,
     phone: DataTypes.STRING,
     email: DataTypes.STRING
   }, {

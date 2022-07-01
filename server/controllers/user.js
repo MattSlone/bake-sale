@@ -193,7 +193,6 @@ module.exports = class UserController {
       }
       next()
     } catch (err) {
-      console.log(err)
       req.flash('error', "There was a problem signing in.")
       res.redirect('/api/signin')
     }
@@ -201,7 +200,7 @@ module.exports = class UserController {
 
   static async validateSignUp(req, res, next) {
     try {
-      const addressComponents = await GMaps.getFormattedAddress(req)
+      const addressComponents = await GMaps.getFormattedAddress(req.body)
       if (typeof addressComponents == 'string') {
         req.flash('error', 'There was an issue validating your address.')
         res.redirect('/api/signup')
@@ -254,7 +253,7 @@ module.exports = class UserController {
         await UserController.validateEditAccount(req, res, next)
         return
       }
-      const addressComponents = await GMaps.getFormattedAddress(req)
+      const addressComponents = await GMaps.getFormattedAddress(req.body)
       if (typeof addressComponents == 'string') {
         req.flash('error', 'There was an issue validating your address.')
         res.redirect('/api/user/edit')

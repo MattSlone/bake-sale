@@ -23,9 +23,10 @@ module.exports = class GMaps {
     return (meters * MILES_MULTIPLE)
   }
 
-  static async getFormattedAddress(req) {
+  static async getFormattedAddress({ street, city, state, zipcode }) {
     try {
-      const address = `${req.body.street} ${req.body.city}, ${req.body.state} ${req.body.zipcode}`
+      const address = `${street} ${city}, ${state} ${zipcode}`
+      console.log('ADDRESS: ', address)
       const params = {
         query: address,
         access_key: process.env.POSITION_STACK_API_KEY,
