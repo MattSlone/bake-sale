@@ -10,6 +10,32 @@ module.exports = class ProductController {
     async create (req, res, next) {
         try {
             const varieties = req.body.product?.custom ? { quantity: 1 } : req.body.product.varieties
+            const updateIngredients = await Promise.all(req.body.product.ingredients.map(async newIngredient => {
+                const ingredient = await db.Ingredient.findOne({
+                    where: { 
+                        name: newIngredient.name
+                    },
+                    include: {
+                        model: db.Product,
+                        include: {
+                            model: db.Shop,
+                            include: {
+                                model: db.User,
+                                where: {
+                                    id: req.user.id
+                                },
+                                required: true
+                            }
+                        }
+                    }
+                })
+                return ingredient ? ingredient : false
+            }).filter(ingredient => ingredient))
+            for (let ingredient of updateIngredients) {
+                const index = req.body.product.ingredients.map(ingredient => ingredient.name)
+                    .indexOf(ingredient.name)
+                req.body.product.ingredients.splice(index, 1)
+            }
             const product = await db.Product.create({
                 name: req.body.product.name,
                 category: req.body.product.category,
@@ -48,6 +74,9 @@ module.exports = class ProductController {
                     }
                 ]
             });
+            for (let ingredient of updateIngredients) {
+                ingredient.addProduct(product)
+            }
             return product
         }
         catch (err) {
