@@ -21,7 +21,8 @@ import {
   EDIT_PRODUCT_FAILURE,
   SET_PRODUCT_EDIT,
   RESET_PRODUCT,
-  SET_CUSTOM_FORM
+  SET_CUSTOM_FORM,
+  SET_PRODUCT_WEIGHT
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
@@ -166,6 +167,13 @@ export const setProductEdit = (product) => {
   return {
     type: SET_PRODUCT_EDIT,
     payload: product
+  }
+}
+
+export const setProductWeight = (weight) => {
+  return {
+    type: SET_PRODUCT_WEIGHT,
+    payload: weight
   }
 }
 

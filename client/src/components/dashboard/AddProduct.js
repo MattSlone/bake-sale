@@ -12,7 +12,7 @@ import AddProductImagesContainer from '../containers/AddProductImagesContainer';
 import ListingDetailsContainer from '../containers/ListingDetailsContainer'
 import IngredientsContainer from '../containers/IngredientsContainer'
 import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
-import Labeling from './Labeling'
+import LabelingContainer from '../containers/LabelingContainer'
 import AddonsContainer from '../containers/AddonsContainer'
 import AddCustomProductContainer from '../containers/AddCustomProductContainer'
 import PersonalizationContainer from '../containers/PersonalizationsContainer'
@@ -38,18 +38,7 @@ const Root = styled('div')((
 ) => ({
   [`&.${classes.root}`]: {
     maxWidth: '100%',
-  },
-
-  [`& .${classes.desktop}`]: {
-    paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
-    paddingLeft: 0,
-    paddingRight: 0
-  },
-
-  [`& .${classes.mobile}`]: {
-    paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(7) : theme.spacing(0),
-    paddingLeft: 0,
-    paddingRight: 0
+    padding: theme.spacing(2)
   },
 
   [`& .${classes.button}`]: {
@@ -78,12 +67,60 @@ function getSteps() {
 }
 
 export default function AddProduct(props) {
-
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
   let { id } = useParams()
-  const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
   const match = useRouteMatch()
+  const matches = useMediaQuery('(min-width:600px)');
+  const edit = match.path.includes('edit')
+  const [product, setProduct] = useState(props.product.products.find(product => product.id == id))
+  const [validListingDetails, setValidListingDetails] = useState({ error: '', success: edit ? true : false })
+  const [validIngredients, setValidIngredients] = useState({ error: '', success: edit ? true : false })
+  const [validPricingAndDelivery, setValidPricingAndInventory] = useState({ error: '', success: edit ? true : false })
+  const [validAddons, setValidAddons] = useState({ error: '', success: edit ? true : false })
+  const [validPersonalization, setValidPersonalization] = useState({ error: '', success: edit ? true : false })
+  const [validLabeling, setValidLabeling] = useState({ error: '', success: edit ? true : false })
+  const [message, setMessage] = useState('')
+  
+  const validate = () => {
+    let valid = { error: '', success: edit ? true : false }
+    //props.setValidShop(false)
+    setMessage('')
+    switch (activeStep) {
+      case 0:
+        valid.success = true
+        break
+      case 1:
+        valid = validListingDetails
+        break
+      case 2:
+        valid = validIngredients
+        break
+      case 3:
+        valid = validPricingAndDelivery
+        break
+      case 4:
+        valid = validLabeling
+        break
+      case 5:
+        valid = validAddons
+        break
+      case 6:
+        valid = validPersonalization
+        break
+      default:
+        break
+    }
+    if (valid.success) {
+      if (edit) {
+        // edit product
+      }
+      // create product
+    } else {
+      setMessage(valid.error)
+    }
+    return valid
+  }
 
   useEffect(() => {
     if(match.path.includes('edit')) {
@@ -104,16 +141,14 @@ export default function AddProduct(props) {
     }
   }, [])
 
-  const includeButtons = () => {
-    return (activeStep === steps.length - 1) && (!match.path.includes('shop/create')) ? 'Finish' : 'Next'
+  const handleNext = () => {
+    const valid = validate()
+    if (valid.success) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    }
   }
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
   const imageFormData = new FormData()
-  
   useEffect(() => {
     const files = props.product.imageFiles.map((imageFile, i) => {
       return {
@@ -145,43 +180,59 @@ export default function AddProduct(props) {
     } else {
       props.createProduct(formData)
     }
-  };
+  }
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  }
 
   const handleReset = () => {
     setActiveStep(0);
-  };
-  const matches = useMediaQuery('(min-width:600px)');
+  }
+
+  const handleGoToStep = (i) => {
+    const valid = validate()
+    if (valid.success) {
+      setActiveStep(i)
+    } else if (props.shop.error) {
+      setMessage(props.shop.error)
+    } else {
+      setMessage(valid.error)
+    }
+  }
 
   return (
     <Root className={classes.root}>
-      <Stepper classes={matches ? {root: classes.desktop} : {root: classes.mobile}} activeStep={activeStep} orientation="vertical">
-        {steps.map((label, index) => (
+      <Stepper activeStep={activeStep} orientation="vertical">
+        {steps.map((label, i) => (
           <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+            {edit ?
+                <StepLabel className={classes.stepLabel} onClick={(e) => handleGoToStep(i)}>{label}</StepLabel>
+              : <StepLabel>{label}</StepLabel>
+              }
             <StepContent>
             {(() => {
               switch (activeStep) {
                 case 0: return <AddProductImagesContainer product={product} />
                 case 1:
-                  return <ListingDetailsContainer />;
+                  return <ListingDetailsContainer setValidListingDetails={setValidListingDetails} />;
                 case 2:
-                  return <IngredientsContainer />;
+                  return <IngredientsContainer setValidIngredients={setValidIngredients} />;
                 case 3:
-                  return <PricingAndInventoryContainer />;
+                  return <PricingAndInventoryContainer setValidPricingAndInventory={setValidPricingAndInventory} />;
                 case 4:
-                  return <Labeling />;
+                  return <LabelingContainer setValidLabeling={setValidLabeling} />;
                 case 5:
-                  return <AddonsContainer />;
+                  return <AddonsContainer setValidAddons={setValidAddons}/>;
                 case 6:
-                  return <PersonalizationContainer />;
+                  return <PersonalizationContainer setValidPersonalization={setValidPersonalization} />;
                 default:
                   return 'Unknown step';
               }
             })()}
+              <Typography style={{color: 'red'}}>
+                {message}
+              </Typography>
               <div className={classes.actionsContainer}>
                 <div>
                   <Button

@@ -63,11 +63,12 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function AddProductImages(props) {
   const match = useRouteMatch()
+  const edit = match.path.includes('edit')
   const hiddenFileInput = React.useRef([])
   const [imageFiles, setImageFiles] = useState([])
 
   useEffect(async () => {
-    if (match.path.includes('edit')) {
+    if (edit) {
       setImageFiles(
         await Promise.all(props.product.ProductImages.map(async image => {
           const res = await axios.get(`/api${image.path}`, { responseType: 'blob' })

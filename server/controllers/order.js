@@ -1,5 +1,10 @@
 'use strict'
 
+/**
+ * The strategy for checking out via Stripe is here:
+ * https://stripe.com/docs/connect/charges-transfers
+ */
+
 const GMaps = require('../lib/gmaps')
 const order = require('../models/order')
 

@@ -19,7 +19,8 @@ import {
   EDIT_PRODUCT_SUCCESS,
   EDIT_PRODUCT_FAILURE,
   RESET_PRODUCT,
-  SET_CUSTOM_FORM
+  SET_CUSTOM_FORM,
+  SET_PRODUCT_WEIGHT
 } from './productTypes'
 
 const initialState = {
@@ -36,6 +37,7 @@ const initialState = {
   personalizationPrompt: '',
   inventory: 0,
   imageFiles: [],
+  weight: 0,
   loading: false,
   products: [],
   fields: [],
@@ -68,6 +70,10 @@ const productReducer = (state = initialState, action) => {
       ...state,
       varieties: action.payload.varieties,
       inventory: action.payload.inventory
+    }
+    case SET_PRODUCT_WEIGHT: return {
+      ...state,
+      weight: action.payload
     }
     case SET_ADDONS: return {
       ...state,

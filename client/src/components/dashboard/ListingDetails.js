@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
-import { Input, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import isByteLength from 'validator/lib/isByteLength';
 
 const PREFIX = 'ListingDetails';
 
@@ -42,32 +40,51 @@ const Root = styled('div')((
 }));
 
 export default function ListingDetails(props) {
+  const [name, setName] = useState(props.name)
+  const [description, setDescription] = useState(props.description)
+  const [category, setCategory] = useState(props.category)
+  const [processingTime, setProcessingTime] = useState(props.processingTime)
 
-
-  const [name, setName] = React.useState(props.name);
-  const [description, setDescription] = React.useState(props.description);
-  const [category, setCategory] = React.useState(props.category);
-  const [processingTime, setProcessingTime] = React.useState(props.processingTime);
-  const [automaticRenewal, setAutomaticRenewal] = React.useState(props.automaticRenewal)
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    for (const field of [
+      { name: 'Title', value: name },
+      { name: 'Description', value: description },
+      { name: 'Category', value: category },
+      { name: 'Processing Time', value: processingTime }
+    ]) {
+      if (!field.value) {
+        rtn.error = `${field.name} is required.`
+        return rtn
+      }
+    }
+    if (!isByteLength(name, { max: 140 })) {
+      rtn.error = "Product names may have a max of 140 characters."
+      return rtn
+    }
+    if (!isByteLength(name, { max: 2000 })) {
+      rtn.error = "Descriptions may have a max of 2000 characters."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
 
   useEffect(() => {
-    if(name && category && processingTime) {
+    const valid = validate()
+    props.setValidListingDetails(valid)
+    if(valid.success) {
       props.setListingDetails({
         name: name,
         description: description,
         category: category,
-        processingTime: processingTime,
-        automaticRenewal: automaticRenewal
+        processingTime: processingTime
       })
     }
-  }, [name, description, category, processingTime, automaticRenewal])
+  }, [name, description, category, processingTime])
 
   const handleCategoryChange = (event) => {
     setCategory(event.target.value);
-  };
-
-  const handleRenewalCheckboxChange = (event) => {
-    setAutomaticRenewal(event.target.checked);
   };
 
   const handleNameChange = (event) => {
@@ -108,6 +125,7 @@ export default function ListingDetails(props) {
                   value={category}
                   onChange={handleCategoryChange}
                 >
+                  <MenuItem value={''}>Select</MenuItem>
                   <MenuItem value={'bread'}>Bread</MenuItem>
                   <MenuItem value={'cakes'}>Cakes</MenuItem>
                   <MenuItem value={'candy,chocolate'}>Candy & Chocolate</MenuItem>
@@ -128,24 +146,6 @@ export default function ListingDetails(props) {
                 value={processingTime} 
                 label="Days" 
                 onChange={handleProcessingTimeChange}/>
-              </FormControl>
-            </Grid>
-            <Grid container item xs={12} md={4}>
-              Automatic Renewal: Each renewal lasts for four months or until the listing sells out. Get more details on auto-renewing here.
-            </Grid>
-            <Grid item xs={12} md={8}>
-              <FormControl className={classes.formControl}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={automaticRenewal}
-                      onChange={handleRenewalCheckboxChange}
-                      name="checked"
-                      color="primary"
-                    />
-                  }
-                  label="Automatic Renewal"
-                />
               </FormControl>
             </Grid>
             <Grid container item xs={12} md={4}>

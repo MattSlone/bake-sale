@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import Container from '@mui/material/Container';
-import { Input, TextField, Typography } from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
+import { TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -48,21 +46,48 @@ const StyledGrid = styled(Grid)((
 }));
 
 export default function PricingAndInventory(props) {
-
-
   const [inventory, setInventory] = useState(props.inventory);
   const [varieties, setVarieties] = useState(props.varieties)
-  const [price, setPrice] = useState(null)
+  const [price, setPrice] = useState(0)
   const [quantity, setQuantity] = useState('')
-  const [deliveryFeeType, setDeliveryFeeType] = useState('flat')
-  const [shipping, setShipping] = useState(null)
-  const [secondaryShipping, setSecondaryShipping] = useState(null)
-  const [delivery, setDelivery] = useState(null)
-  const [secondaryDelivery, setSecondaryDelivery] = useState(null)
+  const [deliveryFeeType, setDeliveryFeeType] = useState('')
+  const [shipping, setShipping] = useState(0)
+  const [secondaryShipping, setSecondaryShipping] = useState(0)
+  const [delivery, setDelivery] = useState(0)
+  const [secondaryDelivery, setSecondaryDelivery] = useState(0)
+  const [message, setMessage] = useState('')
 
-  // wait for setRight to update then create ingredients
+  const validateVariety = () => {
+    let rtn = { error: '', success: false }
+    if (quantity <= 0) {
+      rtn.error = "Quantity must be greater than 0."
+      return rtn
+    } else if (price < 1) {
+      rtn.error = "Product price must be at least $1.00"
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
+
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    if (inventory <= 0) {
+      rtn.error = "Inventory must be greater than 0."
+      return rtn
+    } else if ((varieties.length <= 0) || (varieties.length > 5)) {
+      rtn.error = "Products must have at least one variety, \
+        and a maximum of 5."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
+
   useEffect(() => {
-    if(varieties && inventory) {
+    const valid = validate()
+    props.setValidPricingAndInventory(valid)
+    if(valid.success) {
       props.setPricingAndInventory({
         varieties: varieties,
         inventory: inventory
@@ -79,27 +104,29 @@ export default function PricingAndInventory(props) {
   };
 
   const handleAddVariety = () => {
-    let newVarieties = [...varieties]
-    
-    newVarieties.push({
-      quantity: quantity,
-      price: price,
-      shipping: shipping,
-      secondaryShipping: secondaryShipping,
-      deliveryFeeType: deliveryFeeType,
-      delivery: delivery,
-      secondaryDelivery: secondaryDelivery
-    })
-
-    if (varieties.length < 5 && price !== null && quantity > 0 && (shipping !== null || delivery !== null)) {
-      setVarieties(newVarieties)
+    const valid = validateVariety()
+    if (valid.success) {
+      setMessage('')
+      let newVarieties = [...varieties]
+      newVarieties.push({
+        quantity: quantity,
+        price: price,
+        shipping: shipping,
+        secondaryShipping: secondaryShipping,
+        deliveryFeeType: deliveryFeeType,
+        delivery: delivery,
+        secondaryDelivery: secondaryDelivery
+      })
+      if (varieties.length < 5 && price !== null && quantity > 0) {
+        setVarieties(newVarieties)
+      }
+    } else {
+      setMessage(valid.error)
     }
-    
   }
 
   const handleDeleteVariety = (i) => {
     let newVarieties = varieties.filter((variety, j) => j !== i)
-
     setVarieties(newVarieties)
   }
 
@@ -173,6 +200,7 @@ export default function PricingAndInventory(props) {
               className={classes.fullWidth}
               id="quantity"
               label="Quantity"
+              required
               type="number"
               placeholder="0"
               onChange={(e) => {setQuantity(Number(e.target.value))}}
@@ -186,6 +214,7 @@ export default function PricingAndInventory(props) {
               className={classes.fullWidth}
               id="price"
               label="Price"
+              required
               placeholder="$0.00"
               onChange={(e) => {setPrice(Number(e.target.value))}}
               type="number"
@@ -216,6 +245,7 @@ export default function PricingAndInventory(props) {
                 className={classes.fullWidth}
                 id="secondary-shipping"
                 label="Secondary Shipping"
+                disabled={!shipping ? true : false}
                 placeholder="$0.00"
                 onChange={(e) => {setSecondaryShipping(Number(e.target.value))}}
                 type="number"
@@ -237,6 +267,7 @@ export default function PricingAndInventory(props) {
                   value={deliveryFeeType}
                   onChange={handleSelectDeliveryFeeType}
                 >
+                  <MenuItem value=''>Select</MenuItem>
                   <MenuItem value={'flat'}>Flat-rate</MenuItem> 
                   <MenuItem value={'mile'}>By the mile</MenuItem> 
                 </Select>
@@ -249,6 +280,7 @@ export default function PricingAndInventory(props) {
                 className={classes.fullWidth}
                 id="delivery"
                 label="Delivery Cost"
+                disabled={!deliveryFeeType ? true : false}
                 placeholder="$0.00"
                 onChange={(e) => {setDelivery(Number(e.target.value))}}
                 type="number"
@@ -265,6 +297,7 @@ export default function PricingAndInventory(props) {
                 className={classes.fullWidth}
                 id="secondary-delivery"
                 label="Secondary Delivery"
+                disabled={!delivery ? true : false}
                 placeholder="$0.00"
                 onChange={(e) => {setSecondaryDelivery(Number(e.target.value))}}
                 type="number"
@@ -273,6 +306,11 @@ export default function PricingAndInventory(props) {
                 }}
               />
             </Tooltip>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography style={{color: 'red'}}>
+              {message}
+            </Typography>
           </Grid>
           <Grid item xs={12}>
             <Button onClick={handleAddVariety} variant="contained" color="primary">Add Variety</Button>
@@ -287,6 +325,7 @@ function PricingAndInventoryCustom(props) {
   const [deliveryFeeType, setDeliveryFeeType] = useState('flat')
   const [shipping, setShipping] = useState(null)
   const [delivery, setDelivery] = useState(null)
+  const [message, setMessage] = useState('')
   
   useEffect(() => {
     props.setInventory(1)
@@ -298,7 +337,6 @@ function PricingAndInventoryCustom(props) {
 
   const handleAddVariety = () => {
     let newVarieties = [...props.varieties]
-    
     newVarieties.push({
       quantity: 1,
       price: 0,
@@ -398,6 +436,11 @@ function PricingAndInventoryCustom(props) {
                 }}
               />
             </Tooltip>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography style={{color: "red"}}>
+              {message}
+            </Typography>
           </Grid>
           <Grid item xs={12}>
             <Button onClick={handleAddVariety} variant="contained" color="primary">Save</Button>

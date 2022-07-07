@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import { Input, TextField, Typography } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
+import isByteLength from 'validator/lib/isByteLength';
 
 const PREFIX = 'Personalization';
 
@@ -38,13 +39,24 @@ const StyledGrid = styled(Grid)((
 }));
 
 export default function Personalization(props) {
-
-
   const [personalizationPrompt, setPersonalizationPrompt] = useState(props.personalizationPrompt)
   const [personalization, setPersonalization] = useState(personalizationPrompt ? true : false)
+  const [message, setMessage] = useState('')
 
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    if (personalization && !isByteLength(personalizationPrompt, { max: 140 })) {
+      rtn.error = "Personalization prompt may be a max of 140 characters."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
+  
   useEffect(() => {
-    if(personalizationPrompt) {
+    const valid = validate()
+    props.setValidPersonalization(valid)
+    if(valid.success) {
       personalization ? props.setPersonalizationPrompt(personalizationPrompt) : props.setPersonalizationPrompt('')
     }
   }, [personalization, personalizationPrompt])

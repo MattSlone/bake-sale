@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
@@ -15,6 +15,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import IconButton from '@mui/material/IconButton';
 import { Typography } from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import axios from 'axios'
 
 const PREFIX = 'Ingredients';
 
@@ -34,8 +38,8 @@ const StyledGrid = styled(Grid)((
     theme
   }
 ) => ({
-  [`& .${classes.root}`]: {
-    margin: 'auto',
+  [`&.${classes.root}`]: {
+    padding: theme.spacing(2),
     [theme.breakpoints.down('md')]: {
       flexDirection: 'column',
       alignItems: 'stretch'
@@ -79,49 +83,100 @@ function not(a, b) {
 }
 
 function intersection(a, b) {
-  return a.filter((value) => b.indexOf(value) !== -1);
+  return a.filter((value) => b.indexOf(value) !== -1)
 }
 
-export default function Ingredients({ ingredients, setIngredients }) {
+function unique(a) {
+  return [...new Map(a.map(ingredient => [ingredient.name, ingredient])).values()]
+}
 
-  const [checked, setChecked] = React.useState([]);
-  const [right, setRight] = React.useState(ingredients);
-  const [left, setLeft] = React.useState([]);
-  const [newIngredient, setNewIngredient] = React.useState('');
+export default function Ingredients({ ingredients, setIngredients, setValidIngredients }) {
+  const [checked, setChecked] = useState([])
+  const [right, setRight] = useState(ingredients)
+  const [left, setLeft] = useState([])
+  const leftChecked = intersection(checked, left)
+  const rightChecked = intersection(checked, right)
+  const [newIngredient, setNewIngredient] = useState('')
 
-  // wait for setRight to update then create ingredients
+
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    if (right.length <= 0) {
+      rtn.error = "Products must have at least one ingredient."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
+
+  /**
+   * Populate the right list with the ingredients for the product being edited
+   * (will be empty if new product)
+   */
   useEffect(() => {
-    if(right) {
+    const valid = validate()
+    setValidIngredients(valid)
+    if(valid.success) {
       setIngredients(right)
     }
   }, [right])
 
-  const leftChecked = intersection(checked, left);
-  const rightChecked = intersection(checked, right);
-
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-        newChecked.splice(currentIndex, 1);
+  /**
+   * Get most recently added ingredients by the user
+   */
+  useEffect(async () => {
+    const res = await axios.get('/api/ingredients')
+    if(res.data.success) {
+      console.log(res.data.success)
+      setLeft(res.data.success)
     }
-    setChecked(newChecked);
-  };
+  }, [])
 
-  const handleCheckedRight = () => {
-    setRight(right.concat(leftChecked));
-    setLeft(not(left, leftChecked));
-    setChecked(not(checked, leftChecked));
-    
-  };
+  /**
+   * Search the users' previously used ingredients
+   */
+  useEffect(async () => {
+    const params = { search: newIngredient.name }
+    const res = await axios.get('/api/ingredients', {
+      params
+    })
+    if(res.data.success) {
+      setLeft(res.data.success)
+    }
+  }, [newIngredient])
 
-  const handleCheckedLeft = () => {
-    setLeft(left.concat(rightChecked));
-    setRight(not(right, rightChecked));
-    setChecked(not(checked, rightChecked));
+  /**
+   * Adds or removes an ingredient from the checked array
+   * @param {Object} value 
+   * @returns null
+   */
+  const handleToggle = (value) => () => {
+    const currentIndex = checked.indexOf(value)
+    const newChecked = [...checked]
+    if (currentIndex === -1) {
+      newChecked.push(value)
+    } else {
+        newChecked.splice(currentIndex, 1)
+    }
+    setChecked(newChecked)
+  }
+
+  /**
+   * Moves ingredients that are checked on the left side to the right side
+   */
+  const moveLeftCheckedToRight = () => {
+    setRight(unique(right.concat(leftChecked)))
+    setLeft(not(left, leftChecked))
+    setChecked(not(checked, leftChecked))
+  }
+
+  /**
+   * Moves ingredients that are checked on the right side to the left side
+   */
+  const moveRightCheckedToLeft = () => {
+    setLeft(unique(left.concat(rightChecked)))
+    setRight(not(right, rightChecked))
+    setChecked(not(checked, rightChecked))
   };
 
   const searchIngredients = (e) => {
@@ -157,6 +212,45 @@ export default function Ingredients({ ingredients, setIngredients }) {
     setChecked(newChecked)
   }
 
+  /**
+   * Toggle the allergen flag on an ingredient
+   */
+  const handleAllergenButtonClick = () => {
+    const newChecked = checked.map(ingredient => {
+      return {
+        ...ingredient,
+        allergen: !ingredient.allergen
+      }
+    })
+    const newLeft = newChecked.filter(
+      ingredient => left.map(ingredient => ingredient.name)
+        .includes(ingredient.name)
+    )
+    const newRight = newChecked.filter(
+      ingredient => right.map(ingredient => ingredient.name)
+        .includes(ingredient.name)
+    )
+    setChecked(newChecked)
+    setLeft(newLeft)
+    setRight(newRight)
+    updateIngredients(newChecked)
+  }
+
+  const updateIngredients = async (ingredients) => {
+    try {
+      const res = await axios.post('/api/ingredients/update', {
+        ingredients: ingredients
+      })
+      if (res.data.error) {
+        console.log(res.data.error[0])
+      } else {
+        // that'll do donkey...that'll do
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   const customList = (type, items) => (
     <Card>
       {type == 'left' ? (
@@ -178,13 +272,13 @@ export default function Ingredients({ ingredients, setIngredients }) {
       </div>
       
       ) : (
-        <StyledGrid alignContent="center" container className={(classes.cardHeader, classes.cardHeaderEmpty)}>
+        <Grid alignContent="center" container className={(classes.cardHeader, classes.cardHeaderEmpty)}>
           <Grid item>
             <Typography>
               Product Ingredients
             </Typography>
           </Grid>
-        </StyledGrid>
+        </Grid>
       )
       }
       <Divider />
@@ -193,7 +287,7 @@ export default function Ingredients({ ingredients, setIngredients }) {
           const labelId = `transfer-list-all-item-${item.name}-label`;
 
           return (
-            <ListItem key={item.name} role="listitem" button onClick={handleToggle(item, 3)}>
+            <ListItem key={item.name} role="listitem" button onClick={handleToggle(item)}>
               <ListItemIcon>
                 <Checkbox
                   checked={checked.indexOf(item) !== -1}
@@ -202,7 +296,11 @@ export default function Ingredients({ ingredients, setIngredients }) {
                   inputProps={{ 'aria-labelledby': labelId }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={item.name} />
+              <ListItemText
+                id={labelId}
+                disableTypography
+                primary={<Typography style={{ color: item.allergen ? '#ff0000' : '#000000' }}>{item.name}</Typography>}
+              />
             </ListItem>
           );
         })}
@@ -212,42 +310,50 @@ export default function Ingredients({ ingredients, setIngredients }) {
   );
 
   return (
-    <Grid container spacing={2} direction="column" className={classes.root}>
+    <StyledGrid container spacing={2} direction="column" className={classes.root}>
       <Grid item>
         Please review all <a href="https://www.fdacs.gov/content/download/70108/file/Cottage-Food-Operations.pdf" target="_blank">labeling requirements (page 4)</a>. 
-        If your product contains an allergen from the any of the following food groups: (milk, eggs, wheat, peanuts, soybeans, fish 
+        If your product contains an allergen from any of the following food groups: (milk, eggs, wheat, peanuts, soybeans, fish 
         (including shellfish, crab, lobster or shrimp) and tree nuts (such as almonds, pecans or walnuts),
-        you must include the particular allergen in your ingredient list:
-
+        you must include the particular allergen in your ingredient list. You can also use the 
+        <span> <WarningAmberIcon style={{ verticalAlign: 'text-bottom'}}/></span> button below to 
+        explicitly mark an ingredient as an allergen, and it will be included as such on the product label.
       </Grid>
       <Grid item>
         <Grid container spacing={2} justifyContent="center" alignItems="center">
-          <Grid className={classes.flexGrow2} item>{customList('left', left)}</Grid>
-          <Grid className={classes.flexGrow} item>
+          <Grid xs={12} md={5} item>{customList('left', left)}</Grid>
+          <Grid xs={12} md={2} item>
             <Grid container direction="column" alignItems="center">
               <Button
                 variant="outlined"
-                size="small"
                 className={classes.button}
-                onClick={handleCheckedRight}
+                onClick={moveLeftCheckedToRight}
                 disabled={leftChecked.length === 0}
                 aria-label="move selected right"
               >
-                &gt;
+                <ArrowForwardIcon />
               </Button>
               <Button
                 variant="outlined"
-                size="small"
                 className={classes.button}
-                onClick={handleCheckedLeft}
+                onClick={moveRightCheckedToLeft}
                 disabled={rightChecked.length === 0}
                 aria-label="move selected left"
               >
-                &lt;
+                <ArrowBackIcon />
+              </Button>
+              <Button
+                variant="outlined"
+                className={classes.button}
+                color="red"
+                disabled={rightChecked.length === 0 && leftChecked.length === 0}
+                onClick={handleAllergenButtonClick}
+              >
+                <WarningAmberIcon />
               </Button>
             </Grid>
           </Grid>
-          <Grid className={classes.flexGrow2} item>{customList('Chosen', right)}</Grid>
+          <Grid xs={12} md={5} item>{customList('Chosen', right)}</Grid>
         </Grid>
       </Grid>
       <Grid item>
@@ -271,6 +377,6 @@ export default function Ingredients({ ingredients, setIngredients }) {
           </Grid>
         </Grid>*/}
       </Grid>
-    </Grid>
+    </StyledGrid>
   );
 }

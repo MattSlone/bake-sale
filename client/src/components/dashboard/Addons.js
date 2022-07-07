@@ -47,15 +47,26 @@ const StyledGrid = styled(Grid)((
 }));
 
 export default function Addons(props) {
-
-
   const [addons, setAddons] = useState(props.addons)
   const [price, setPrice] = useState('')
   const [secondaryPrice, setSecondaryPrice] = useState('')
   const [name, setName] = useState('')
+  const [message, setMessage] = useState('')
+
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    if (addons.length > 5) {
+      rtn.error = "Products may have a maximum of 5 addons."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
 
   useEffect(() => {
-    if(addons) {
+    const valid = validate()
+    props.setValidAddons(valid)
+    if(valid.success) {
       props.setAddons(addons)
     }
   }, [addons])
@@ -142,6 +153,7 @@ export default function Addons(props) {
                 label="Secondary Price"
                 placeholder="$0.00"
                 type="number"
+                disabled={price ? false : true}
                 InputLabelProps={{
                   shrink: true,
                 }}

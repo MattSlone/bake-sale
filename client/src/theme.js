@@ -10,6 +10,9 @@ const theme = createTheme(adaptV4Theme({
     secondary: {
       main: '#19857b',
     },
+    red: {
+      main: '#ff0000'
+    },
     error: {
       main: red.A400,
     },

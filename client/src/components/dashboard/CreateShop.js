@@ -7,14 +7,11 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import isByteLength from 'validator/lib/isByteLength';
-import AddProductContainer from '../containers/AddProductContainer';
 import Grid from '@mui/material/Grid';
-import { stateList } from './stateList';
 import { useAuth } from '../../hooks/use-auth'
-import { useHistory, useLocation, Switch, Route, Redirect, Link, useRouteMatch } from "react-router-dom";
+import { useHistory, Link, useRouteMatch } from "react-router-dom";
 import PickupAndDeliveryOptionsContainer from '../containers/PickupAndDeliveryOptionsContainer';
 import SetupPaymentAccountContainer from '../containers/SetupPaymentAccountContainer';
-import { editShop } from '../../redux';
 
 const PREFIX = 'CreateShop';
 
@@ -107,7 +104,6 @@ export default function CreateShop(props) {
   const history = useHistory();
   const steps = getSteps(edit);
   const [shopName, setShopName] = useState(props.shop.name)
-  const [state, setState] = useState(props.shop.state)
   const [activeStep, setActiveStep] = useState(0);
   const [message, setMessage] = useState('')
   const [childStep, setChildStep] = useState(0)
@@ -214,10 +210,6 @@ export default function CreateShop(props) {
     }
     return valid
   }
-
-  useEffect(() => {
-    console.log(activeStep, childStep)
-  }, [activeStep, childStep])
 
   const handleGoToStep = (i) => {
     if (validate()) {

@@ -21,4 +21,55 @@ module.exports = (app) => {
       next(err)
     }
   })
+
+  app.post('/api/ingredients/update',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
+    try {
+      console.log(req.body)
+        let response = await IngredientController.update(req, res, next)
+        res.send({
+            success: response
+        })
+    }
+    catch (err) {
+      req.flash('error', err)
+      res.redirect('/api/ingredients/update')
+
+    }
+  })
+
+  app.get('/api/ingredients/update', async (req, res, next) => {
+    try {
+        res.send({
+            error: req.flash('error'),
+            success: false
+        })
+    }
+    catch (err) {
+      res.send({
+        error: [err],
+        success: false
+      })
+    }
+  })
+
+  app.get('/api/ingredients',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
+    try {
+      console.log(req.body.query)
+        let response = await IngredientController.list(req, res, next)
+        res.send({
+            error: req.flash('error'),
+            success: response
+        })
+    }
+    catch (err) {
+      res.send({
+        error: [err],
+        success: false
+    })
+    }
+  })
 }
