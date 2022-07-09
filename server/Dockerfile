@@ -10,6 +10,7 @@ ENV NODE_ENV ${NODE_ENV}
 RUN apk --no-cache add --virtual build-deps build-base python3
 
 COPY package.json /app
+COPY /uploads/3a5517608fcb9971aef031549e32ae8b /uploads
 RUN yarn install --silent
 RUN yarn global add nodemon
 COPY . .

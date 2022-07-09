@@ -20,7 +20,8 @@ import {
   EDIT_PRODUCT_FAILURE,
   RESET_PRODUCT,
   SET_CUSTOM_FORM,
-  SET_PRODUCT_WEIGHT
+  SET_PRODUCT_WEIGHT,
+  SET_VALID_PRODUCT
 } from './productTypes'
 
 const initialState = {
@@ -41,7 +42,8 @@ const initialState = {
   loading: false,
   products: [],
   fields: [],
-  count: 0
+  count: 0,
+  valid: false
 }
 
 const productReducer = (state = initialState, action) => {
@@ -57,6 +59,10 @@ const productReducer = (state = initialState, action) => {
     case SET_CUSTOM_FORM: return {
       ...state,
       fields: action.payload
+    }
+    case SET_VALID_PRODUCT: return {
+      ...state,
+      valid: action.payload
     }
     case SET_LISTING_DETAILS: return {
       ...state,

@@ -5,37 +5,12 @@ const db = require('../models/index')
 const { Op, fn, col } = require("sequelize");
 const GMaps = require('../lib/gmaps');
 const shop = require('../routes/shop');
+const fs = require('fs').promises
 
 module.exports = class ProductController {
     async create (req, res, next) {
         try {
             const varieties = req.body.product?.custom ? { quantity: 1 } : req.body.product.varieties
-            const updateIngredients = await Promise.all(req.body.product.ingredients.map(async newIngredient => {
-                const ingredient = await db.Ingredient.findOne({
-                    where: { 
-                        name: newIngredient.name
-                    },
-                    include: {
-                        model: db.Product,
-                        include: {
-                            model: db.Shop,
-                            include: {
-                                model: db.User,
-                                where: {
-                                    id: req.user.id
-                                },
-                                required: true
-                            }
-                        }
-                    }
-                })
-                return ingredient ? ingredient : false
-            }).filter(ingredient => ingredient))
-            for (let ingredient of updateIngredients) {
-                const index = req.body.product.ingredients.map(ingredient => ingredient.name)
-                    .indexOf(ingredient.name)
-                req.body.product.ingredients.splice(index, 1)
-            }
             const product = await db.Product.create({
                 name: req.body.product.name,
                 category: req.body.product.category,
@@ -44,10 +19,10 @@ module.exports = class ProductController {
                 description: req.body.product.description,
                 automaticRenewal: req.body.product.automaticRenewal,
                 inventory: req.body.product.inventory,
+                weight: req.body.product.weight,
                 personalizationPrompt: req.body.product.personalizationPrompt,
                 Varieties: varieties,
                 Addons: req.body.product.addons,
-                Ingredients: req.body.product.ingredients,
                 ShopId: req.body.shopId,
                 Form: {
                     name: req.body.product.formName,
@@ -55,7 +30,6 @@ module.exports = class ProductController {
                 },
               }, {
                 include: [
-                    db.Ingredient,
                     db.Variety,
                     db.Addon,
                     {
@@ -74,13 +48,11 @@ module.exports = class ProductController {
                     }
                 ]
             });
-            for (let ingredient of updateIngredients) {
-                ingredient.addProduct(product)
-            }
+            await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
             return product
         }
         catch (err) {
-            return next(err)
+            console.log(err)
         }
     }
 
@@ -143,10 +115,8 @@ module.exports = class ProductController {
 
     async list(req, res, next) {
         try {
-            console.log("QUERY PARAMS: ", req.query)
             const user = req.user ? await db.User.findByPk(req.user.id) : {}
             const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
-            console.log('SHOP IDS: ', shopIds)
             const where = {
                 ...(req.query.shop && {ShopId: req.query.shop}),
                 ...(req.query.products && {id: req.query.products}),
@@ -196,10 +166,8 @@ module.exports = class ProductController {
 
     async count(req, res, next) {
         try {
-            console.log("QUERY PARAMS: ", req.query)
             const user = req.user ? await db.User.findByPk(req.user.id) : {}
             const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
-            console.log('SHOP IDS: ', shopIds)
             const where = {
                 ...(req.query.shop && {ShopId: req.query.shop}),
                 ...(req.query.products && {id: req.query.products}),
@@ -216,17 +184,85 @@ module.exports = class ProductController {
         }
     }
 
+    async updateProductIngredients(userId, product, ingredients) {
+        const updateUserIngredients = (await Promise.all(ingredients.map(async newIngredient => {
+            const ingredient = await db.Ingredient.findOne({
+                where: { 
+                    name: newIngredient.name
+                },
+                include: {
+                    model: db.Product,
+                    include: {
+                        model: db.Shop,
+                        include: {
+                            model: db.User,
+                            where: {
+                                id: userId
+                            },
+                            required: true
+                        }
+                    }
+                }
+            })
+            return ingredient ? ingredient : false
+        }))).filter(ingredient => ingredient)
+        let newIngredients = ingredients.filter(ingredient => {
+            return !updateUserIngredients.map(ingredient => ingredient.name)
+                .includes(ingredient.name)
+        })
+        newIngredients = await db.Ingredient.bulkCreate(newIngredients, { returning: true })
+        await product.addIngredients(newIngredients.concat(updateUserIngredients))
+        const deletedIngredients = await db.Ingredient.findAll({
+            where: {
+                name: {[Op.notIn]:newIngredients.concat(updateUserIngredients)
+                    .map(ingredient => ingredient.name)}
+            },
+            include: {
+                model: db.Product,
+                where: { id: product.id }
+            }
+        })
+        await product.removeIngredients(deletedIngredients)
+    }
+
     async addImages(req, res, next) {
         try {
-            await db.ProductImage.bulkCreate(
+            const productImages = await db.ProductImage.bulkCreate(
                 req.files.map(file => {
                     return {
                         name: file.originalname,
                         path: file.path,
                         ProductId: req.body.productId
                     }
-                })
+                }),
+                {
+                    returning: true
+                }
             )
+            const product = await db.Product.findOne({
+                where: { id: req.body.productId },
+                include: { model: db.Shop, include: {
+                    model: db.User,
+                    where: {
+                        id: req.user.id
+                    },
+                    required: true
+                }}
+            })
+            await product.setProductImages(productImages)
+            this.deleteImages()
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async deleteImages() {
+        try {
+            const imagesToDelete = await db.ProductImage.findAll({ where: { ProductId: null } })
+            await db.ProductImage.destroy({ where: { ProductId: null } })
+            for (let image of imagesToDelete) {
+                await fs.unlink(image.path)
+            }
         } catch (err) {
             console.log(err)
         }
@@ -241,9 +277,9 @@ module.exports = class ProductController {
             );
             product = await db.Product.findByPk(req.body.product.id, 
                 {
-                    include: [db.Variety, db.Addon, db.Ingredient]
+                    include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
                 }
-            );
+            )
             let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
             await product.setVarieties(varieties.map(variety => variety.id))
             await db.Variety.destroy({
@@ -254,20 +290,17 @@ module.exports = class ProductController {
             await db.Addon.destroy({
                 where: { ProductId: null }
             })
-
-            let ingredients = await this.upsertAssociation(product, db.Ingredient, req.body.product.ingredients, true)
-            await product.setIngredients(ingredients.map(ingredient => ingredient.id))
-
+            await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
             product = await db.Product.findByPk(req.body.product.id, 
                 {
-                    include: [db.Variety, db.Addon, db.Ingredient]
+                    include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
                 }
-            );
-
+            )
+            console.log('newProduct: ', product.ProductImages)
             return product
         }
         catch (err) {
-            return next(err)
+            console.log(err)
         }
       }
 

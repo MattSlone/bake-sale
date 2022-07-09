@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     processingTime: DataTypes.INTEGER,
     automaticRenewal: DataTypes.BOOLEAN,
     inventory: DataTypes.INTEGER,
-    personalizationPrompt: DataTypes.TEXT
+    personalizationPrompt: DataTypes.TEXT,
+    weight: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'Product',

@@ -28,7 +28,8 @@ const classes = {
   mobile: `${PREFIX}-mobile`,
   button: `${PREFIX}-button`,
   actionsContainer: `${PREFIX}-actionsContainer`,
-  resetContainer: `${PREFIX}-resetContainer`
+  resetContainer: `${PREFIX}-resetContainer`,
+  stepLabel: `${PREFIX}-stepLabel`
 };
 
 const Root = styled('div')((
@@ -52,7 +53,12 @@ const Root = styled('div')((
 
   [`& .${classes.resetContainer}`]: {
     padding: theme.spacing(3),
-  }
+  },
+
+  [`& .${classes.stepLabel}`]: {
+    cursor: 'pointer',
+    pointerEvents: 'all !important'
+  },
 }));
 
 function getSteps() {
@@ -84,8 +90,9 @@ export default function AddProduct(props) {
   
   const validate = () => {
     let valid = { error: '', success: edit ? true : false }
-    //props.setValidShop(false)
+    props.setValidProduct(false)
     setMessage('')
+    console.log(activeStep, imageFormData.getAll('photos'))
     switch (activeStep) {
       case 0:
         valid.success = true
@@ -113,9 +120,9 @@ export default function AddProduct(props) {
     }
     if (valid.success) {
       if (edit) {
-        // edit product
+        props.editProduct(formData)
       }
-      // create product
+      props.setValidProduct(true)
     } else {
       setMessage(valid.error)
     }
@@ -123,7 +130,7 @@ export default function AddProduct(props) {
   }
 
   useEffect(() => {
-    if(match.path.includes('edit')) {
+    if(edit) {
       if(product.custom) {
         return <AddCustomProductContainer />
       }
@@ -144,26 +151,35 @@ export default function AddProduct(props) {
   const handleNext = () => {
     const valid = validate()
     if (valid.success) {
+      if (activeStep === steps.length-1) {
+        handleFinish()
+      }
       setActiveStep((prevActiveStep) => prevActiveStep + 1)
     }
   }
 
   const imageFormData = new FormData()
   useEffect(() => {
+    console.log('IMAGE FILES CHANGEDDDD: ', props.product.imageFiles)
     const files = props.product.imageFiles.map((imageFile, i) => {
       return {
         file: imageFile.file,
         i: i
       }
     })
-    if (files.length > 0 
-        && Object.keys(files[0].file).length > 0
-      ) {
+    if (files.length > 0) {
         for (let file of files) {
-          imageFormData.append(`photos`, file.file, `images${file.i}`)    
+          imageFormData.append(`photos`, file.file, `images${file.i}`)
+        }
+      }
+      if (edit) {
+        const valid = validate()
+        if (valid.success) {
+          // success?
         }
       }
   }, [props.product.imageFiles])
+
   const formData = {
     product: {
       ...props.product,
@@ -174,10 +190,7 @@ export default function AddProduct(props) {
   }
 
   const handleFinish = () => {
-    handleNext()
-    if(match.path.includes('edit')) {
-      props.editProduct(formData)
-    } else {
+    if (!props.product.id && props.product.valid) {
       props.createProduct(formData)
     }
   }
@@ -194,8 +207,8 @@ export default function AddProduct(props) {
     const valid = validate()
     if (valid.success) {
       setActiveStep(i)
-    } else if (props.shop.error) {
-      setMessage(props.shop.error)
+    } else if (props.product.error) {
+      setMessage(props.product.error)
     } else {
       setMessage(valid.error)
     }
@@ -242,27 +255,14 @@ export default function AddProduct(props) {
                   >
                     Back
                   </Button>
-                  {(() => {
-                    if (activeStep === steps.length - 1) {
-                      return <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleFinish}
-                      className={classes.button}
-                      >
-                        Finish
-                      </Button>
-                    } else {
-                      return <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        className={classes.button}
-                      >
-                        Next
-                      </Button>
-                    }
-                  })()}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleNext}
+                    className={classes.button}
+                  >
+                    {activeStep === steps.length -1 ? "Finish" : "Next"}
+                  </Button>
                 </div>
               </div>
             </StepContent>

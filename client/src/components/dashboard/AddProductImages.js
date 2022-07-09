@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
-import CameraIcon from '@mui/icons-material/PhotoCamera';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import { useRouteMatch } from 'react-router-dom';
 import { Input } from '@mui/material';
 import { CardActionArea } from '@mui/material';
 import axios from 'axios'
+import Popover from '@mui/material/Popover';
 
 const PREFIX = 'AddProductImages';
 
@@ -64,8 +60,21 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export default function AddProductImages(props) {
   const match = useRouteMatch()
   const edit = match.path.includes('edit')
-  const hiddenFileInput = React.useRef([])
+  const hiddenFileInput = useRef([])
   const [imageFiles, setImageFiles] = useState([])
+  const [deleteImageAnchorEl, setDeleteImageAnchorEl] = useState(null);
+  let deleteImageAnchorRef = useRef('')
+
+  const handleDeleteImageClose = () => {
+    setDeleteImageAnchorEl(null);
+  }
+
+  const handleDeleteImage = () => {
+    handleDeleteImageClose()
+  }
+
+  const open = Boolean(deleteImageAnchorEl);
+  const id = open ? 'delete-image-popover' : undefined;
 
   useEffect(async () => {
     if (edit) {
@@ -82,18 +91,20 @@ export default function AddProductImages(props) {
   }, [])
 
   useEffect(() => {
-    console.log(imageFiles)
     props.setProductImagesPreview(imageFiles)
   }, [imageFiles])
 
   const handleClick = (event, index) => {
-    hiddenFileInput.current[index].click();
+    if (imageFiles[index-1]?.file) {
+      setDeleteImageAnchorEl(event.currentTarget)
+    } else {
+      hiddenFileInput.current[index].click()
+    }
   };
 
   const handleChange = (event, key) => {
     let reader = new FileReader
     let file = event.target.files[0]
-
     if (file) {
       reader.onloadend = () => {
         setImageFiles([...imageFiles, {
@@ -104,7 +115,6 @@ export default function AddProductImages(props) {
       reader.readAsDataURL(file)
     } else {
       let tempImageFiles = imageFiles.filter((file, i) => i !== key-1)
-      console.log(tempImageFiles)
       setImageFiles(tempImageFiles)
     }
   };
@@ -130,6 +140,24 @@ export default function AddProductImages(props) {
               </Grid>
             ))}
           </Grid>
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={deleteImageAnchorEl}
+            onClose={handleDeleteImageClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+          >
+            <Button
+              sx={{margin: '1em'}}
+              variant="contained"
+              onClick={handleDeleteImage}
+            >
+              Delete Image
+            </Button>
+          </Popover>
         </Container>
       </main>
     </Root>

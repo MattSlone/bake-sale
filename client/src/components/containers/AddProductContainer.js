@@ -1,6 +1,12 @@
 import { connect } from 'react-redux'
 import AddProduct from '../dashboard/AddProduct'
-import { createProduct, setProductEdit, editProduct, resetProduct } from '../../redux'
+import {
+  createProduct,
+  setProductEdit,
+  editProduct,
+  resetProduct,
+  setValidProduct
+} from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -15,7 +21,8 @@ const mapDispatchToProps = dispatch => {
     createProduct: (formData) => dispatch(createProduct(formData)),
     setProductEdit: (product) => dispatch(setProductEdit(product)),
     editProduct: (product) => dispatch(editProduct(product)),
-    resetProduct: () => dispatch(resetProduct())
+    resetProduct: () => dispatch(resetProduct()),
+    setValidProduct: (valid) => dispatch(setValidProduct(valid))
   }
 }
 

@@ -29,7 +29,7 @@ const StyledGrid = styled(Grid)((
 }));
 
 export default function Labeling(props) {
-  const [weight, setWeight] = useState('')
+  const [weight, setWeight] = useState(props.weight)
 
   const validate = () => {
     let rtn = { error: '', success: false }
@@ -58,7 +58,7 @@ export default function Labeling(props) {
   }, [weight])
 
   return (
-    <StyledGrid container fullWidth spacing={2} className={classes.root}>
+    <StyledGrid container spacing={2} className={classes.root}>
       <Grid item xs={12}>
         <Typography>
           You can use the below label for your products, or create your own!

@@ -47,7 +47,8 @@ const classes = {
   sectionMobile: `${PREFIX}-sectionMobile`,
   routerLinkButton: `${PREFIX}-routerLinkButton`,
   white: `${PREFIX}-white`,
-  popoverRoot: `${PREFIX}-popoverRoot`
+  popoverRoot: `${PREFIX}-popoverRoot`,
+  logo: `${PREFIX}-logo`
 };
 
 const Root = styled('div')((
@@ -58,10 +59,6 @@ const Root = styled('div')((
 ) => ({
   [`& .${classes.grow}`]: {
     flexGrow: 1,
-  },
-
-  [`& .${classes.quantityInput}`]: {
-    width: 45
   },
 
   [`& .${classes.fullWidth}`]: {
@@ -164,37 +161,19 @@ const Root = styled('div')((
     }
   },
 
-  [`& .${classes.link}`]: {
-    color: 'black',
-    textDecoration: 'none'
-  },
-
   [`& .${classes.white}`]: {
     color: 'white'
-  },
-
-  [`& .${classes.logo}`]: {
-    height: '45px'
-  },
-
-  [`& .${classes.popoverRoot}`]: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'f',
   }
 }));
 
-
-
 export default function PrimarySearchAppBar(props) {
   const location = useLocation()
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [search, setSearch] = useState('')
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const isMount = useIsMount();
 
-  const [cartAnchorEl, setCartAnchorEl] = React.useState(null);
+  const [cartAnchorEl, setCartAnchorEl] = useState(null);
   let cartAnchorRef = useRef('')
 
   const fulfillment = ['pickup', 'delivery', 'shipping']
@@ -216,8 +195,6 @@ export default function PrimarySearchAppBar(props) {
   };
 
   const cartOpen = Boolean(cartAnchorEl && props.cart.products.length > 0);
-
-
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -425,7 +402,7 @@ export default function PrimarySearchAppBar(props) {
       </AppBar>
       <Popover
         id="mouse-over-popover"
-        className={classes.popoverRoot}
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         open={cartOpen}
         anchorEl={cartAnchorEl}
         anchorReference='none'
@@ -439,7 +416,7 @@ export default function PrimarySearchAppBar(props) {
                 <ListItem key={i}>
                   <ListItemText>
                     <TextField
-                      className={classes.quantityInput}
+                      sx={{ width: 100 }}
                       inputProps={{min: 1, style: { textAlign: 'center' }}} 
                       id="quantity"
                       type="number"
@@ -454,7 +431,7 @@ export default function PrimarySearchAppBar(props) {
                         variation => variation.quantity == product.variation
                       ).quantity}`
                     }
-                    className={classes.paddingLeft}
+                    sx={{paddingLeft: 1}}
                   >
                     {product.product?.name}
                   </ListItemText>}
@@ -462,7 +439,7 @@ export default function PrimarySearchAppBar(props) {
                   secondary={product.quantity > 1 
                     ? `$${Number.parseFloat(product.clientSidePrice).toFixed(2)} ea` 
                     : ""}
-                  className={classes.paddingLeft}
+                  sx={{paddingLeft: 1}}
                   >
                     ${Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}
                   </ListItemText>
@@ -478,9 +455,14 @@ export default function PrimarySearchAppBar(props) {
                 </ListItem>
               ))}
               <ListItem>
-                <RouterLink to='/checkout' className={`${classes.routerLinkButton} ${classes.fullWidth}`}>
+                <RouterLink to='/checkout'
+                  style={{
+                    textDecoration: 'none',
+                    width: '100%'
+                  }}
+                >
                   <Button 
-                    fullWidth
+                    style={{ width: '100%' }}
                     variant="contained"
                     color="primary"
                     onClick={handleCartPopoverClose}

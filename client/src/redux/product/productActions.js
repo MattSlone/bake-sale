@@ -22,7 +22,8 @@ import {
   SET_PRODUCT_EDIT,
   RESET_PRODUCT,
   SET_CUSTOM_FORM,
-  SET_PRODUCT_WEIGHT
+  SET_PRODUCT_WEIGHT,
+  SET_VALID_PRODUCT
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
@@ -57,6 +58,13 @@ export const setAddons = (addons) => {
   return {
     type: SET_ADDONS,
     payload: addons
+  }
+}
+
+export const setValidProduct = (valid) => {
+  return {
+    type: SET_VALID_PRODUCT,
+    payload: valid
   }
 }
 
@@ -191,7 +199,7 @@ export const createProduct = (formData) => {
     try {
       dispatch(createProductRequest())
       const res = await axios.post('/api/product/create', formData)
-      if (res.data.success?.id) {
+      if (res.data?.success?.id) {
         imageFormData.append('productId', res.data.success.id)
         const res2 = await axios.post('/api/product/images', imageFormData)
       }
@@ -272,7 +280,7 @@ export const resetProduct = (custom = false) => {
 }
 
 export const editProduct = (formData) => {
-  console.log(formData)
+  const imageFormData = formData.imageFormData
   formData = {
     ...formData,
     product: {
@@ -283,11 +291,13 @@ export const editProduct = (formData) => {
   return async (dispatch) => {
     try {
       dispatch(editProductRequest())
+      console.log('HEREEEEEE: ', imageFormData.getAll('photos'))
+      imageFormData.append('productId', formData.product.id)
+      const imageRes = await axios.post('/api/product/images', imageFormData)
       const res = await axios.post('/api/product/update', formData)
       if (res.data.error[0]) {
         dispatch(editProductFailure(res.data.error[0]))
       } else {
-        console.log(res.data)
         dispatch(editProductSuccess(res.data))
       }
     } catch (error) {
