@@ -4,7 +4,7 @@ import { setProductImagesPreview } from '../../redux'
 
 const mapStateToProps = state => {
   return {
-    imageFiles: state.product.imageFiles
+    product: state.product
   }
 }
 

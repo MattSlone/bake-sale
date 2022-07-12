@@ -16,12 +16,13 @@ import { useAuth } from '../../hooks/use-auth'
 import { Switch, Route, Redirect, useRouteMatch } from "react-router-dom";
 import CreateShopContainer from "../containers/CreateShopContainer"
 import ProductsContainer from "../containers/ProductsContainer"
-import AddProductContainer from '../containers/AddProductContainer';
+import AddRegularProductContainer from '../containers/AddRegularProductContainer';
 import AddCustomProductContainer from '../containers/AddCustomProductContainer';
 import QuotesContainer from '../containers/QuotesContainer';
 import RequestContainer from '../containers/RequestContainer';
 import ShopOrdersContainer from '../containers/ShopOrdersContainer';
 import ShopOrderContainer from '../containers/ShopOrderContainer';
+import AddProductContainer from '../containers/AddProductContainer';
 
 const PREFIX = 'Dashboard';
 
@@ -118,7 +119,7 @@ export default function Dashboard(props) {
         <CreateShopContainer />
       </Route>
       <Route path={`${match.path}/products/add`}>
-        <AddProductContainer />
+        <AddRegularProductContainer />
       </Route>
       <Route path={`${match.path}/products/add-custom`}>
         <AddCustomProductContainer />

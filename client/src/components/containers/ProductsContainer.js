@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import Products from '../dashboard/Products'
-import { getProducts } from '../../redux'
+import { getProducts, resetProduct } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -12,7 +12,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getProducts: (formData) => dispatch(getProducts(formData))
+    getProducts: (formData) => dispatch(getProducts(formData)),
+    resetProduct: () => dispatch(resetProduct())
   }
 }
 

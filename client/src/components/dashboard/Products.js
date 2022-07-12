@@ -71,6 +71,7 @@ export default function Products(props) {
   }
 
   useEffect(() => {
+    props.resetProduct()
     props.getProducts({
       shop: props.shop.id
     })

@@ -27,6 +27,7 @@ import {
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
+  console.log(files[files.length-1])
   return {
     type: SET_PRODUCT_IMAGES_PREVIEW,
     payload: files
@@ -291,7 +292,7 @@ export const editProduct = (formData) => {
   return async (dispatch) => {
     try {
       dispatch(editProductRequest())
-      console.log('HEREEEEEE: ', imageFormData.getAll('photos'))
+      console.log(imageFormData.getAll('photos'))
       imageFormData.append('productId', formData.product.id)
       const imageRes = await axios.post('/api/product/images', imageFormData)
       const res = await axios.post('/api/product/update', formData)

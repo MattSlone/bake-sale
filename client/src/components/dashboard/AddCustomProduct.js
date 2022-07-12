@@ -75,14 +75,20 @@ export default function AddCustomProduct (props) {
   const steps = getSteps()
   let { id } = useParams()
   const match = useRouteMatch()
+  const edit = match.path.includes('edit')
   const matches = useMediaQuery('(min-width:600px)')
   const [product, setProduct] = useState(props.product.products.find(product => product.id === Number(id)))
-
+  const [validProductImages, setValidProductImages] = useState({ error: '', success: edit ? true : false })
+  const [validListingDetails, setValidListingDetails] = useState({ error: '', success: edit ? true : false })
+  const [validPricingAndDelivery, setValidPricingAndInventory] = useState({ error: '', success: edit ? true : false })
+  
   useEffect(() => {
-    if (match.path.includes('edit')) {
+    if (edit) {
       props.setProductEdit({
         ...product,
         id: product.id,
+        productImages: product.ProductImages,
+        varieties: product.Varieties,
         custom: true
       })
     } else {
@@ -128,11 +134,11 @@ export default function AddCustomProduct (props) {
             <StepContent>
               {(() => {
                 switch (activeStep) {
-                  case 0: return <AddProductImagesContainer />
+                  case 0: return <AddProductImagesContainer setValidProductImages={setValidProductImages} />
                   case 1:
-                    return <ListingDetailsContainer />
+                    return <ListingDetailsContainer setValidListingDetails={setValidListingDetails} />
                   case 2:
-                    return <PricingAndInventoryContainer custom={true} />
+                    return <PricingAndInventoryContainer setValidPricingAndInventory={setValidPricingAndInventory} custom={true} />
                   case 3:
                     return <FormGeneratorContainer />
                   default:

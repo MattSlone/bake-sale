@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -7,11 +7,12 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { useRouteMatch } from 'react-router-dom';
+import { useRouteMatch, useParams } from 'react-router-dom';
 import { Input } from '@mui/material';
 import { CardActionArea } from '@mui/material';
 import axios from 'axios'
 import Popover from '@mui/material/Popover';
+import { useIsMount } from '../../hooks/useIsMount';
 
 const PREFIX = 'AddProductImages';
 
@@ -59,43 +60,80 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function AddProductImages(props) {
   const match = useRouteMatch()
+  const isMount = useIsMount()
+  const { id } = useParams()
   const edit = match.path.includes('edit')
   const hiddenFileInput = useRef([])
-  const [imageFiles, setImageFiles] = useState([])
+  const [imageFiles, dispatchImageFiles] = useReducer(imageFilesReducer, { files: [] });
   const [deleteImageAnchorEl, setDeleteImageAnchorEl] = useState(null);
   let deleteImageAnchorRef = useRef('')
 
+  function imageFilesReducer(state, action) {
+    return action.payload;
+  }
+
   const handleDeleteImageClose = () => {
-    setDeleteImageAnchorEl(null);
+    setDeleteImageAnchorEl(null)
   }
 
   const handleDeleteImage = () => {
     handleDeleteImageClose()
   }
 
-  const open = Boolean(deleteImageAnchorEl);
-  const id = open ? 'delete-image-popover' : undefined;
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    if (imageFiles.files.length > 9) {
+      rtn.error = "Products may have a maximum of 9 images."
+      return rtn
+    }
+    if (!imageFiles.files.length >= 1 || !Object.keys(imageFiles.files[0]).length > 0) {
+      rtn.error = "Products must have at least one image."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
 
-  useEffect(async () => {
-    if (edit) {
-      setImageFiles(
-        await Promise.all(props.product.ProductImages.map(async image => {
-          const res = await axios.get(`/api${image.path}`, { responseType: 'blob' })
+  const open = Boolean(deleteImageAnchorEl);
+
+  /**
+   * Load Images
+   */
+  useEffect(() => {
+    const getImages = async () => {
+      if (!isMount && edit && props.product.productImages.length > 0) {
+        console.log('getting disc images')
+        const newImageFiles = await Promise.all(props.product.productImages.map(async image => {
+          const res = await axios.get(`/api${image.path}`,{
+            responseType: 'blob'
+          })
           return {
             file: res.data,
             imagePreviewUrl: `/api${image.path}`
           }
         }))
-      )
+        console.log('finished getting disc images')
+        dispatchImageFiles({ payload: { files: newImageFiles } })
+      } else if ((edit && isMount && props.product.id == id) || (!edit && !props.product.id)) {
+        console.log('setting images from product imageFiles', props.product.imageFiles)
+        dispatchImageFiles({ payload: { files: props.product.imageFiles } })
+      } else {
+        dispatchImageFiles({ payload: { files: [] } })
+      }
     }
-  }, [])
+    getImages()
+  }, [props.product.productImages])
 
   useEffect(() => {
-    props.setProductImagesPreview(imageFiles)
+    const valid = validate()
+    props.setValidProductImages(valid)
+    if(valid.success) {
+      props.setProductImagesPreview(imageFiles.files)
+    }
   }, [imageFiles])
 
   const handleClick = (event, index) => {
-    if (imageFiles[index-1]?.file) {
+    if (imageFiles.files[index-1]?.file) {
       setDeleteImageAnchorEl(event.currentTarget)
     } else {
       hiddenFileInput.current[index].click()
@@ -106,16 +144,20 @@ export default function AddProductImages(props) {
     let reader = new FileReader
     let file = event.target.files[0]
     if (file) {
+      // add image to preview box
       reader.onloadend = () => {
-        setImageFiles([...imageFiles, {
-          file: file,
-          imagePreviewUrl: reader.result,
-        }]);
+        dispatchImageFiles({ 
+          payload: { files: [...imageFiles.files, {
+            file: file,
+            imagePreviewUrl: reader.result,
+          }] }
+        })
       }
       reader.readAsDataURL(file)
     } else {
-      let tempImageFiles = imageFiles.filter((file, i) => i !== key-1)
-      setImageFiles(tempImageFiles)
+      // remove current image if cancel
+      let tempImageFiles = imageFiles.files.filter((file, i) => i !== key-1)
+      dispatchImageFiles({ payload: { files: tempImageFiles } })
     }
   };
 
@@ -131,7 +173,7 @@ export default function AddProductImages(props) {
                   <CardActionArea onClick={event => handleClick(event, card)}>
                       <CardMedia
                         className={classes.cardMedia}
-                        image={imageFiles[card-1]?.imagePreviewUrl ? imageFiles[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
+                        image={imageFiles.files[card-1]?.imagePreviewUrl ? imageFiles.files[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
                         title="Image title"
                       />
                     <Input type='file' style={{display: 'none'}} inputRef={el => hiddenFileInput.current[card] = el} onChange={(e) => handleChange(e, card)}/>
@@ -141,7 +183,7 @@ export default function AddProductImages(props) {
             ))}
           </Grid>
           <Popover
-            id={id}
+            id={open ? 'delete-image-popover' : undefined}
             open={open}
             anchorEl={deleteImageAnchorEl}
             onClose={handleDeleteImageClose}

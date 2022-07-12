@@ -296,7 +296,6 @@ module.exports = class ProductController {
                     include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
                 }
             )
-            console.log('newProduct: ', product.ProductImages)
             return product
         }
         catch (err) {

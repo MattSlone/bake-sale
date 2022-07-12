@@ -75,9 +75,9 @@ export default function PricingAndInventory(props) {
     if (inventory <= 0) {
       rtn.error = "Inventory must be greater than 0."
       return rtn
-    } else if ((varieties.length <= 0) || (varieties.length > 5)) {
-      rtn.error = "Products must have at least one variety, \
-        and a maximum of 5."
+    } else if ((varieties.length <= 0) || (varieties.length > (props.custom ? 1 : 5))) {
+      rtn.error = `Products must have at least one variety, \
+        and a maximum of ${props.custom ? '1' : '5'}.`
       return rtn
     }
     rtn.success = true
@@ -224,7 +224,10 @@ export default function PricingAndInventory(props) {
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2}>
-            <Tooltip title={<Typography>If you offer shipping, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}>
+            <Tooltip 
+              title={<Typography>If you offer shipping, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}
+              position='top'
+            >
               <TextField
                 className={classes.fullWidth}
                 id="shipping"
@@ -239,8 +242,11 @@ export default function PricingAndInventory(props) {
             </Tooltip>
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2}>
-            <Tooltip title={<Typography>You can add a separate shipping cost for each additional package of this variety a customer orders
-              after the first one. You can leave this blank to keep the same shipping cost.</Typography>}>
+            <Tooltip 
+              title={<Typography>You can add a separate shipping cost for each additional package of this variety a customer orders
+              after the first one. You can leave this blank to keep the same shipping cost.</Typography>}
+              placement="top"
+            >
               <TextField
                 className={classes.fullWidth}
                 id="secondary-shipping"
@@ -256,8 +262,11 @@ export default function PricingAndInventory(props) {
             </Tooltip>
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2} >
-          <Tooltip title={<Typography>Choose between a flat-rate delivery, or by the mile. By the mile 
-             delivery fees are calculated by the distance between your home/kitchen and the delivery address.</Typography>}>
+            <Tooltip 
+              title={<Typography>Choose between a flat-rate delivery, or by the mile. By the mile 
+              delivery fees are calculated by the distance between your home/kitchen and the delivery address.</Typography>}
+              placement="top"
+            >
               <FormControl variant="outlined" className={classes.fullWidth}>
                 <InputLabel id="delivery-type-label">Delivery Fee Type</InputLabel>
                 <Select
@@ -275,7 +284,10 @@ export default function PricingAndInventory(props) {
             </Tooltip>
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2}>
-            <Tooltip title={<Typography>If you offer delivery, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}>  
+            <Tooltip 
+              title={<Typography>If you offer delivery, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}
+              placement="top"
+            >  
               <TextField
                 className={classes.fullWidth}
                 id="delivery"
@@ -291,8 +303,11 @@ export default function PricingAndInventory(props) {
             </Tooltip>
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2}>
-            <Tooltip title={<Typography>You can add a separate delivery cost for each additional package of this variety a customer orders. 
-            You can leave this blank to keep the same delivery cost.</Typography>}>
+            <Tooltip 
+              title={<Typography>You can add a separate delivery cost for each additional package of this variety a customer orders. 
+            You can leave this blank to keep the same delivery cost.</Typography>}
+              placement="top"
+            >
               <TextField
                 className={classes.fullWidth}
                 id="secondary-delivery"
@@ -390,7 +405,10 @@ function PricingAndInventoryCustom(props) {
       <Grid item>
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6} md={3} lg={2}>
-            <Tooltip title={<Typography>If you offer shipping, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}>
+            <Tooltip 
+              title={<Typography>If you offer shipping, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}
+              placement="top"
+            >
               <TextField
                 className={classes.fullWidth}
                 id="shipping"
@@ -405,8 +423,11 @@ function PricingAndInventoryCustom(props) {
             </Tooltip>
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2} >
-          <Tooltip title={<Typography>Choose between a flat-rate delivery, or by the mile. By the mile 
-             delivery fees are calculated by the distance between your home/kitchen and the delivery address.</Typography>}>
+          <Tooltip 
+            title={<Typography>Choose between a flat-rate delivery, or by the mile. By the mile 
+             delivery fees are calculated by the distance between your home/kitchen and the delivery address.</Typography>}
+            placement="top"
+          >
               <FormControl variant="outlined" className={classes.fullWidth}>
                 <InputLabel id="delivery-type-label">Delivery Fee Type</InputLabel>
                 <Select
@@ -423,7 +444,10 @@ function PricingAndInventoryCustom(props) {
             </Tooltip>
           </Grid>
           <Grid item xs={12} sm={6} md={3} lg={2}>
-            <Tooltip title={<Typography>If you offer delivery, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}>  
+            <Tooltip 
+              title={<Typography>If you offer delivery, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}
+              placement="top"
+            >  
               <TextField
                 className={classes.fullWidth}
                 id="delivery"

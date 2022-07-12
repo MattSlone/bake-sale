@@ -38,6 +38,7 @@ const initialState = {
   personalizationPrompt: '',
   inventory: 0,
   imageFiles: [],
+  productImages: [],
   weight: 0,
   loading: false,
   products: [],
@@ -147,7 +148,8 @@ const productReducer = (state = initialState, action) => {
         inventory: action.payload.inventory,
         addons: action.payload.addons,
         fields: action.payload.fields,
-        personalizationPrompt: action.payload.personalizationPrompt
+        personalizationPrompt: action.payload.personalizationPrompt,
+        productImages: action.payload.productImages
       }
     case EDIT_PRODUCT_REQUEST: return {
       ...state,
@@ -166,6 +168,7 @@ const productReducer = (state = initialState, action) => {
       varieties: action.payload.Varieties,
       addons: action.payload.Addons,
       personalizationPrompt: action.payload.personalizationPrompt,
+      productImages: action.payload.ProductImages,
       inventory: action.payload.inventory,
       error: ''
     }
@@ -189,6 +192,7 @@ const productReducer = (state = initialState, action) => {
       personalizationPrompt: '',
       inventory: 0,
       imageFiles: [],
+      productImages: [],
       loading: false
     }
     default: return state
