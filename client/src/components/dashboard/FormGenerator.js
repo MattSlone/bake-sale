@@ -3,7 +3,6 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import { TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -73,7 +72,6 @@ export default function FormGenerator(props) {
       constraints: constraints
     })
     setFields(newFields)
-
     setName('')
     setType('')
     setPrompt('')
@@ -101,7 +99,6 @@ export default function FormGenerator(props) {
     let newOptions = [...options]
     newOptions.push(option)
     setOptions(newOptions)
-
     setOption('')
   }
 

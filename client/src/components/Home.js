@@ -10,8 +10,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
-import { useHistory, Link as RouterLink } from "react-router-dom";
-import { store } from '../redux/store'
+import { Link as RouterLink } from "react-router-dom";
 import Pagination from '@mui/material/Pagination'
 
 function Copyright() {
@@ -91,17 +90,31 @@ export default function Home(props) {
     },
 
     [`& .${classes.card}`]: {
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
+      height: '250px',
+      maxWidth: '290px',
+      position: "relative"
     },
 
     [`& .${classes.cardMedia}`]: {
-      paddingTop: '56.25%', // 16:9
+      position: "absolute",
+      top: 0,
+      right: 0,
+      height: "100%",
+      width: "100%"
+    },
+
+    [`& .${classes.actionArea}`]: {
+      position: "relative"
     },
 
     [`& .${classes.cardContent}`]: {
-      flexGrow: 1,
+      position: "absolute",
+      height: '33%',
+      bottom: 0,
+      width: '100%',
+      padding: '0.5em',
+      color: "#ffffff",
+      backgroundColor: "rgba(0,0,0,.24)"
     },
 
     [`& .${classes.footer}`]: {
@@ -157,28 +170,22 @@ export default function Home(props) {
           <Grid container spacing={4}>
             {props.product.products ? props.product.products.map((card) => (
               <Grid item key={card.id} xs={12} sm={6} md={4}>
-                <Card className={classes.card}>
-                  <CardMedia
-                    className={classes.cardMedia}
-                    image={`/api${card.ProductImages[0]?.path}`}
-                    title="Image title"
-                  />
-                  <CardContent className={classes.cardContent}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {card.name}
-                    </Typography>
-                    <Typography>
-                      {card.description}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <RouterLink className={classes.routerLink} to={`/products/${card.id}`}>
-                      <Button size="small" color="primary">
-                        View
-                      </Button>
-                    </RouterLink>
-                  </CardActions>
-                </Card>
+                <RouterLink className={classes.routerLink} to={`/products/${card.id}`}>
+                  <Card className={classes.card}>
+                    <CardMedia
+                      className={classes.cardMedia}
+                      image={`/api${card.ProductImages[0]?.path}`}
+                      title="Image title"
+                    />
+                    <CardContent className={classes.cardContent}>
+                      <Typography gutterBottom variant="h6" component="h6">
+                        {card.name.length < 40 ? card.name :
+                          card.name.slice(0,40) + '...' 
+                        }
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </RouterLink>
               </Grid>
             )) : ''}
             <Grid item xs={12} container justifyContent="center">

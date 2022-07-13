@@ -102,7 +102,6 @@ export default function AddProductImages(props) {
   useEffect(() => {
     const getImages = async () => {
       if (!isMount && edit && props.product.productImages.length > 0) {
-        console.log('getting disc images')
         const newImageFiles = await Promise.all(props.product.productImages.map(async image => {
           const res = await axios.get(`/api${image.path}`,{
             responseType: 'blob'
@@ -112,10 +111,8 @@ export default function AddProductImages(props) {
             imagePreviewUrl: `/api${image.path}`
           }
         }))
-        console.log('finished getting disc images')
         dispatchImageFiles({ payload: { files: newImageFiles } })
       } else if ((edit && isMount && props.product.id == id) || (!edit && !props.product.id)) {
-        console.log('setting images from product imageFiles', props.product.imageFiles)
         dispatchImageFiles({ payload: { files: props.product.imageFiles } })
       } else {
         dispatchImageFiles({ payload: { files: [] } })

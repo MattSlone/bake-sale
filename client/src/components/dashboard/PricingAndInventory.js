@@ -236,7 +236,7 @@ export default function PricingAndInventory(props) {
                 onChange={(e) => {setShipping(Number(e.target.value))}}
                 type="number"
                 InputLabelProps={{
-                  shrink: true,
+                  shrink: true
                 }}
               />
             </Tooltip>
@@ -362,7 +362,7 @@ function PricingAndInventoryCustom(props) {
       secondaryDelivery: 0
     })
 
-    if (props.varieties.length < 1 && (shipping !== null || delivery !== null)) {
+    if (props.varieties.length < 1) {
       props.setVarieties(newVarieties)
     }
     

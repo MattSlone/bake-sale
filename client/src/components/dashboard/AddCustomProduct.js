@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import AddProductImagesContainer from '../containers/AddProductImagesContainer'
 import { useRouteMatch, useParams } from 'react-router-dom'
-// import { setProductImagesPreview } from '../../redux'
 import FormGeneratorContainer from '../containers/FormGeneratorContainer'
 import ListingDetailsContainer from '../containers/ListingDetailsContainer'
 import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
@@ -36,15 +35,11 @@ const Root = styled('div')((
   },
 
   [`& .${classes.desktop}`]: {
-    paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(8) : theme.spacing(10),
-    paddingLeft: 0,
-    paddingRight: 0
+    padding: theme.spacing(2)
   },
 
   [`& .${classes.mobile}`]: {
-    paddingTop: useRouteMatch().path.includes('add') ? theme.spacing(7) : theme.spacing(0),
-    paddingLeft: 0,
-    paddingRight: 0
+    padding: theme.spacing(2)
   },
 
   [`& .${classes.button}`]: {
@@ -70,7 +65,6 @@ function getSteps () {
 }
 
 export default function AddCustomProduct (props) {
-
   const [activeStep, setActiveStep] = React.useState(0)
   const steps = getSteps()
   let { id } = useParams()
@@ -78,41 +72,111 @@ export default function AddCustomProduct (props) {
   const edit = match.path.includes('edit')
   const matches = useMediaQuery('(min-width:600px)')
   const [product, setProduct] = useState(props.product.products.find(product => product.id === Number(id)))
+  const [message, setMessage] = useState('')
   const [validProductImages, setValidProductImages] = useState({ error: '', success: edit ? true : false })
   const [validListingDetails, setValidListingDetails] = useState({ error: '', success: edit ? true : false })
   const [validPricingAndDelivery, setValidPricingAndInventory] = useState({ error: '', success: edit ? true : false })
-  
+  const [imageFormData, setImageFormData] = useState(null)
+  const [formData, setFormData] = useState({
+    product: {
+      ...props.product,
+      custom: true
+    },
+    shopId: props.shop.id
+  })
+
   useEffect(() => {
     if (edit) {
       props.setProductEdit({
         ...product,
         id: product.id,
         productImages: product.ProductImages,
+        custom: true,
         varieties: product.Varieties,
-        custom: true
+        ingredients: product.Ingredients,
+        addons: product.Addons,
       })
     } else {
       props.resetProduct(true)
     }
   }, [])
 
-  const formData = {
-    product: {
-      ...props.product,
-      custom: true
-    },
-    shopId: props.shop.id
+  useEffect(() => {
+    const imageFormData = new FormData()
+    const files = props.product.imageFiles.map((imageFile, i) => {
+      return {
+        file: imageFile.file,
+        i: i
+      }
+    })
+    
+    if (files.length > 0) {
+      for (let file of files) {
+        if (file.file?.size > 0) {
+          imageFormData.append(`photos`, file.file, `images${file.i}`)
+        }
+      }
+      setImageFormData(imageFormData)
+    }
+  }, [props.product.imageFiles])
+
+  /**
+   * Update formData when product or imageFormData changes
+   */
+   useEffect(() => {
+    setFormData({
+      ...formData,
+      product: {
+        ...props.product,
+        fields: props.product.fields
+      },
+      imageFormData: imageFormData
+    })
+  }, [props.product, imageFormData])
+
+  const validate = () => {
+    let valid = { error: '', success: edit ? true : false }
+    props.setValidProduct(false)
+    setMessage('')
+    switch (activeStep) {
+      case 0:
+        valid = validProductImages
+        break
+      case 1:
+        valid = validListingDetails
+        break
+      case 2:
+        valid = validPricingAndDelivery
+        break
+      case 4:
+        valid.success = true
+        break
+      default:
+        break
+    }
+    if (valid.success) {
+      if (edit) {
+        props.editProduct(formData)
+      }
+      props.setValidProduct(true)
+    } else {
+      setMessage(valid.error)
+    }
+    return valid
   }
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    const valid = validate()
+    if (valid.success) {
+      if (activeStep === steps.length-1) {
+        handleFinish()
+      }
+      setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    }
   }
 
   const handleFinish = () => {
-    handleNext()
-    if (match.path.includes('edit')) {
-      props.editProduct(formData)
-    } else {
+    if (!props.product.id && props.product.valid) {
       props.createProduct(formData)
     }
   }
@@ -145,6 +209,9 @@ export default function AddCustomProduct (props) {
                     return 'Unknown step'
                 }
               })()}
+              <Typography style={{color: 'red'}}>
+                {message}
+              </Typography>
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
@@ -156,20 +223,16 @@ export default function AddCustomProduct (props) {
                   </Button>
                   {(() => {
                     if (activeStep === steps.length - 1) {
-                      if (match.path.includes('shop/create')) {
-                        return ''
-                      } else {
-                        return (
-                          <Button
-                            variant='contained'
-                            color='primary'
-                            onClick={handleFinish}
-                            className={classes.button}
-                          >
-                            Finish
-                          </Button>
-                        )
-                      }
+                      return (
+                        <Button
+                          variant='contained'
+                          color='primary'
+                          onClick={handleNext}
+                          className={classes.button}
+                        >
+                          {edit ? 'Save' : 'Finish'}
+                        </Button>
+                      )
                     } else {
                       return <Button
                         variant="contained"

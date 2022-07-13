@@ -270,7 +270,7 @@ export default function AddRegularProduct(props) {
                     onClick={handleNext}
                     className={classes.button}
                   >
-                    {activeStep === steps.length -1 ? "Finish" : "Next"}
+                    {activeStep === steps.length -1 ? (edit ? 'Save' : 'Finish') : "Next"}
                   </Button>
                 </div>
               </div>

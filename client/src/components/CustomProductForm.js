@@ -15,9 +15,9 @@ import Autocomplete from '@mui/lab/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useRouteMatch } from "react-router-dom";
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DatePicker from '@mui/lab/DatePicker';
-import DateAdapter from "@mui/lab/AdapterDateFns";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { MobileDatePicker as DatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { AdapterDateFns as DateAdapter } from '@mui/x-date-pickers/AdapterDateFns';
 
 const PREFIX = 'CustomProductForm';
 
@@ -224,6 +224,7 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                   format="MM/dd/yyyy"
                   value={field.value}
                   onChange={(e, newValue) => handleValueChange(newValue, index)}
+                  renderInput={(params) => <TextField {...params} />}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
