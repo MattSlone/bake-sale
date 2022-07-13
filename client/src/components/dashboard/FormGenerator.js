@@ -55,11 +55,8 @@ export default function FormGenerator(props) {
   const [constraints, setConstraints] = useState({})
 
   useEffect(() => {
-    console.log(fields)
     props.setCustomForm(fields)
   }, [fields])
-
-  
 
   const handleCreateField = () => {
     let newFields = [...fields]

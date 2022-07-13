@@ -65,7 +65,10 @@ export default function AddProductImages(props) {
   const edit = match.path.includes('edit')
   const hiddenFileInput = useRef([])
   const [imageFiles, dispatchImageFiles] = useReducer(imageFilesReducer, { files: [] });
-  const [deleteImageAnchorEl, setDeleteImageAnchorEl] = useState(null);
+  const [deleteImageAnchor, setDeleteImageAnchor] = useState({
+    element: null,
+    index: 0
+  });
   let deleteImageAnchorRef = useRef('')
 
   function imageFilesReducer(state, action) {
@@ -73,10 +76,16 @@ export default function AddProductImages(props) {
   }
 
   const handleDeleteImageClose = () => {
-    setDeleteImageAnchorEl(null)
+    setDeleteImageAnchor({
+      element: null,
+      index: 0
+    })
   }
 
   const handleDeleteImage = () => {
+    const newImageFiles = { files: [...imageFiles.files] }
+    newImageFiles.files.splice(deleteImageAnchor.index-1, 1)
+    dispatchImageFiles({ payload: newImageFiles })
     handleDeleteImageClose()
   }
 
@@ -94,7 +103,7 @@ export default function AddProductImages(props) {
     return rtn
   }
 
-  const open = Boolean(deleteImageAnchorEl);
+  const open = Boolean(deleteImageAnchor.element);
 
   /**
    * Load Images
@@ -131,7 +140,10 @@ export default function AddProductImages(props) {
 
   const handleClick = (event, index) => {
     if (imageFiles.files[index-1]?.file) {
-      setDeleteImageAnchorEl(event.currentTarget)
+      setDeleteImageAnchor({
+        element: event.currentTarget,
+        index: index
+      })
     } else {
       hiddenFileInput.current[index].click()
     }
@@ -182,7 +194,7 @@ export default function AddProductImages(props) {
           <Popover
             id={open ? 'delete-image-popover' : undefined}
             open={open}
-            anchorEl={deleteImageAnchorEl}
+            anchorEl={deleteImageAnchor.element}
             onClose={handleDeleteImageClose}
             anchorOrigin={{
               vertical: 'bottom',
