@@ -188,7 +188,7 @@ import {
         error: ''
       }
       case EDIT_SHOP_FAILURE: return {
-        shop: '',
+        ...state,
         loading: false,
         error: action.payload
       }

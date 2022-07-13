@@ -92,7 +92,8 @@ export default function Home(props) {
     [`& .${classes.card}`]: {
       height: '250px',
       maxWidth: '290px',
-      position: "relative"
+      position: "relative",
+      margin: 'auto'
     },
 
     [`& .${classes.cardMedia}`]: {
@@ -109,12 +110,12 @@ export default function Home(props) {
 
     [`& .${classes.cardContent}`]: {
       position: "absolute",
-      height: '33%',
+      height: '20%',
       bottom: 0,
       width: '100%',
       padding: '0.5em',
       color: "#ffffff",
-      backgroundColor: "rgba(0,0,0,.24)"
+      backgroundColor: "rgba(0,0,0,.33)"
     },
 
     [`& .${classes.footer}`]: {
@@ -178,10 +179,8 @@ export default function Home(props) {
                       title="Image title"
                     />
                     <CardContent className={classes.cardContent}>
-                      <Typography gutterBottom variant="h6" component="h6">
-                        {card.name.length < 40 ? card.name :
-                          card.name.slice(0,40) + '...' 
-                        }
+                      <Typography noWrap gutterBottom variant="h5" component="h5">
+                        {card.name}
                       </Typography>
                     </CardContent>
                   </Card>

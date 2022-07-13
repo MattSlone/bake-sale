@@ -156,7 +156,7 @@ export default function SignIn({ userSignIn, userData }) {
             autoComplete="current-password"
             onChange={e => setPassword(e.target.value)}
           />
-          <Typography color="red">
+          <Typography style={{color: 'red'}}>
             {message}
           </Typography>
           <Button

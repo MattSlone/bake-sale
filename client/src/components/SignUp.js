@@ -296,7 +296,7 @@ export default function SignUp(props) {
               />
             </Grid>
             <Grid item xs={12}>
-              <Typography color="red">
+              <Typography style={{color: 'red'}}>
                 {message}
               </Typography>
             </Grid>

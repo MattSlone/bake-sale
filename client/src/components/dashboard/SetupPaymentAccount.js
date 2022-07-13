@@ -67,7 +67,7 @@ export default function SetupPaymentAccount(props) {
         You will be returned to this page when you're done. You can skip this step for now, 
         but won't be able to publish products until it's completed.
       </Typography>
-      <Typography className={classes.detailsSubmittedText}>
+      <Typography className={classes.detailsSubmittedText} style={{color: 'red'}}>
         {message}
       </Typography>
       {!props.shop.error ?

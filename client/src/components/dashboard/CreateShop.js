@@ -288,7 +288,7 @@ export default function CreateShop(props) {
                       default: return "";
                     }
                   })()}
-                  <Typography color="red">
+                  <Typography style={{color: 'red'}}>
                     {message}
                   </Typography>
                   <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
@@ -302,7 +302,7 @@ export default function CreateShop(props) {
                           Back
                         </Button>
                       : '' }
-                      {(edit && childStep == 0) || childStep == childStepsLength - 1 ?
+                      {(edit && childStep == 0) || childStep == childStepsLength ?
                         !(activeStep === 2) || props.shop.stripeDetailsSubmitted ?
                         <Link to={match.path + (activeStep === 1 ? '/stripe' : '')}>
                           <Button variant="contained" color="primary" onClick={handleNext}>

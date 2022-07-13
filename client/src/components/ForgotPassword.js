@@ -136,7 +136,7 @@ export default function ForgotPassword() {
           >
             Submit
           </Button>
-          <Typography color="red">
+          <Typography style={{color: 'red'}}>
             {message}
           </Typography>
         </form>

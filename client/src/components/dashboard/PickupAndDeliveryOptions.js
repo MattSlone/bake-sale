@@ -123,13 +123,6 @@ export default function PickupAndDeliveryOptions(props) {
   const [validDeliveryArea, setValidDeliveryArea] = useState(edit ? {valid: true} : {valid: false})
 
   useEffect(() => {
-    console.log(
-      'validating for parent...:',
-      validAddress,
-      validPickupSchedule,
-      validShopContact,
-      validDeliveryArea
-    )
     if ([
       validAddress,
       validPickupSchedule,
@@ -386,10 +379,6 @@ export default function PickupAndDeliveryOptions(props) {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleReset = () => {
-    props.setChildStep(0)
-    setActiveStep(0);
-  };
   const matches = useMediaQuery('(min-width:600px)');
 
   const containerStyle = {
@@ -723,7 +712,7 @@ export default function PickupAndDeliveryOptions(props) {
               }
             })()}
               <div className={classes.actionsContainer}>
-                <Typography color="red">
+                <Typography style={{color: "red"}}>
                   {message}
                 </Typography>
                 <div>
@@ -734,20 +723,14 @@ export default function PickupAndDeliveryOptions(props) {
                   >
                     Back
                   </Button>
-                  {(() => {
-                    if (activeStep === Object.keys(steps).length - 1) {
-                      return ''
-                    } else {
-                      return <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        className={classes.button}
-                      >
-                        Next
-                      </Button>
-                    }
-                  })()}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleNext}
+                    className={classes.button}
+                  >
+                    {activeStep === Object.keys(steps).length - 1 && edit ? 'Save' : 'Next'}
+                  </Button>
                 </div>
               </div>
             </StepContent>
@@ -756,10 +739,9 @@ export default function PickupAndDeliveryOptions(props) {
       </Stepper>
       {activeStep === Object.keys(steps).length && (
         <Paper square elevation={0} className={classes.resetContainer}>
-          <Typography>All steps completed - you&apos;re finished</Typography>
-          <Button onClick={handleReset} className={classes.button}>
-            Reset
-          </Button>
+          <Typography>
+            Shop Saved! You can move on to the next step or visit the Dashboard.
+          </Typography>
         </Paper>
       )}
     </Root>

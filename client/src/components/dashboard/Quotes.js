@@ -39,7 +39,7 @@ export default function Quotes(props) {
 
   return (
     <Root>
-      <Title>Quotes</Title>
+      <Title>Requests</Title>
       <Table size="small">
         <TableHead>
           <TableRow>

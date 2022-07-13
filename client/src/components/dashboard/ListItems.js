@@ -70,7 +70,7 @@ export default function MainListItems() {
           <ListItemIcon>
             <RedeemIcon />
           </ListItemIcon>
-          <ListItemText primary="Quote Requests" />
+          <ListItemText primary="Requests" />
         </ListItem>
       </Link>
     </Root>

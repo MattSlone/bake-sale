@@ -100,7 +100,7 @@ export default function Products(props) {
   return (
     <StyledContainer spacing={2} className={classes.cardGrid} maxWidth="lg">
       {message ?
-        <Typography style={{marginBottom: '1em'}} color="red">
+        <Typography style={{marginBottom: '1em', color: 'red'}}>
           {message}
         </Typography>
       : ''}
