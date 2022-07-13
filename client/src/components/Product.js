@@ -261,7 +261,7 @@ export default function Product(props)
           indicators={false}
           >
             {
-              items.map( (item, i) => <Item product={product} key={i} item={item} /> )
+              product.ProductImages?.map( (item, i) => <Item product={product} key={i} item={item} /> )
             }
           </Carousel>
           <DescriptionContainer product={product} classProp={classes.descriptionContainer} />
@@ -397,7 +397,7 @@ function Item(props)
       <Card className={classes.card}>
         <CardMedia
           className={classes.cardMedia}
-          image={`/api${props.product.ProductImages[0]?.path}`}
+          image={`/api${props.item.path}`}
           title="Image title"
         />
       </Card>
