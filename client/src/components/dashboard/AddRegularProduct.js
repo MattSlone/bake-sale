@@ -92,6 +92,7 @@ export default function AddRegularProduct(props) {
   const [formData, setFormData] = useState({
     product: {
       ...props.product,
+      custom: false,
       fields: props.product.fields
     },
     shopId: props.shop.id,
@@ -148,6 +149,7 @@ export default function AddRegularProduct(props) {
         ingredients: product.Ingredients,
         addons: product.Addons,
         productImages: product.ProductImages,
+        custom: false,
         fields: []
       })
     } else {
@@ -164,6 +166,12 @@ export default function AddRegularProduct(props) {
       setActiveStep((prevActiveStep) => prevActiveStep + 1)
     }
   }
+
+  useEffect(() => {
+    if (props.product.error) {
+      setMessage(props.product.error + '\nYour last changes may not have been saved.')
+    }
+  }, [props.product.error])
 
   useEffect(() => {
     const imageFormData = new FormData()

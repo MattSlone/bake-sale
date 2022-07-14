@@ -2,10 +2,12 @@
 
 const { query } = require('express');
 const db = require('../models/index')
-const { Op, fn, col } = require("sequelize");
+const { Op, fn, col} = require("sequelize");
 const GMaps = require('../lib/gmaps');
 const shop = require('../routes/shop');
-const fs = require('fs').promises
+const fsAsync = require('fs').promises
+const fs = require("fs")
+const validator = require('validator')
 
 module.exports = class ProductController {
     async create (req, res, next) {
@@ -190,19 +192,13 @@ module.exports = class ProductController {
                 where: { 
                     name: newIngredient.name
                 },
-                include: {
-                    model: db.Product,
-                    include: {
-                        model: db.Shop,
-                        include: {
-                            model: db.User,
-                            where: {
-                                id: userId
-                            },
-                            required: true
-                        }
-                    }
-                }
+                include: { model: db.Product, include: { model: db.Shop, include: {
+                  model: db.User,
+                  where: {
+                      id: userId
+                  },
+                  required: true
+                }}}
             })
             return ingredient ? ingredient : false
         }))).filter(ingredient => ingredient)
@@ -232,7 +228,7 @@ module.exports = class ProductController {
                     return {
                         name: file.originalname,
                         path: file.path,
-                        ProductId: req.body.productId
+                        ProductId: req.body.productId[0]
                     }
                 }),
                 {
@@ -250,9 +246,11 @@ module.exports = class ProductController {
                 }}
             })
             await product.setProductImages(productImages)
-            this.deleteImages()
+            await this.deleteImages()
         } catch (err) {
-            console.log(err)
+          console.log(err)
+          req.flash('error', err)
+          res.redirect('/api/product/error')
         }
     }
 
@@ -261,60 +259,167 @@ module.exports = class ProductController {
             const imagesToDelete = await db.ProductImage.findAll({ where: { ProductId: null } })
             await db.ProductImage.destroy({ where: { ProductId: null } })
             for (let image of imagesToDelete) {
-                await fs.unlink(image.path)
+              if (fs.existsSync(image.path)) {
+                await fsAsync.unlink(image.path)
+              }
             }
         } catch (err) {
-            console.log(err)
+          console.log(err)
         }
     }
 
     async update (req, res, next) {
-        try {
-            let product = await db.Product.update(req.body.product,
-                {
-                    where: {id: req.body.product.id},
-                }
-            );
-            product = await db.Product.findByPk(req.body.product.id, 
-                {
-                    include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
-                }
-            )
-            let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
-            await product.setVarieties(varieties.map(variety => variety.id))
-            await db.Variety.destroy({
-                where: { ProductId: null }
-            })
-            let addons = await this.upsertAssociation(product, db.Addon, req.body.product.addons)
-            await product.setAddons(addons.map(addon => addon.id))
-            await db.Addon.destroy({
-                where: { ProductId: null }
-            })
-            await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
-            product = await db.Product.findByPk(req.body.product.id, 
-                {
-                    include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
-                }
-            )
-            return product
-        }
-        catch (err) {
-            console.log(err)
-        }
+      try {
+        let product = await db.Product.update(req.body.product,
+            {
+                where: {id: req.body.product.id},
+            }
+        );
+        product = await db.Product.findByPk(req.body.product.id, 
+          {
+            include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
+          }
+        )
+        let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
+        await product.setVarieties(varieties.map(variety => variety.id))
+        await db.Variety.destroy({
+            where: { ProductId: null }
+        })
+        let addons = await this.upsertAssociation(product, db.Addon, req.body.product.addons)
+        await product.setAddons(addons.map(addon => addon.id))
+        await db.Addon.destroy({
+          where: { ProductId: null }
+        })
+        await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
+        product = await db.Product.findByPk(req.body.product.id, 
+          {
+            include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
+          }
+        )
+        return product
       }
+      catch (err) {
+          console.log(err)
+      }
+    }
 
       async upsertAssociation(product, model, data, hasMany = false) {
         let associatedInstances = await Promise.all(data.map(async values => {
-            const [instance, created] = await model.upsert(hasMany ? {...values} : {
-                ...values,
-                ProductId: product.id
-            }, {
-                include: hasMany ? [db.Product] : []
-            });
-
-            return instance
+          const [instance, created] = await model.upsert(hasMany ? {...values} : {
+            ...values,
+            ProductId: product.id
+          }, {
+            include: hasMany ? [db.Product] : []
+          });
+          return instance
         }))
-
         return associatedInstances
+      }
+
+      static async validateCreateOrEditProduct(req, res, next) {
+        try {
+          for (const field of [
+            { name: 'Title', value: req.body.product.name, custom: true },
+            { name: 'Description', value:req.body.product.description, custom: true },
+            { name: 'Category', value: req.body.product.category, custom: true },
+            { name: 'Processing Time', value: req.body.product.processingTime, custom: true },
+            { name: 'Weight', value: req.body.product.weight, custom: false },
+            { name: 'Inventory', value: req.body.product.inventory, custom: false }
+          ]) {
+            if (
+              !field.value && 
+              (!req.body.product.custom || (req.body.product.custom && field.custom))
+            ) {
+              console.log(`${field.name} is required.`)
+              req.flash('error', `${field.name} is required.`)
+              res.redirect('/api/product/error')
+              return
+            }
+          }
+          if (!validator.isByteLength(req.body.product.name, { max: 140 })) {
+            req.flash('error', "Product names may have a maximum of 140 characters.")
+            res.redirect('/api/product/error')
+            return
+          }
+          if (!validator.isByteLength(req.body.product.description, { max: 2000 })) {
+            req.flash('error', "Descriptions may have a maximum of 2000 characters.")
+            res.redirect('/api/product/error')
+            return
+          }
+          if (!req.body.product.custom && req.body.product.ingredients.length <= 0) {
+            req.flash('error', "Products must have at least one ingredient.")
+            res.redirect('/api/product/error')
+            return
+          }
+          if (!req.body.product.custom && Number(req.body.product.inventory).toFixed(0) <= 0) {
+            req.flash('error', "Inventory must be greater than 0.")
+            res.redirect('/api/product/error')
+            return
+          }
+          if (req.body.product.varieties.length <= 0
+            || req.body.product.varieties.length > (req.body.product.custom ? 1 : 5)
+          ) {
+            const error = `Products must have at least one variety, \
+              and a maximum of ${req.body.product.custom ? '1' : '5'}.`
+            "Inventory must be greater than 0."
+            req.flash('error', error)
+            res.redirect('/api/product/error')
+            return
+          }
+          if (!req.body.product.custom) {
+            const validVarieties = await ProductController.validateVarieties(req.body.product.varieties)
+            if (!validVarieties.success) {
+              console.log(validVarieties.error)
+              req.flash('error', validVarieties.error)
+              res.redirect('/api/product/error')
+              return
+            }
+          }
+          if (!req.body.product.custom && req.body.product.addons.length > 5) {
+            req.flash('error', "Products may have a maximum of 5 addons.")
+            res.redirect('/api/product/error')
+            return
+          }
+          if (!req.body.product.custom
+            && !validator.isByteLength(req.body.product.personalizationPrompt, { max: 140 })
+          ) {
+            req.flash('error', "Personalization prompt may be a max of 140 characters.")
+            res.redirect('/api/product/error')
+            return
+          }
+          next()
+        } catch (err) {
+          req.flash('error', err)
+          res.redirect('/api/product/error')
+          return
+        }
+      }
+
+      static async validateVarieties(varieties) {
+        try {
+          let rtn = { error: '', success: false }
+          for (let variety of varieties) {
+            for (const field of [
+              { name: 'Quantity', value: variety.quantity },
+              { name: 'Price', value:variety.price },
+            ]) {
+              if (!field.value) {
+                rtn.error = `${field.name} is required for each product variation.`
+                return rtn
+              }
+            }
+            if (Number(variety.quantity).toFixed(0) < 1) {
+              rtn.error = "Quantity must be greater than 0."
+              return rtn
+            } else if (Number(variety.quantity).toFixed(0) < 1) {
+              rtn.error = "Product price must be at least $1.00"
+              return rtn
+            }
+            rtn.success = true
+            return rtn
+          }
+        } catch (err) {
+          return { error: err, success: false}
+        }
       }
 }

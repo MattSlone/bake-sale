@@ -292,12 +292,13 @@ export const editProduct = (formData) => {
   return async (dispatch) => {
     try {
       dispatch(editProductRequest())
-      console.log(imageFormData.getAll('photos'))
       imageFormData.append('productId', formData.product.id)
       const imageRes = await axios.post('/api/product/images', imageFormData)
       const res = await axios.post('/api/product/update', formData)
-      if (res.data.error[0]) {
+      if (res.data.error && res.data.error[0]) {
         dispatch(editProductFailure(res.data.error[0]))
+      } else if (imageRes.data.error) {
+        dispatch(editProductFailure(imageRes.data.error[0]))
       } else {
         dispatch(editProductSuccess(res.data))
       }

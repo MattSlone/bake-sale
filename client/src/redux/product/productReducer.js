@@ -153,7 +153,8 @@ const productReducer = (state = initialState, action) => {
       }
     case EDIT_PRODUCT_REQUEST: return {
       ...state,
-      loading: true
+      loading: true,
+      error: ''
     }
     case EDIT_PRODUCT_SUCCESS: return {
       ...state,

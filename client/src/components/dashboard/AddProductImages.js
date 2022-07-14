@@ -111,12 +111,15 @@ export default function AddProductImages(props) {
   useEffect(() => {
     const getImages = async () => {
       if (!isMount && edit && props.product.productImages.length > 0) {
-        const newImageFiles = await Promise.all(props.product.productImages.map(async image => {
+        const newImageFiles = await Promise.all(props.product.productImages.map(async (image, index) => {
           const res = await axios.get(`/api${image.path}`,{
             responseType: 'blob'
           })
           return {
-            file: res.data,
+            file: new File([res.data], `image${props.product.id}_${index}`, {
+              type: 'image/png',
+              size: 2
+            }),
             imagePreviewUrl: `/api${image.path}`
           }
         }))

@@ -128,6 +128,7 @@ export default function AddCustomProduct (props) {
       ...formData,
       product: {
         ...props.product,
+        custom: true,
         fields: props.product.fields
       },
       imageFormData: imageFormData
@@ -164,6 +165,12 @@ export default function AddCustomProduct (props) {
     }
     return valid
   }
+
+  useEffect(() => {
+    if (props.product.error) {
+      setMessage(props.product.error)
+    }
+  }, [props.product.error])
 
   const handleNext = () => {
     const valid = validate()
