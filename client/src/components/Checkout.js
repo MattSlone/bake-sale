@@ -22,24 +22,27 @@ const StyledContainer = styled(Container)((
     theme
   }
 ) => ({
-  padding: theme.spacing(10, 3, 10, 3),
-  [theme.breakpoints.up('md')]: {
-    padding: theme.spacing(10)
-  }
+  padding: theme.spacing(2),
 }));
 
 export default function  Checkout(props) {
-  const [clientSecret, setClientSecret] = useState("");
+  const [clientSecret, setClientSecret] = useState("")
+  const [message, setMessage] = useState("")
+  const [paymentComplete, setPaymentComplete] = useState(false)
 
   useEffect(async () => {
     if (props.cart.products.length > 0) {
       props.checkout(props.cart.products)
     }
-  }, []);
+  }, [props.cart.products]);
 
   useEffect(() => {
+    setMessage('')
+    setClientSecret('')
     if (props.cart.clientSecret) {
       setClientSecret(props.cart.clientSecret)
+    } else {
+      setMessage(props.cart.error)
     }
   }, [props.cart.clientSecret]);
 
@@ -53,38 +56,42 @@ export default function  Checkout(props) {
 
   return (
     <StyledContainer className={classes.checkoutContainer}>
-      {props.cart.products.length > 0 ?
+      {!paymentComplete ?
       <div>
-      <Typography variant="h6" gutterBottom>
-        Order summary
-      </Typography>
-      <List disablePadding>
-        {props.cart.products.map((product) => (
-          <ListItem key={product.product.name} sx={{ py: 1, px: 0 }}>
-            <ListItemText>x{product.quantity}</ListItemText>
-            <ListItemText primary={product.product.name} secondary={product.quote ? '' : `package of ${product.variation}`} />
-            <Typography variant="body2">{Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}</Typography>
-          </ListItem>
-        ))}
+        <Typography variant="h6" gutterBottom>
+          Order summary
+        </Typography>
+        <List disablePadding>
+          {props.cart.products.map((product) => (
+            <ListItem key={product.product.name} sx={{ py: 1, px: 0 }}>
+              <ListItemText>x{product.quantity}</ListItemText>
+              <ListItemText primary={product.product.name} secondary={product.quote ? '' : `package of ${product.variation}`} />
+              <Typography variant="body2">{Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}</Typography>
+            </ListItem>
+          ))}
 
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Total" />
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            ${Number.parseFloat(props.cart.products.map(product => product.clientSidePrice * product.quantity)
-              .reduce((prev, curr) => prev + curr)).toFixed(2)}
-          </Typography>
-        </ListItem>
-      </List>
+          <ListItem sx={{ py: 1, px: 0 }}>
+            <ListItemText primary="Total" />
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              ${Number.parseFloat(props.cart.products.map(product => product.clientSidePrice * product.quantity)
+                .reduce((prev, curr) => prev + curr, 0)).toFixed(2)}
+            </Typography>
+          </ListItem>
+        </List>
+        <Typography style={ { color: 'red' } }>
+          {message}
+        </Typography>
       </div>
-      : 
+      :
       <Typography variant="h6" gutterBottom>
-        Thanks for your order
+        Thanks for your order!
+        Check your email for an order confirmation.
       </Typography>
       }
       <div className={classes.paymentForm}>
         {clientSecret && (
           <Elements options={options} stripe={stripePromise}>
-            <CheckoutForm resetCart={props.resetCart} />
+            <CheckoutForm setPaymentComplete={setPaymentComplete} resetCart={props.resetCart} />
           </Elements>
         )}
       </div>

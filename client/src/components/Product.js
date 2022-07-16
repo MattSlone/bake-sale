@@ -16,6 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import CustomProductContainer from './containers/CustomProductContainer'
 import Checkbox from '@mui/material/Checkbox';
 import { TextField, Typography } from '@mui/material';
+import isByteLength from 'validator/lib/isByteLength';
 import axios from 'axios'
 
 const PREFIX = 'Product';
@@ -128,7 +129,6 @@ const StyledGrid = styled(Grid)((
 
 export default function Product(props)
 {
-
   let { id } = useParams()
   const auth = useAuth()
   const [product, setProduct] = useState('')
@@ -139,6 +139,7 @@ export default function Product(props)
   const [price, setPrice] = useState(0)
   const [addonsChecked, setAddonsChecked] = useState([]);
   const [deliveryCost, setDeliveryCost] = useState('')
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     props.getProducts({products: [id]})
@@ -158,6 +159,25 @@ export default function Product(props)
       }
     }
   }, [props.product.loading])
+
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    for (const field of [
+      { name: 'Variation', value: variation },
+      { name: 'Fulfillment', value: fulfillment }
+    ]) {
+      if (!field.value) {
+        rtn.error = `${field.name} is required.`
+        return rtn
+      }
+    }
+    if (!isByteLength(name, { max: 2000 })) {
+      rtn.error = "Personalization may have a max of 2000 characters."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
+  }
 
   const handleAddonCheckChange = (event) => {
     setAddonsChecked({ ...addonsChecked, [event.target.id]: event.target.checked });
@@ -198,15 +218,21 @@ export default function Product(props)
   }
 
   const handleAddToCart = () => {
-    props.addToCart({
-      product: product,
-      personalization: personalization,
-      variation: variation,
-      fulfillment: fulfillment,
-      addons: addonsChecked,
-      clientSidePrice: price,
-      quantity: 1
-    })
+    setMessage('')
+    const valid = validate()
+    if (valid.success) {
+      props.addToCart({
+        product: product,
+        personalization: personalization,
+        variation: variation,
+        fulfillment: fulfillment,
+        addons: addonsChecked,
+        clientSidePrice: price,
+        quantity: 1
+      })
+    } else {
+      setMessage(valid.error)
+    }
   }
 
   const handleSelectVariation = (e) => {
@@ -358,6 +384,11 @@ export default function Product(props)
                       }
                     </Select>
                   </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography style={{ color: 'red' }}>
+                    {message}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Button

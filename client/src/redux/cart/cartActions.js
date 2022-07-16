@@ -65,7 +65,7 @@ export const checkout = (items) => {
     try {
       dispatch(checkoutRequest())
       const res = await axios.post('/api/order/intent', formData)
-      if (res.data.error[0]) {
+      if (res.data.error) {
         dispatch(checkoutFailure(res.data.error[0]))
       } else {
         dispatch(checkoutSuccess(res.data.success))

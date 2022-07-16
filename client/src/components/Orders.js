@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import Order from './Order'
+import Typography from '@mui/material/Typography';
 
 const PREFIX = 'Orders';
 
@@ -26,8 +27,7 @@ const StyledContainer = styled(Container)((
   },
 
   [`&.${classes.cardGrid}`]: {
-    paddingTop: theme.spacing(10),
-    paddingBottom: theme.spacing(8),
+    padding: theme.spacing(2)
   },
 
   [`& .${classes.card}`]: {
@@ -71,7 +71,12 @@ export default function Orders(props) {
   return (
     <StyledContainer className={classes.cardGrid} maxWidth="lg">
       <Grid container spacing={4}>
-        {orders ? orders.map((order) => (
+        <Grid item xs={12}>
+          <Typography variant="h4" component="h4">
+            Your Orders
+          </Typography>
+        </Grid>
+        {orders.length > 0 ? orders.map((order) => (
           <Grid className={classes.gridItem} item key={order.id} xs={12}>
             <Order order={order} />
           </Grid>

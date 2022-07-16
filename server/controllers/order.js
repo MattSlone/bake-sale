@@ -7,10 +7,12 @@
 
 const GMaps = require('../lib/gmaps')
 const order = require('../models/order')
+const product = require('../routes/product')
 
 const db = require('../models/index'),
   MakeStripeAPI = require('../lib/stripe'),
-  StripeAPI = new MakeStripeAPI()
+  StripeAPI = new MakeStripeAPI(),
+  { Op } = require("sequelize")
 
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
@@ -68,7 +70,7 @@ module.exports = class OrderController {
   async mapCartToShopAmounts(req, items) {
     try {
       const shops = items.map(item => item.product.ShopId)
-        .filter((shop, index, shops) => shops.indexOf(shop) === index)
+        .filter((shop, index, shops) => shops.indexOf(shop) === index) // unique shops
 
       const shopItems = await Promise.all(shops.map(async id => {
         let itemsTest = await Promise.all(items.map(async item => {
@@ -133,7 +135,9 @@ module.exports = class OrderController {
       })
       for (const addon of addons) {
         if(addon.checked) {
-          let addonInstance = await db.Addon.findByPk(addon.id, { attributes: ['price', 'secondaryPrice', 'ProductId'] })
+          let addonInstance = await db.Addon.findByPk(addon.id,
+            { attributes: ['price', 'secondaryPrice', 'ProductId'] }
+          )
           if (addonInstance.ProductId != item.product.id) {
             throw Error('ERROR: addon doesn\'t exist for this product. Handle accordingly')
           }
@@ -189,7 +193,7 @@ module.exports = class OrderController {
           transfers.forEach(async transfer => {
             try {
               const transferId = await StripeAPI.createTransfer(
-                transfer.amount*100,
+                transfer.amount*100, // Needs to be in cents
                 transfer.Shop.stripeAccountId,
                 data.charges.data[0].id
               )
@@ -218,7 +222,9 @@ module.exports = class OrderController {
 
   async list(req, res, next) {
     const shop = req.query.forShop ? await db.Shop.findOne({ where: { UserId: req.user.id } }) : null
+    const completedStatus = await db.OrderStatus.findOne({ where: { status: 'completed' } })
     const where = {
+      OrderStatusId: completedStatus.id,
       ...(!shop && {UserId: req.user.id}),
       ...(req.query.orderId && {id: req.query.orderId })
     }
@@ -305,6 +311,100 @@ module.exports = class OrderController {
       }
     } catch (err) {
       console.log(err)
+    }
+  }
+
+  static async validateOrderQuantities() {
+
+  }
+
+  static async validateCart(req, res, next) {
+    try {
+      const products = await Promise.all(req.body.items.map(async item => {
+        return await db.Product.findOne({
+          attributes: ['id', 'inventory', 'name'],
+          where: { id: item.product.id },
+          include: [db.Variety, db.Addon, db.Shop]
+        })
+      }))
+      const productsUnique = products.filter((product, index) => products.indexOf(product) === index)
+      for (let product of productsUnique) {
+        const orderItems = req.body.items.filter(item => item.product.id == product.id)
+        console.log('order items: ', orderItems)
+        const orderQuantity = orderItems.map(item => Number(item.variation) * Number(item.quantity))
+          .reduce((prev, curr) => prev + curr, 0)
+        console.log(orderQuantity, product.inventory)
+        if (orderQuantity > product.inventory) {
+          req.flash('error', `Order quantity ${orderQuantity} exceeds product inventory \
+            ${product.inventory} for ${product.name}.`
+          )
+          res.redirect('/api/order/error')
+          return
+        }
+        const orderVariations = orderItems.map(item => item.variation)
+        for (let variation of orderVariations) {
+          const isValidVariation = product.Varieties.map(variety => variety.quantity).includes(variation)
+          if(!isValidVariation) {
+            req.flash('error', `Package quantity ${variation} is not available for ${product.name}.`)
+            res.redirect('/api/order/error')
+            return
+          }
+        }
+        const orderFulfillments = orderItems.map(item => {
+          return {
+            fulfillment: item.fulfillment,
+            variation: item.variation
+          }
+        })
+        const orderVariationInstances = await db.Variety.findAll({
+          where: {
+            quantity: { [Op.In]: orderVariations },
+            ProductId: product.id
+          }
+        })
+        for (let fulfillment of orderFulfillments) {
+          if (fulfillment.fulfillment = 'pickup' && !product.Shop.allowPickups) {
+            req.flash('error', `${product.Shop.name} does not allow pickups. \
+              Please change your choice of fulfillment for ${product.name}`
+            )
+            res.redirect('/api/order/error')
+            return
+          } else if (fulfillment.fulfillment = 'shipping') {
+            for (let orderVariationInstance of orderVariationInstances) {
+              if (orderVariationInstance.shipping == null 
+                && orderVariationInstance.quantity == fulfillment.variation
+              ) {
+                req.flash('error', `Shipping is not offered for package quantity \
+                  ${fulfillment.variation} of ${product.name}. Please change your \
+                  choice of fulfillment for ${product.name}`
+                )
+                res.redirect('/api/order/error')
+                return
+              }
+            }
+          } else if (fulfillment.fulfillment = 'delivery') {
+            for (let orderVariationInstance of orderVariationInstances) {
+              if (orderVariationInstance.delivery == null 
+                && orderVariationInstance.quantity == fulfillment.variation
+              ) {
+                req.flash('error', `Delivery is not offered for package quantity \
+                  ${fulfillment.variation} of ${product.name}. Please change your \
+                  choice of fulfillment.`
+                )
+                res.redirect('/api/order/error')
+                return
+              }
+            }
+          }
+        }
+      }
+      console.log('GOOOOOOOOOOOOOOOOOOOOD')
+      next()
+    } catch (err) {
+      console.log(err)
+      req.flash('error', err)
+      res.redirect('/api/order/error')
+      return
     }
   }
 }

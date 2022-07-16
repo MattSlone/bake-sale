@@ -52,11 +52,14 @@ const cartReducer = (state = initialState, action) => {
     }
     case CHECKOUT_SUCCESS: return {
       ...state,
+      loading: false,
       clientSecret: action.payload,
       error: ''
     }
     case CHECKOUT_FAILURE: return {
       ...state,
+      loading: false,
+      clientSecret: initialState.clientSecret,
       error: action.payload
     }
     case RESET_CART: return initialState

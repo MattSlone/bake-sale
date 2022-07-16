@@ -26,23 +26,38 @@ module.exports = (app, webhookApp) => {
     }
   })
 
-  app.post('/api/order/intent', async (req, res, next) => {
+  app.post('/api/order/intent',
+  MakeOrderController.validateCart,
+  async (req, res, next) => {
     try {
         let response = await OrderController.createPaymentIntent(req, res, next)
         res.send({
-            error: req.flash('error'),
+            error: false,
             success: response
         })
     }
     catch (err) {
-      next(err)
+      req.flash('error', err)
+      res.redirect('/api/order/error')
+    }
+  })
+
+  app.get('/api/order/error', async (req, res, next) => {
+    try {
+      res.send({
+          error: req.flash('error'),
+          success: false
+      })
+    }
+    catch (err) {
+      console.log(err)
     }
   })
   
   webhookApp.post('/webhook', async (req, res, next) => {
     try {
       const response = await OrderController.handleStripeWebhooks(req, res, next)
-      res.send(response)
+      res.sendStatus(response)
     }
     catch (err) {
       console.log(err)

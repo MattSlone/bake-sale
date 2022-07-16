@@ -51,7 +51,7 @@ export default function ShopOrders(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {orders ? orders.map((row) => (
+          {orders.length > 0 ? orders.map((row) => (
             <TableRow key={row.id}>
               <TableCell>{row.createdAt}</TableCell>
               <TableCell>{row.name}</TableCell>
