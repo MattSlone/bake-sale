@@ -303,123 +303,139 @@ module.exports = class ProductController {
       }
     }
 
-      async upsertAssociation(product, model, data, hasMany = false) {
-        let associatedInstances = await Promise.all(data.map(async values => {
-          const [instance, created] = await model.upsert(hasMany ? {...values} : {
-            ...values,
-            ProductId: product.id
-          }, {
-            include: hasMany ? [db.Product] : []
-          });
-          return instance
-        }))
-        return associatedInstances
-      }
+    async updateInventoryOnSuccessfulOrder(productId, varietyId, quantity) {
+      const product = await db.Product.findByPk(productId, {
+        include: {
+          model: db.Variety,
+          where: { id: varietyId },
+          limit: 1,
+          required: true
+        }
+      })
+      console.log('RIGHT HERREEEEE: ', product)
+      product.inventory = product.inventory - product.Varieties[0].quantity * quantity
+      await product.save()
+    }
 
-      static async validateCreateOrEditProduct(req, res, next) {
-        try {
-          for (const field of [
-            { name: 'Title', value: req.body.product.name, custom: true },
-            { name: 'Description', value:req.body.product.description, custom: true },
-            { name: 'Category', value: req.body.product.category, custom: true },
-            { name: 'Processing Time', value: req.body.product.processingTime, custom: true },
-            { name: 'Weight', value: req.body.product.weight, custom: false },
-            { name: 'Inventory', value: req.body.product.inventory, custom: false }
-          ]) {
-            if (
-              !field.value && 
-              (!req.body.product.custom || (req.body.product.custom && field.custom))
-            ) {
-              console.log(`${field.name} is required.`)
-              req.flash('error', `${field.name} is required.`)
-              res.redirect('/api/product/error')
-              return
-            }
-          }
-          if (!validator.isByteLength(req.body.product.name, { max: 140 })) {
-            req.flash('error', "Product names may have a maximum of 140 characters.")
-            res.redirect('/api/product/error')
-            return
-          }
-          if (!validator.isByteLength(req.body.product.description, { max: 2000 })) {
-            req.flash('error', "Descriptions may have a maximum of 2000 characters.")
-            res.redirect('/api/product/error')
-            return
-          }
-          if (!req.body.product.custom && req.body.product.ingredients.length <= 0) {
-            req.flash('error', "Products must have at least one ingredient.")
-            res.redirect('/api/product/error')
-            return
-          }
-          if (!req.body.product.custom && Number(req.body.product.inventory).toFixed(0) <= 0) {
-            req.flash('error', "Inventory must be greater than 0.")
-            res.redirect('/api/product/error')
-            return
-          }
-          if (req.body.product.varieties.length <= 0
-            || req.body.product.varieties.length > (req.body.product.custom ? 1 : 5)
+    async upsertAssociation(product, model, data, hasMany = false) {
+      let associatedInstances = await Promise.all(data.map(async values => {
+        const [instance, created] = await model.upsert(hasMany ? {...values} : {
+          ...values,
+          ProductId: product.id
+        }, {
+          include: hasMany ? [db.Product] : []
+        });
+        return instance
+      }))
+      return associatedInstances
+    }
+
+
+
+    static async validateCreateOrEditProduct(req, res, next) {
+      try {
+        for (const field of [
+          { name: 'Title', value: req.body.product.name, custom: true },
+          { name: 'Description', value:req.body.product.description, custom: true },
+          { name: 'Category', value: req.body.product.category, custom: true },
+          { name: 'Processing Time', value: req.body.product.processingTime, custom: true },
+          { name: 'Weight', value: req.body.product.weight, custom: false },
+          { name: 'Inventory', value: req.body.product.inventory, custom: false }
+        ]) {
+          if (
+            !field.value && 
+            (!req.body.product.custom || (req.body.product.custom && field.custom))
           ) {
-            const error = `Products must have at least one variety, \
-              and a maximum of ${req.body.product.custom ? '1' : '5'}.`
-            "Inventory must be greater than 0."
-            req.flash('error', error)
+            console.log(`${field.name} is required.`)
+            req.flash('error', `${field.name} is required.`)
             res.redirect('/api/product/error')
             return
           }
-          if (!req.body.product.custom) {
-            const validVarieties = await ProductController.validateVarieties(req.body.product.varieties)
-            if (!validVarieties.success) {
-              console.log(validVarieties.error)
-              req.flash('error', validVarieties.error)
-              res.redirect('/api/product/error')
-              return
-            }
-          }
-          if (!req.body.product.custom && req.body.product.addons.length > 5) {
-            req.flash('error', "Products may have a maximum of 5 addons.")
-            res.redirect('/api/product/error')
-            return
-          }
-          if (!req.body.product.custom
-            && !validator.isByteLength(req.body.product.personalizationPrompt, { max: 140 })
-          ) {
-            req.flash('error', "Personalization prompt may be a max of 140 characters.")
-            res.redirect('/api/product/error')
-            return
-          }
-          next()
-        } catch (err) {
-          req.flash('error', err)
+        }
+        if (!validator.isByteLength(req.body.product.name, { max: 140 })) {
+          req.flash('error', "Product names may have a maximum of 140 characters.")
           res.redirect('/api/product/error')
           return
         }
+        if (!validator.isByteLength(req.body.product.description, { max: 2000 })) {
+          req.flash('error', "Descriptions may have a maximum of 2000 characters.")
+          res.redirect('/api/product/error')
+          return
+        }
+        if (!req.body.product.custom && req.body.product.ingredients.length <= 0) {
+          req.flash('error', "Products must have at least one ingredient.")
+          res.redirect('/api/product/error')
+          return
+        }
+        if (!req.body.product.custom && Number(req.body.product.inventory).toFixed(0) <= 0) {
+          req.flash('error', "Inventory must be greater than 0.")
+          res.redirect('/api/product/error')
+          return
+        }
+        if (req.body.product.varieties.length <= 0
+          || req.body.product.varieties.length > (req.body.product.custom ? 1 : 5)
+        ) {
+          const error = `Products must have at least one variety, \
+            and a maximum of ${req.body.product.custom ? '1' : '5'}.`
+          "Inventory must be greater than 0."
+          req.flash('error', error)
+          res.redirect('/api/product/error')
+          return
+        }
+        if (!req.body.product.custom) {
+          const validVarieties = await ProductController.validateVarieties(req.body.product.varieties)
+          if (!validVarieties.success) {
+            console.log(validVarieties.error)
+            req.flash('error', validVarieties.error)
+            res.redirect('/api/product/error')
+            return
+          }
+        }
+        if (!req.body.product.custom && req.body.product.addons.length > 5) {
+          req.flash('error', "Products may have a maximum of 5 addons.")
+          res.redirect('/api/product/error')
+          return
+        }
+        if (!req.body.product.custom
+          && !validator.isByteLength(req.body.product.personalizationPrompt, { max: 140 })
+        ) {
+          req.flash('error', "Personalization prompt may be a max of 140 characters.")
+          res.redirect('/api/product/error')
+          return
+        }
+        next()
+      } catch (err) {
+        req.flash('error', err)
+        res.redirect('/api/product/error')
+        return
       }
+    }
 
-      static async validateVarieties(varieties) {
-        try {
-          let rtn = { error: '', success: false }
-          for (let variety of varieties) {
-            for (const field of [
-              { name: 'Quantity', value: variety.quantity },
-              { name: 'Price', value:variety.price },
-            ]) {
-              if (!field.value) {
-                rtn.error = `${field.name} is required for each product variation.`
-                return rtn
-              }
-            }
-            if (Number(variety.quantity).toFixed(0) < 1) {
-              rtn.error = "Quantity must be greater than 0."
-              return rtn
-            } else if (Number(variety.quantity).toFixed(0) < 1) {
-              rtn.error = "Product price must be at least $1.00"
+    static async validateVarieties(varieties) {
+      try {
+        let rtn = { error: '', success: false }
+        for (let variety of varieties) {
+          for (const field of [
+            { name: 'Quantity', value: variety.quantity },
+            { name: 'Price', value:variety.price },
+          ]) {
+            if (!field.value) {
+              rtn.error = `${field.name} is required for each product variation.`
               return rtn
             }
-            rtn.success = true
+          }
+          if (Number(variety.quantity).toFixed(0) < 1) {
+            rtn.error = "Quantity must be greater than 0."
+            return rtn
+          } else if (Number(variety.quantity).toFixed(0) < 1) {
+            rtn.error = "Product price must be at least $1.00"
             return rtn
           }
-        } catch (err) {
-          return { error: err, success: false}
+          rtn.success = true
+          return rtn
         }
+      } catch (err) {
+        return { error: err, success: false}
       }
+    }
 }

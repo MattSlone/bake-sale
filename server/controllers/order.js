@@ -12,7 +12,8 @@ const product = require('../routes/product')
 const db = require('../models/index'),
   MakeStripeAPI = require('../lib/stripe'),
   StripeAPI = new MakeStripeAPI(),
-  { Op } = require("sequelize")
+  { Op } = require("sequelize"),
+  ProductController = require('./product')
 
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
@@ -38,7 +39,7 @@ module.exports = class OrderController {
           // addon: {"addon name": true if added / false if not}
           const addonIds = Object.entries(item.addons).map(addon => addon[1] ? addon[0] : null)
             .filter(addon => addon !== null)
-          const variation = db.Variety.findOne({
+          const variation = await db.Variety.findOne({
             where: {
               ProductId: item.product.id,
               quantity: item.variation
@@ -205,6 +206,12 @@ module.exports = class OrderController {
               const completedStatus = await db.OrderStatus.findOne({ where: { status: 'completed' } })
               const order = await db.Order.findOne({ where: { TransferId: transfer.id } })
               order.OrderStatusId = completedStatus.id
+              const product = await db.Product.findByPk(order.ProductId)
+              await (new ProductController).updateInventoryOnSuccessfulOrder(
+                product.id,
+                order.VarietyId,
+                order.quantity
+              )
               await order.save()
               this.removeStaleOrders(order.UserId)
             } catch (err) {
@@ -312,10 +319,6 @@ module.exports = class OrderController {
     } catch (err) {
       console.log(err)
     }
-  }
-
-  static async validateOrderQuantities() {
-
   }
 
   static async validateCart(req, res, next) {

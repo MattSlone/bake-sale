@@ -255,6 +255,7 @@ export const getFormattedShopAddress = (formData) => {
 export const getShop = (formData) => {
   return async (dispatch) => {
     try {
+      console.log(formData)
       dispatch(getShopRequest())
       const res = await axios.get('/api/shop', {
         params: formData
