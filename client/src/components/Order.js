@@ -129,6 +129,11 @@ export default function Order({ order }) {
     
   }
 
+  const convertTo12HourTime = time => {
+    const hoursMin = time.split(':')
+    return `${(hoursMin[0] % 12) || 12}:${hoursMin[1]}${hoursMin[0] >= 12 ? 'pm' : 'am'}`;
+  }
+
   const getPickupAddress = async () => {
     try {
       const res = await axios.get('/api/shop', {
@@ -222,7 +227,11 @@ export default function Order({ order }) {
                 <ListItem disableGutters>
                   <ListItemText>
                     <Box component="span" fontWeight="bold">Pickup Time: </Box>
-                    {order.nextPickupWindow.dataValues.start} - {order.nextPickupWindow.dataValues.end}
+                    {convertTo12HourTime(
+                      order.nextPickupWindow.dataValues.start
+                    )} - {convertTo12HourTime(
+                      order.nextPickupWindow.dataValues.end
+                    )}
                   </ListItemText>
                 </ListItem>
               </> }
