@@ -14,6 +14,7 @@ const db = require('../models/index'),
   StripeAPI = new MakeStripeAPI(),
   { Op } = require("sequelize"),
   ProductController = require('./product')
+require('datejs')
 
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
@@ -178,46 +179,50 @@ module.exports = class OrderController {
     }
   }
 
+  async handleStripePaymentIntentSucceeded() {
+    const transfers = await db.Transfer.findAll({
+      include: {
+        model: db.Shop,
+        attributes: ['stripeAccountId'],
+        required: true
+      },
+      where: { stripePaymentIntentId: data.id }
+    })
+    transfers.forEach(async transfer => {
+      try {
+        const transferId = await StripeAPI.createTransfer(
+          transfer.amount*100, // Needs to be in cents
+          transfer.Shop.stripeAccountId,
+          data.charges.data[0].id
+        )
+        transfer.set({
+          stripeTransferId: transferId
+        });
+        await transfer.save()
+
+        const completedStatus = await db.OrderStatus.findOne({ where: { status: 'completed' } })
+        const order = await db.Order.findOne({ where: { TransferId: transfer.id } })
+        order.OrderStatusId = completedStatus.id
+        const product = await db.Product.findByPk(order.ProductId)
+        await (new ProductController).updateInventoryOnSuccessfulOrder(
+          product.id,
+          order.VarietyId,
+          order.quantity
+        )
+        await order.save()
+        this.removeStaleOrders(order.UserId)
+      } catch (err) {
+        console.log(err)
+      }
+    })
+  }
+
   async handleStripeWebhooks(req, res, next) {
     try {
       const [event, data] = StripeAPI.handleWebhooks(req, res, next)
       switch (event) {
         case 'payment_intent.succeeded':
-          const transfers = await db.Transfer.findAll({
-            include: {
-              model: db.Shop,
-              attributes: ['stripeAccountId'],
-              required: true
-            },
-            where: { stripePaymentIntentId: data.id }
-          })
-          transfers.forEach(async transfer => {
-            try {
-              const transferId = await StripeAPI.createTransfer(
-                transfer.amount*100, // Needs to be in cents
-                transfer.Shop.stripeAccountId,
-                data.charges.data[0].id
-              )
-              transfer.set({
-                stripeTransferId: transferId
-              });
-              await transfer.save()
-
-              const completedStatus = await db.OrderStatus.findOne({ where: { status: 'completed' } })
-              const order = await db.Order.findOne({ where: { TransferId: transfer.id } })
-              order.OrderStatusId = completedStatus.id
-              const product = await db.Product.findByPk(order.ProductId)
-              await (new ProductController).updateInventoryOnSuccessfulOrder(
-                product.id,
-                order.VarietyId,
-                order.quantity
-              )
-              await order.save()
-              this.removeStaleOrders(order.UserId)
-            } catch (err) {
-              console.log(err)
-            }
-          })
+          this.handleStripePaymentIntentSucceeded(data)
           return 200
         default:
           return 200
@@ -255,31 +260,33 @@ module.exports = class OrderController {
                   }
                 ],
                 where: {
-                  ...(shop && {ShopId: shop.id})
+                  ...(shop && { ShopId: shop.id })
                 }
               },
               db.Addon,
-              ...(shop ? [{
-                model: db.User,
-                attributes: [
-                  'firstName',
-                  'lastName',
-                  'street',
-                  'city',
-                  'state',
-                  'zipcode']
-              },
-              {
-                model: db.Transfer,
-                attributes: ['amount']
-              }
-            ] : [])
+              ...(shop ? [
+                {
+                  model: db.User,
+                  attributes: [
+                    'firstName',
+                    'lastName',
+                    'street',
+                    'city',
+                    'state',
+                    'zipcode']
+                },
+                {
+                  model: db.Transfer,
+                  attributes: ['amount']
+                }
+              ] : [])
             ]
-        });
-        if (orders[0]?.User && orders[0]?.fulfillment == 'pickup') {
-          for (order of orders) {
-            delete order.User
-          } 
+        })
+        for (let i = 0; i < orders.length; i++) {
+          if (orders[i].fulfillment == 'pickup') {
+            const nextPickupWindow = await this.getNextAvailablePickupWindow(orders[i])
+            orders[i].setDataValue('nextPickupWindow', nextPickupWindow)
+          }
         }
         return orders
     }
@@ -319,6 +326,36 @@ module.exports = class OrderController {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  async getNextAvailablePickupWindow(order) {
+    const fulfillmentDay = Date.today()
+      .set({ day: new Date(order.createdAt).getDate() })
+      .clearTime()
+      .add(order.Product.processingTime + 1).day()
+      .getDay()
+    console.log('fulfillMentDate and Day: ', fulfillmentDay)
+    order.Product.Shop.PickupSchedules.reverse()
+    let window = order.Product.Shop.PickupSchedules.find((day, index) => 
+      index >= fulfillmentDay && day.start !== day.end
+      && (new Date).getHours() < day.end.split(':')[0]
+    )
+    if (window === undefined) {
+      window = order.Product.Shop.PickupSchedules.find((day, index) => 
+        index > fulfillmentDay && day.start !== day.end
+      )
+    }
+    if (window === undefined) {
+      window = order.Product.Shop.PickupSchedules.find(day => day.start !== day.end)
+    }
+    const pickupDate = Date.today().add(order.Product.processingTime).day()
+      .next()[window.day.toLowerCase()]()
+      .toString('dddd MMMM dS, yyyy')
+    window = {
+      ...window,
+      date: pickupDate
+    }
+    return window
   }
 
   static async validateCart(req, res, next) {
@@ -401,7 +438,6 @@ module.exports = class OrderController {
           }
         }
       }
-      console.log('GOOOOOOOOOOOOOOOOOOOOD')
       next()
     } catch (err) {
       console.log(err)

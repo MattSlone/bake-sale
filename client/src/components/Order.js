@@ -184,22 +184,22 @@ export default function Order({ order }) {
           </AccordionSummary>
           <AccordionDetails>
             <List disablePadding dense={true}>
+              {order.fulfillment !== 'pickup' && (
               <ListItem disableGutters>
                 <ListItemText>
                   <Box component="span" fontWeight="bold">Fulfillment By: </Box>
-                  {
-                    new Date((new Date).setDate(new Date(order.createdAt).getDate() 
-                      + order.Product.processingTime)).toDateString()
-                  }
+                  {new Date((new Date).setDate(new Date(order.createdAt).getDate() 
+                      + order.Product.processingTime)).toDateString()}
                 </ListItemText>
               </ListItem>
+              )}
               <ListItem disableGutters>
                 <ListItemText>
                   <Box component="span" fontWeight="bold">Fulfillment Type: </Box>
                   {capitalize(order.fulfillment)}
                 </ListItemText>
               </ListItem>
-              {order.fulfillment == 'pickup' || order.fulfillment == 'delivery' ?
+              {order.fulfillment == 'pickup' || order.fulfillment == 'delivery' &&
               <ListItem disableGutters>
                 <ListItemText>
                 <Box display="flex" flexDirection="column">
@@ -210,7 +210,22 @@ export default function Order({ order }) {
                 </Box>
                 </ListItemText>
               </ListItem>
-              : '' }
+              }
+              {order.fulfillment == 'pickup' &&
+              <>
+                <ListItem disableGutters>
+                  <ListItemText>
+                    <Box component="span" fontWeight="bold">Next Pickup Date: </Box>
+                    {order.nextPickupWindow.date}
+                  </ListItemText>
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemText>
+                    <Box component="span" fontWeight="bold">Pickup Time: </Box>
+                    {order.nextPickupWindow.dataValues.start} - {order.nextPickupWindow.dataValues.end}
+                  </ListItemText>
+                </ListItem>
+              </> }
             </List>
           </AccordionDetails>
         </Accordion>

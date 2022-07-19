@@ -59,7 +59,8 @@ module.exports = class ShopController {
       }
       return true
     } catch (err) {
-      req.flash('error', 'Shop not found.')
+      console.log(err)
+      return false
     }
   }
 
