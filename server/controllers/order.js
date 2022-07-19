@@ -179,7 +179,7 @@ module.exports = class OrderController {
     }
   }
 
-  async handleStripePaymentIntentSucceeded() {
+  async handleStripePaymentIntentSucceeded(data) {
     const transfers = await db.Transfer.findAll({
       include: {
         model: db.Shop,
