@@ -61,7 +61,8 @@ export default function Home(props) {
     cardMedia: `${PREFIX}-cardMedia`,
     cardContent: `${PREFIX}-cardContent`,
     footer: `${PREFIX}-footer`,
-    routerLinkButton: `${PREFIX}-routerLinkButton`
+    routerLinkButton: `${PREFIX}-routerLinkButton`,
+    routerLink: `${PREFIX}-routerLink`
   };
 
   // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
@@ -90,32 +91,21 @@ export default function Home(props) {
     },
 
     [`& .${classes.card}`]: {
-      height: '250px',
-      maxWidth: '290px',
-      position: "relative",
-      margin: 'auto'
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
     },
 
     [`& .${classes.cardMedia}`]: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      height: "100%",
-      width: "100%"
-    },
-
-    [`& .${classes.actionArea}`]: {
-      position: "relative"
+      paddingTop: '56.25%', // 16:9
     },
 
     [`& .${classes.cardContent}`]: {
-      position: "absolute",
-      height: '20%',
-      bottom: 0,
-      width: '100%',
-      padding: '0.5em',
-      color: "#ffffff",
-      backgroundColor: "rgba(0,0,0,.33)"
+      flexGrow: 1,
+      padding: theme.spacing(1),
+      "&:last-child": {
+        paddingBottom: 0
+      }
     },
 
     [`& .${classes.footer}`]: {
@@ -124,6 +114,10 @@ export default function Home(props) {
     },
 
     [`& .${classes.routerLinkButton}`]: {
+      textDecoration: 'none',
+    },
+
+    [`& .${classes.routerLink}`]: {
       textDecoration: 'none',
     }
   }));
@@ -176,11 +170,13 @@ export default function Home(props) {
                     <CardMedia
                       className={classes.cardMedia}
                       image={`/api${card.ProductImages[0]?.path}`}
-                      title="Image title"
                     />
-                    <CardContent className={classes.cardContent}>
+                    <CardContent noGutter className={classes.cardContent}>
                       <Typography noWrap gutterBottom variant="h5" component="h5">
                         {card.name}
+                      </Typography>
+                      <Typography noWrap gutterBottom variant="p" component="p">
+                        {card.description}
                       </Typography>
                     </CardContent>
                   </Card>
