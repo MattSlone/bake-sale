@@ -70,10 +70,10 @@ export default function Orders(props) {
 
   return (
     <StyledContainer className={classes.cardGrid} maxWidth="lg">
-      <Grid container spacing={4}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h4" component="h4">
-            Your Orders
+          <Typography variant="h5" component="h5">
+            Orders
           </Typography>
         </Grid>
         {orders.length > 0 ? orders.map((order) => (

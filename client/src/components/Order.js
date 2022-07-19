@@ -204,7 +204,7 @@ export default function Order({ order }) {
                   {capitalize(order.fulfillment)}
                 </ListItemText>
               </ListItem>
-              {order.fulfillment == 'pickup' || order.fulfillment == 'delivery' &&
+              {(order.fulfillment == 'pickup' || order.fulfillment == 'delivery') && 
               <ListItem disableGutters>
                 <ListItemText>
                 <Box display="flex" flexDirection="column">
