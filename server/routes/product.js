@@ -5,7 +5,7 @@ const UserController = require('../controllers/user'),
   ProductController = new MakeProductController(),
   multer = require('multer'),
   upload = multer({
-    dest: "/uploads",
+    dest: '/uploads',
     fileFilter: function(_req, file, cb){
       checkFileType(_req, file, cb);
     }

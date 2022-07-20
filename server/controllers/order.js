@@ -51,10 +51,12 @@ module.exports = class OrderController {
           const order = await db.Order.create({
             amount: await this.calculateProductPrice(req, item),
             quantity: item.quantity,
+            processingTime: item.product.processingTime,
             TransferId: transfer.id,
             ProductId: item.product.id,
             VarietyId: variation.id,
             fulfillment: item.fulfillment,
+            personalization: item.personalization,
             OrderStatusId: pendingStatus.id,
             UserId: req.user.id
           })
@@ -332,7 +334,7 @@ module.exports = class OrderController {
     const fulfillmentDay = Date.today()
       .set({ day: new Date(order.createdAt).getDate() })
       .clearTime()
-      .add(order.Product.processingTime + 1).day()
+      .add(order.processingTime + 1).day()
       .getDay()
     console.log('fulfillMentDate and Day: ', fulfillmentDay)
     order.Product.Shop.PickupSchedules.reverse()
@@ -348,7 +350,7 @@ module.exports = class OrderController {
     if (window === undefined) {
       window = order.Product.Shop.PickupSchedules.find(day => day.start !== day.end)
     }
-    const pickupDate = Date.today().add(order.Product.processingTime).day()
+    const pickupDate = Date.today().add(order.processingTime).day()
       .next()[window.day.toLowerCase()]()
       .toString('dddd MMMM dS, yyyy')
     window = {
@@ -370,10 +372,8 @@ module.exports = class OrderController {
       const productsUnique = products.filter((product, index) => products.indexOf(product) === index)
       for (let product of productsUnique) {
         const orderItems = req.body.items.filter(item => item.product.id == product.id)
-        console.log('order items: ', orderItems)
         const orderQuantity = orderItems.map(item => Number(item.variation) * Number(item.quantity))
           .reduce((prev, curr) => prev + curr, 0)
-        console.log(orderQuantity, product.inventory)
         if (orderQuantity > product.inventory) {
           req.flash('error', `Order quantity ${orderQuantity} exceeds product inventory \
             ${product.inventory} for ${product.name}.`
@@ -403,13 +403,14 @@ module.exports = class OrderController {
           }
         })
         for (let fulfillment of orderFulfillments) {
-          if (fulfillment.fulfillment = 'pickup' && !product.Shop.allowPickups) {
+          console.log('FULFILLMENT: ', fulfillment.fulfillment)
+          if (fulfillment.fulfillment == 'pickup' && !product.Shop.allowPickups) {
             req.flash('error', `${product.Shop.name} does not allow pickups. \
               Please change your choice of fulfillment for ${product.name}`
             )
             res.redirect('/api/order/error')
             return
-          } else if (fulfillment.fulfillment = 'shipping') {
+          } else if (fulfillment.fulfillment == 'shipping') {
             for (let orderVariationInstance of orderVariationInstances) {
               if (orderVariationInstance.shipping == null 
                 && orderVariationInstance.quantity == fulfillment.variation
@@ -422,7 +423,14 @@ module.exports = class OrderController {
                 return
               }
             }
-          } else if (fulfillment.fulfillment = 'delivery') {
+          } else if (fulfillment.fulfillment == 'delivery') {
+            const localShopIds = await (new ProductController).getLocalShopIds(req.user)
+            console.log(localShopIds)
+            if (!localShopIds.includes(product.Shop.id)) {
+              req.flash('error', `Your address is not within ${product.Shop.name}'s delivery area.`)
+              res.redirect('/api/order/error')
+              return
+            }
             for (let orderVariationInstance of orderVariationInstances) {
               if (orderVariationInstance.delivery == null 
                 && orderVariationInstance.quantity == fulfillment.variation

@@ -16,6 +16,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Divider from '@mui/material/Divider';
 import { Redirect, Link as RouterLink } from "react-router-dom";
 
 const PREFIX = 'Order';
@@ -235,6 +236,31 @@ export default function Order({ order }) {
                   </ListItemText>
                 </ListItem>
               </> }
+              {(!order.Product.custom) && 
+              <>
+                <Divider />
+                <ListItem disableGutters>
+                  <ListItemText>
+                    <Box component="span" fontWeight="bold">Quantity: </Box>
+                    {`${order.quantity} package${order.quantity > 1 ? "'s" : ''} of ${order.Variety.quantity}`}
+                  </ListItemText>
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemText>
+                    <Box component="span" fontWeight="bold">Addons: </Box>
+                    {order.Addons.length > 0 ? order.Addons.map((addon, index) => (
+                      `${index < order.Addons.length-1 ? addon.name + ', ' : addon.name}`
+                    )) : "No addons"}
+                  </ListItemText>
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemText>
+                    <Box component="span" fontWeight="bold">{order.Product.personalizationPrompt}: </Box>
+                    {order.personalization}
+                  </ListItemText>
+                </ListItem>
+              </>
+              }
             </List>
           </AccordionDetails>
         </Accordion>

@@ -6,7 +6,7 @@ module.exports = {
       {
         day: 'Sunday',
         start: '12:00',
-        end: '12:00',
+        end: '13:00',
         ShopId: 1,
         createdAt: new Date(),
         updatedAt: new Date()

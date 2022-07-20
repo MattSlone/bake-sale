@@ -122,7 +122,7 @@ module.exports = class ProductController {
             const where = {
                 ...(req.query.shop && {ShopId: req.query.shop}),
                 ...(req.query.products && {id: req.query.products}),
-                ...((user.id && !req.query.shop) && {ShopId: shopIds}),
+                ...((user.id && !req.query.shop && req.query.delivers) && {ShopId: shopIds}),
                 ...(req.query.category && { category: req.query.category }),
                 ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
             }
@@ -329,8 +329,6 @@ module.exports = class ProductController {
       }))
       return associatedInstances
     }
-
-
 
     static async validateCreateOrEditProduct(req, res, next) {
       try {

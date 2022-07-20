@@ -79,6 +79,8 @@ export default function Profile(props) {
   const [city, setCity] = useState(props.user.city)
   const [state, setState] = useState(props.user.state)
   const [zipcode, setZipcode] = useState(props.user.zipcode)
+  const [lat, setLat] = useState(props.user.lat)
+  const [lng, setLng] = useState(props.user.lng)
   const [seller, setSeller] = useState(props.user.seller)
   const [validAddress, setValidAddress] = useState(false)
   const [message, setMessage] = useState('')
@@ -88,6 +90,8 @@ export default function Profile(props) {
     street: street,
     city: city,
     state: state,
+    lat: lat,
+    lng: lng,
     zipcode: zipcode,
     seller: seller
   }
@@ -106,6 +110,8 @@ export default function Profile(props) {
       setCity(auth.userData.city)
       setState(auth.userData.state)
       setZipcode(auth.userData.zipcode)
+      setLat(auth.userData.lat)
+      setLng(auth.userData.lng)
       setValidAddress(true)
     } else {
       setValidAddress(false)

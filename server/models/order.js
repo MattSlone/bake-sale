@@ -20,7 +20,9 @@ module.exports = (sequelize, DataTypes) => {
   Order.init({
     amount: DataTypes.FLOAT,
     quantity: DataTypes.INTEGER,
-    fulfillment: DataTypes.STRING
+    processingTime: DataTypes.INTEGER,
+    fulfillment: DataTypes.STRING,
+    personalization: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'Order',

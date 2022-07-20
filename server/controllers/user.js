@@ -148,6 +148,8 @@ module.exports = class UserController {
         ...(req.body.city && { city: req.body.city }),
         ...(req.body.state && { state: req.body.state }),
         ...(req.body.zipcode && { zipcode: req.body.zipcode }),
+        ...(req.body.lat && { lat: req.body.lat}),
+        ...(req.body.lng && { lng: req.body.lng }),
         ...('seller' in req.body && { seller: req.body.seller }),
         ...(req.body.username && { username: req.body.username }),
         ...(req.body.email && { email: req.body.email }),

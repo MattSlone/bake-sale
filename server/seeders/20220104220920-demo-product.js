@@ -10,6 +10,7 @@ module.exports = {
       processingTime: 1,
       automaticRenewal: 1,
       inventory: 25,
+      weight: 2,
       personalizationPrompt: 'What\'s your name?',
       ShopId: 1,
       createdAt: new Date(),

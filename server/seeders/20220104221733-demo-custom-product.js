@@ -9,7 +9,7 @@ module.exports = {
       description: 'Custom product description',
       processingTime: 1,
       automaticRenewal: 1,
-      inventory: 0,
+      inventory: 1,
       personalizationPrompt: null,
       ShopId: 1,
       createdAt: new Date(),

@@ -39,6 +39,7 @@ module.exports = class GMaps {
         return res.data.error.message
       }
       else {
+        console.log(res.data)
         if (res.data.data[0].type !== 'address') {
           return "Invalid Address."
         }
