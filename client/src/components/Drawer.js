@@ -133,7 +133,7 @@ function ResponsiveDrawer(props) {
   const DashboardListItems = (
     <>
     <List>
-      <MainListItems />
+      <MainListItems shop={props.shop} />
     </List>
     </>
   )

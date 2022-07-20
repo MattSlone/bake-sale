@@ -8,8 +8,10 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import RedeemIcon from '@mui/icons-material/Redeem';
-import PeopleIcon from '@mui/icons-material/People';
-import { Link } from 'react-router-dom'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import Divider from '@mui/material/Divider';
+import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom'
 import AssignmentIcon from '@mui/icons-material/Assignment';
 const PREFIX = 'ListItems';
 
@@ -28,51 +30,62 @@ const Root = styled('div')((
   }
 }));
 
-export default function MainListItems() {
-
-
+export default function MainListItems(props) {
   return (
     <Root>
-      <Link className={classes.routerLink} to="/dashboard">
+      <RouterLink className={classes.routerLink} to="/dashboard">
         <ListItem button>
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItem>
-      </Link>
-      <Link className={classes.routerLink} to="/dashboard/shop/edit">
+      </RouterLink>
+      <RouterLink className={classes.routerLink} to="/dashboard/shop/edit">
         <ListItem button>
           <ListItemIcon>
             <StorefrontIcon />
           </ListItemIcon>
           <ListItemText primary="Shop" />
         </ListItem>
-      </Link>
-      <Link className={classes.routerLink} to="/dashboard/products">
+      </RouterLink>
+      <RouterLink className={classes.routerLink} to="/dashboard/products">
         <ListItem button>
           <ListItemIcon>
             <RedeemIcon />
           </ListItemIcon>
           <ListItemText primary="Products" />
         </ListItem>
-      </Link>
-      <Link className={classes.routerLink} to="/dashboard/orders">
+      </RouterLink>
+      <RouterLink className={classes.routerLink} to="/dashboard/orders">
         <ListItem button>
           <ListItemIcon>
             <ShoppingCartIcon />
           </ListItemIcon>
           <ListItemText primary="Orders" />
         </ListItem>
-      </Link>
-      <Link className={classes.routerLink} to="/dashboard/requests">
+      </RouterLink>
+      <RouterLink className={classes.routerLink} to="/dashboard/requests">
         <ListItem button>
           <ListItemIcon>
             <RedeemIcon />
           </ListItemIcon>
           <ListItemText primary="Requests" />
         </ListItem>
-      </Link>
+      </RouterLink>
+      {props.shop.status == 1 &&
+        <>
+          <Divider />
+          <Link className={classes.routerLink} target="_blank" href="https://dashboard.stripe.com">
+            <ListItem button>
+              <ListItemIcon>
+                <ExitToAppIcon />
+              </ListItemIcon>
+              <ListItemText primary="Stripe" />
+            </ListItem>
+          </Link>
+        </>
+      }
     </Root>
   );
 }
