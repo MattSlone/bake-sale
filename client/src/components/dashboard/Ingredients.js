@@ -222,14 +222,10 @@ export default function Ingredients({ ingredients, setIngredients, setValidIngre
         allergen: !ingredient.allergen
       }
     })
-    const newLeft = newChecked.filter(
-      ingredient => left.map(ingredient => ingredient.name)
-        .includes(ingredient.name)
-    )
-    const newRight = newChecked.filter(
-      ingredient => right.map(ingredient => ingredient.name)
-        .includes(ingredient.name)
-    )
+    const newLeft = left.filter(ingredient => !newChecked.map(ingredient => ingredient.name).includes(ingredient.name))
+      .concat(newChecked.filter(ingredient => left.map(ingredient => ingredient.name).includes(ingredient.name)))
+    const newRight = right.filter(ingredient => !newChecked.map(ingredient => ingredient.name).includes(ingredient.name)) 
+      .concat(newChecked.filter(ingredient => right.map(ingredient => ingredient.name).includes(ingredient.name)))
     setChecked(newChecked)
     setLeft(newLeft)
     setRight(newRight)

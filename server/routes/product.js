@@ -143,7 +143,7 @@ module.exports = (app) => {
     var fileName = req.params.name
     res.sendFile(fileName, options, function (err) {
       if (err) {
-        console.log(err)
+        res.sendStatus(404)
       } else {
         console.log('Sent:', fileName)
       }
