@@ -48,6 +48,7 @@ module.exports = (app, passport) => {
   })
 
   app.post('/api/user/address/components',
+  UserController.verifyReCaptcha,
   async (req, res, next) => {
     const addressComponents = await GMaps.getFormattedAddress(req.body)
     console.log(addressComponents)
@@ -72,7 +73,9 @@ module.exports = (app, passport) => {
     res.json({ message: 'Successfully signed out' });
   })
 
-  app.post('/api/signin', UserController.validateSignIn, passport.authenticate('local', { failureRedirect: '/api/signin', failureFlash: true}),
+  app.post('/api/signin',
+  UserController.validateSignIn,
+  passport.authenticate('local', { failureRedirect: '/api/signin', failureFlash: true}),
   async (req, res) => {
     res.send({
       error: false,
@@ -87,7 +90,17 @@ module.exports = (app, passport) => {
     })
   })
 
-  app.post('/api/signup', UserController.validateSignUp, passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
+  app.get('/api/user/error', (req, res, next) => {
+    res.send({
+      error: req.flash('error'),
+      success: false
+    })
+  })
+
+  app.post('/api/signup',
+  UserController.verifyReCaptcha,
+  UserController.validateSignUp,
+  passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
   async (req, res) => {
     try {
       await (new UserController).sendSignUpEmail(req)

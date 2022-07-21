@@ -19,6 +19,7 @@ import isByteLength from 'validator/lib/isByteLength';
 import isAlpha from 'validator/lib/isAlpha';
 import isEmpty from 'validator/lib/isEmpty'
 import { useAuth } from '../hooks/use-auth';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const PREFIX = 'SignUp';
 
@@ -89,6 +90,7 @@ export default function SignUp(props) {
   const [zipcode, setZipcode] = useState('')
   const [seller, setSeller] = useState(0)
   const [message, setMessage] = useState('')
+  const [token, setToken] = useState('')
   const [validAddress, setValidAddress] = useState(false)
 
   let formData = {
@@ -102,11 +104,16 @@ export default function SignUp(props) {
     zipcode: zipcode,
     username: username,
     password: password,
-    seller: seller
+    seller: seller,
+    token: token
   }
 
   const getFormattedAddress = () => {
     props.getFormattedAddress(formData)
+  }
+
+  function onChange(value) {
+    setToken(value);
   }
 
   useEffect(() => {
@@ -127,40 +134,51 @@ export default function SignUp(props) {
   }, [auth.userData.loading])
 
   const handleSubmit = e => {
-    e.preventDefault()
-    setMessage('')
-    getFormattedAddress()
+    const valid = validate()
+    if (valid.success) {
+      setMessage('')
+      getFormattedAddress()
+    } else {
+      setMessage(valid.error)
+    }
+  }
+
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    for (const field of [
+      { name: 'First name', value: firstName },
+      { name: 'Last name', value: lastName },
+      { name: 'Street', value: street },
+      { name: 'City', value: city },
+      { name: 'State', value: state },
+      { name: 'Zipcode', value: zipcode },
+      { name: 'Email', value: username },
+      { name: 'Password', value: password },
+      { name: 'ReCaptcha', value: token }
+    ]) {
+      if (!field.value) {
+        rtn.error = `${field.name} is required.`
+        return rtn
+      }
+    }
+    if (!isEmail(username)) {
+      rtn.error = 'Invalid email address'
+      return rtn
+    }
+    if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
+      rtn.error = 'Name may only contain letters.'
+      return rtn
+    }
+    if (!isByteLength(password, { min: 5, max: 15 })) {
+      rtn.error = "Password should be between 5 and 15 characters."
+      return rtn
+    }
+    rtn.success = true
+    return rtn
   }
 
   useEffect(() => {
     if (validAddress) {
-      for (const field of [
-        { name: 'First name', value: firstName },
-        { name: 'Last name', value: lastName },
-        { name: 'Street', value: street },
-        { name: 'City', value: city },
-        { name: 'State', value: state },
-        { name: 'Zipcode', value: zipcode },
-        { name: 'Email', value: username },
-        { name: 'Password', value: password }
-      ]) {
-        if (!field.value) {
-          setMessage(`${field.name} is required.`)
-          return
-        }
-      }
-      if (!isEmail(username)) {
-        setMessage('Invalid email address')
-        return
-      }
-      if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
-        setMessage('Name may only contain letters.')
-        return
-      }
-      if (!isByteLength(password, { min: 5, max: 15 })) {
-        setMessage("Password should be between 5 and 15 characters.")
-        return
-      }
       auth.userSignUp(formData)
     }
   }, [validAddress])
@@ -296,13 +314,18 @@ export default function SignUp(props) {
               />
             </Grid>
             <Grid item xs={12}>
+              <ReCAPTCHA
+                sitekey="6LeSJQkhAAAAADzijHf5RNNIqdXgRDmcGkaQj3Rp"
+                onChange={onChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
               <Typography style={{color: 'red'}}>
                 {message}
               </Typography>
             </Grid>
           </Grid>
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"

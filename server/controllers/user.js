@@ -6,7 +6,9 @@ const User = require('../models/user'),
   Email = require('email-templates'),
   nodemailer = require('nodemailer'),
   jwt = require('jsonwebtoken'),
-  validator = require('validator')
+  validator = require('validator'),
+  axios = require('axios'),
+  qs = require('qs')
 
 module.exports = class UserController {
   /* static async isAdmin (req, res, next) {
@@ -190,6 +192,12 @@ module.exports = class UserController {
       }
       if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })) {
         req.flash('error', "Password should be between 5 and 15 characters.")
+        res.redirect('/api/signin')
+        return
+      }
+      const user = await db.User.findOne({ where: { username: req.body.username } })
+      if (!user?.active) {
+        req.flash('error', "Your account is not active.")
         res.redirect('/api/signin')
         return
       }
@@ -380,6 +388,26 @@ module.exports = class UserController {
       console.log(err)
       req.flash('error', "There was a problem resetting your password.")
       res.redirect('/api/resetpassword')
+      return
+    }
+  }
+
+  static async verifyReCaptcha(req, res, next) {
+    try {
+      const { data } = await axios.post('https://www.google.com/recaptcha/api/siteverify', qs.stringify({
+        secret: process.env.RECAPTCHA_SECRET,
+        response: req.body.token
+      }))
+      console.log(data)
+      if(!data.success) {
+        req.flash('error', 'ReCaptcha verification failed.')
+        res.redirect('/api/user/error')
+        return
+      }
+      next()
+    } catch(err) {
+      req.flash('error', 'ReCaptcha verification failed.')
+      res.redirect('/api/user/error')
       return
     }
   }

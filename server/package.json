@@ -26,6 +26,7 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pug": "^3.0.2",
+    "qs": "^6.11.0",
     "sequelize": "^6.2.2",
     "stripe": "^8.205.0",
     "validator": "^13.7.0"

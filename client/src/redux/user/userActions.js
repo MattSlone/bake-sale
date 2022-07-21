@@ -243,7 +243,7 @@ export const getFormattedAddress = (formData) => {
       dispatch(getFormattedAddressRequest())
       const res = await axios.post('/api/user/address/components', formData)
       if(res.data.error) {
-        dispatch(getFormattedAddressFailure(res.data.error))
+        dispatch(getFormattedAddressFailure(res.data.error[0]))
       }
       else {
         dispatch(getFormattedAddressSuccess(res.data.success))
