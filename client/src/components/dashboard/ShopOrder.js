@@ -127,6 +127,7 @@ export default function ShopOrder(props)
               secondary="Fulfillment Location"
             />
           </ListItem>
+          {order.fulfillment == 'pickup' &&
           <ListItem className={classes.listItem}>
             <ListItemText
               primary={
@@ -136,6 +137,7 @@ export default function ShopOrder(props)
               secondary="Pickup Time"
             />
           </ListItem>
+          }
           <Divider />
           {!order.Product.custom &&
           <>

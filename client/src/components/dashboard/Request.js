@@ -48,8 +48,7 @@ const StyledPaper = styled(Paper)((
   }
 ) => ({
   padding: theme.spacing(2),
-  margin: theme.spacing(2),
-  marginTop: theme.spacing(10)
+  margin: theme.spacing(2)
 }));
 
 export default function Request(props)
