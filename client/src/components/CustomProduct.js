@@ -13,6 +13,7 @@ import { TextField, Typography } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
+import { Link as RouterLink } from 'react-router-dom';
 import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios'
 
@@ -28,7 +29,8 @@ const classes = {
   titles: `${PREFIX}-titles`,
   requestQuoteButton: `${PREFIX}-requestQuoteButton`,
   formControl: `${PREFIX}-formControl`,
-  descTitle: `${PREFIX}-descTitle`
+  descTitle: `${PREFIX}-descTitle`,
+  link: `${PREFIX}-link`
 };
 
 const StyledPaper = styled(Paper)((
@@ -42,6 +44,12 @@ const StyledPaper = styled(Paper)((
     width: '100%',
     marginBottom: theme.spacing(1)
   },
+
+  [`& .${classes.link}`]: {
+    textDecoration: 'none',
+    color: 'black'
+  },
+
 
   [`&.${classes.card}`]: {
     height: '100%',
@@ -87,10 +95,26 @@ export default function CustomProduct(props)
   const auth = useAuth()
   const [quote, setQuote] = useState(props.quote.quotes.filter(quote => quote.ProductId == id)[props.quote.quotes.length-1])
   const [fields, setFields] = useState([])
+  const [requested, setRequested] = useState(quote && quote.QuoteStatusId == '1')
   const [product, setProduct] = useState('')
   const [message, setMessage] = useState('')
   const [fulfillment, setFulfillment] = useState('')
   const [deliveryCost, setDeliveryCost] = useState(0)
+
+  const validate = () => {
+    let rtn = { error: '', success: false }
+    for (const field of [
+      { name: 'Fulfillment', value: fulfillment },
+      ...fields
+    ]) {
+      if (!field.value) {
+        rtn.error = `${field.name} is required.`
+        return rtn
+      }
+    }
+    rtn.success = true
+    return rtn
+  }
 
   useEffect(() => {
     props.getProducts({products: [id]})
@@ -99,6 +123,10 @@ export default function CustomProduct(props)
   useEffect(() => {
     setQuote(props.quote.quotes.filter(quote => quote.ProductId == id)[props.quote.quotes.length-1])
   }, [props.quote.quotes])
+
+  useEffect(() => {
+    setRequested(quote && quote.QuoteStatusId == '1')
+  }, [quote])
 
   useEffect(() => {
     let tempProduct = props.product.products.find(product => product.id == id)
@@ -115,12 +143,17 @@ export default function CustomProduct(props)
   }, [product])
 
   const handleRequestQuote = () => {
-    props.requestQuote({
-      ...quote,
-      productId: product.id,
-      values: mapValuesToFields()
-    })
-    setMessage('You\'ll receive an email with a final price once your quote has been processed')
+    const valid = validate()
+    if (valid.success) {
+      props.requestQuote({
+        ...quote,
+        productId: product.id,
+        values: mapValuesToFields()
+      })
+      setMessage('You\'ll receive an email with a final price once your quote has been processed')
+    } else {
+      setMessage(valid.error)
+    }
   }
   const handleSelectFulfillment = (e) => {
     setFulfillment(e.target.value)
@@ -147,24 +180,12 @@ export default function CustomProduct(props)
       if(res.data.error[0]) {
         console.log(res.data.error[0])
       } else {
-        console.log('right here', res.data.success)
         setDeliveryCost(res.data.success)
       }
     } else {
       setDeliveryCost(product.Varieties.find(v => v.quantity == 1).delivery)
     }
   })
-
-  var items = [
-    {
-      name: "Random Name #1",
-      description: "Probably the most random thing you have ever seen!"
-    },
-    {
-      name: "Random Name #2",
-      description: "Hello World!"
-    }
-  ]
 
   return ( product ?
     <StyledPaper className={classes.product}>
@@ -174,7 +195,7 @@ export default function CustomProduct(props)
           indicators={false}
           >
             {
-              items.map( (item, i) => <Item product={product} key={i} item={item} /> )
+              product.ProductImages.map( (item, i) => <Item product={product} key={i} item={item} /> )
             }
           </Carousel>
         </Grid>
@@ -182,7 +203,9 @@ export default function CustomProduct(props)
           <Grid item container className={classes.sidebar} justifyContent="flex-start" direction="column">
             <Grid item>
               <Typography gutterBottom variant="h6" component="h4">
-                {props.shop.name}
+                <RouterLink className={classes.link} to={`/shop/${props.shop.id}`}>
+                  {props.shop.name}
+                </RouterLink>
               </Typography>
             </Grid>
             <Grid item className={classes.titles}>
@@ -233,17 +256,20 @@ export default function CustomProduct(props)
               </FormControl>
             </Grid>
             <Grid item>
+              <Typography style={{color: 'red'}}>
+                {message}
+              </Typography>
+            </Grid>
+            <Grid item>
               <Button
               className={classes.requestQuoteButton}
               variant="contained"
+              disabled={requested}
               color="primary"
               onClick={handleRequestQuote}
               >
-                {(quote && quote.QuoteStatusId == '1') ? "Requested!" : "Request a Quote"}
+                {requested ? "Requested!" : "Request a Quote"}
               </Button>
-            </Grid>
-            <Grid item>
-              {message}
             </Grid>
           </Grid>
         </Grid>
