@@ -2,40 +2,19 @@ import { React, useState, useEffect, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import Carousel from 'react-material-ui-carousel'
 import { useParams } from 'react-router-dom'
-import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography'
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 
-const PREFIX = 'Request';
+const PREFIX = 'Order';
 
 const classes = {
-  product: `${PREFIX}-product`,
-  personalizationBox: `${PREFIX}-personalizationBox`,
-  card: `${PREFIX}-card`,
-  cardMedia: `${PREFIX}-cardMedia`,
-  sidebar: `${PREFIX}-sidebar`,
-  top: `${PREFIX}-top`,
-  titles: `${PREFIX}-titles`,
-  requestQuoteButton: `${PREFIX}-requestQuoteButton`,
-  formControl: `${PREFIX}-formControl`,
-  descTitle: `${PREFIX}-descTitle`
-};
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
+  list: `${PREFIX}-list`,
+  listItem: `${PREFIX}-listItem`,
+  listItemText: `${PREFIX}-listItemText`,
 };
 
 const StyledPaper = styled(Paper)((
@@ -45,6 +24,22 @@ const StyledPaper = styled(Paper)((
 ) => ({
   padding: theme.spacing(2),
   margin: theme.spacing(2),
+
+  [`& .${classes.list}`]: {
+    display: 'flex',
+    flexDirection: 'column',
+    maxWidth: '500px'
+  },
+
+  [`& .${classes.listItem}`]: {
+    display: 'flex',
+    justifyContent: 'flex-start'
+  },
+
+  [`& .${classes.listItemText}`]: {
+    flex: 1
+  }
+
 }));
 
 export default function ShopOrder(props)
@@ -76,41 +71,90 @@ export default function ShopOrder(props)
     return `${order.User.street}, ${order.User.city}, ${order.User.state} ${order.User.zipcode}`
   }
 
+  const convertTo12HourTime = time => {
+    const hoursMin = time.split(':')
+    return `${(hoursMin[0] % 12) || 12}:${hoursMin[1]}${hoursMin[0] >= 12 ? 'pm' : 'am'}`;
+  }
+
   return ( order ?
     <StyledPaper>
       <Typography sx={{fontWeight: 'bold'}}>
         Order: {order.Product.name}
       </Typography>
-      <List>
-          <ListItem>
+      <List className={classes.list}>
+          <ListItem className={classes.listItem}>
             <ListItemText
-              primary={new Date((new Date).setDate(new Date(order.createdAt).getDate() 
-                + order.Product.processingTime)).toDateString()}
+              primary={`${order.User.firstName} ${order.User.lastName}`}
+              secondary="Customer Name"
+            />
+          </ListItem>
+          <Divider />
+          <ListItem className={classes.listItem}>
+            <ListItemText
+              className={classes.listItemText}
+              primary={`$${Number(order.amount).toFixed(2)}`}
+              secondary="Order Amount"
+            />
+            <ListItemText
+              className={classes.listItemText}
+              primary={`$${Number(order.Transfer.amount).toFixed(2)}`}
+              secondary="Payout Amount"
+            />
+          </ListItem>
+          <Divider />
+          <ListItem className={classes.listItem}>
+            <ListItemText
+              className={classes.listItemText}
+              primary={order.fulfillment == 'pickup' ?
+                order.nextPickupWindow.date
+                :
+                new Date((new Date).setDate(new Date(order.createdAt).getDate() 
+                + order.Product.processingTime)).toDateString()
+              }
               secondary="Fulfillment Due By"
             />
             <ListItemText
+              className={classes.listItemText}
               primary={capitalize(order.fulfillment)}
               secondary="Fulfillment Type"
             />
           </ListItem>
-          <ListItem>
-            <ListItemText
-              primary={`$${order.amount}`}
-              secondary="Order Amount"
-            />
-            <ListItemText
-              primary={`$${order.Transfer.amount}`}
-              secondary="Payment Amount"
-            />
-          </ListItem>
-          <ListItem>
+          <ListItem className={classes.listItem}>
             <ListItemText
               primary={
-                order.fulfillment == 'delivery' ? getBuyerAddress() : getShopAddress()
+                ['shipping', 'delivery'].includes(order.fulfillment) ? getBuyerAddress() : getShopAddress()
               }
               secondary="Fulfillment Location"
             />
           </ListItem>
+          <ListItem className={classes.listItem}>
+            <ListItemText
+              primary={
+                `${convertTo12HourTime(order.nextPickupWindow.dataValues.start)} -
+                ${convertTo12HourTime(order.nextPickupWindow.dataValues.end)}`
+              }
+              secondary="Pickup Time"
+            />
+          </ListItem>
+          <Divider />
+          {!order.Product.custom &&
+          <>
+            <ListItem className={classes.listItem}>
+              <ListItemText
+                primary={order.Addons.length > 0 ? order.Addons.map((addon, index) => (
+                  `${index < order.Addons.length-1 ? addon.name + ', ' : addon.name}`
+                )) : "No addons"}
+                secondary="Addons"
+              />
+            </ListItem>
+            <ListItem className={classes.listItem}>
+              <ListItemText
+                primary={order.personalization ? order.personalization : 'No answer provided'}
+                secondary="Personalization"
+              />
+            </ListItem>
+          </>
+          }
       </List>
     </StyledPaper> : ''
   )

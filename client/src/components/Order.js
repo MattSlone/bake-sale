@@ -256,7 +256,7 @@ export default function Order({ order }) {
                 <ListItem disableGutters>
                   <ListItemText>
                     <Box component="span" fontWeight="bold">{order.Product.personalizationPrompt}: </Box>
-                    {order.personalization}
+                    {order.personalization ? order.personalization : 'No answer provided'}
                   </ListItemText>
                 </ListItem>
               </>
