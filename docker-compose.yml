@@ -58,12 +58,11 @@ services:
       - app-network
 volumes:
   web-root:
-    driver: local
+    driver: bridge
     driver_opts:
       type: none
       device: client:/public
       o: bind
-
 networks:
   app-network:
     driver: bridge
