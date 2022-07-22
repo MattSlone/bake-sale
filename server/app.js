@@ -84,7 +84,7 @@ require('./routes/quote')(app)
 require('./routes/order')(app, webhookApp)
 
 app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+  res.sendFile(path.join('/public', 'index.html'));
 });
 
 // Default response for any other request

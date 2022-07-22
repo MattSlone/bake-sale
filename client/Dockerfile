@@ -1,5 +1,5 @@
 FROM node:16-alpine
-RUN apk update && apk upgrade
+RUN apk update && apk upgrade && apk add bash
 RUN rm -rf /app
 RUN mkdir /app
 WORKDIR /app
