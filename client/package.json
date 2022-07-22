@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "latest",
     "@mui/lab": "latest",
+    "@mui/x-date-pickers": "latest",
     "@mui/material": "latest",
     "@mui/styles": "latest",
     "@mui/system": "^5.0.0",

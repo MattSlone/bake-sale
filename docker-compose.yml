@@ -38,3 +38,32 @@ services:
       - db
     environment:
       - NODE_ENV=development
+    restart: unless-stopped
+    networks:
+      - app-network
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      #- certbot-etc:/etc/letsencrypt
+      #- certbot-var:/var/lib/letsencrypt
+    depends_on:
+      - server
+    networks:
+      - app-network
+volumes:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: client:/public
+      o: bind
+
+networks:
+  app-network:
+    driver: bridge
