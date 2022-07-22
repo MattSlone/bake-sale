@@ -63,6 +63,6 @@ volumes:
       type: none
       device: ./client/public
       o: bind
-  networks:
-    app-network:
-      driver: bridge
+networks:
+  app-network:
+    driver: bridge
