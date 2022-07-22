@@ -65,7 +65,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./client/build/
+      device: ./client/build
       o: bind
 networks:
   app-network:
