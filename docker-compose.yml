@@ -14,6 +14,8 @@ services:
       MYSQL_PASSWORD: root
     cap_add:
       - SYS_NICE
+    networks:
+      - app-network
   client:
     container_name: client
     build: ./client
@@ -25,6 +27,8 @@ services:
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
+    networks:
+      - app-network
   server:
     container_name: server
     build: ./server
@@ -38,7 +42,6 @@ services:
       - db
     environment:
       - NODE_ENV=development
-    restart: unless-stopped
     networks:
       - app-network
   webserver:
@@ -48,7 +51,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - client:/var/www/html
+      - web-root:/var/www/html
       - ./nginx-conf:/etc/nginx/conf.d
       #- certbot-etc:/etc/letsencrypt
       #- certbot-var:/var/lib/letsencrypt
