@@ -72,7 +72,6 @@ app.use(bodyParser.json({limit: '50mb'}))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 webhookApp.use(express.raw({ type: 'application/json' }))
 
-/* Don't worry about these */
 app.use(express.static(path.join(__dirname, '../build')));
 app.use(express.static(path.join(__dirname, '../uploads')))
 
@@ -84,6 +83,12 @@ require('./routes/ingredient')(app)
 require('./routes/quote')(app)
 require('./routes/order')(app, webhookApp)
 
+// taking over for webpack-dev-server when in production
+if (process.env.NODE_ENV == 'production') {
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  });
+}
 
 // Default response for any other request
 app.use(function(req, res) {
