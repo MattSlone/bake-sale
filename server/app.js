@@ -6,8 +6,7 @@ const express = require('express'),
   session = require('express-session'),
   flash = require('connect-flash'),
   app = express(),
-  webhookApp = express(),
-  dirTree = require('directory-tree')
+  webhookApp = express()
 
 const { Sequelize, Transaction } = require('sequelize')
 
@@ -84,10 +83,6 @@ require('./routes/ingredient')(app)
 require('./routes/quote')(app)
 require('./routes/order')(app, webhookApp)
 
-const tree = dirTree("/");
-for (item of tree) {
-  console.log(item)
-}
 app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
