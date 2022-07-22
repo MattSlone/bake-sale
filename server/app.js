@@ -6,7 +6,8 @@ const express = require('express'),
   session = require('express-session'),
   flash = require('connect-flash'),
   app = express(),
-  webhookApp = express()
+  webhookApp = express(),
+  dirTree = require('directory-tree')
 
 const { Sequelize, Transaction } = require('sequelize')
 
@@ -83,12 +84,13 @@ require('./routes/ingredient')(app)
 require('./routes/quote')(app)
 require('./routes/order')(app, webhookApp)
 
-// taking over for webpack-dev-server when in production
-if (process.env.NODE_ENV == 'production') {
-  app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, '/build', 'index.html'));
-  });
+const tree = dirTree("/");
+for (item of tree) {
+  console.log(item)
 }
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
 
 // Default response for any other request
 app.use(function(req, res) {
