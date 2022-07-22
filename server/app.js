@@ -86,7 +86,7 @@ require('./routes/order')(app, webhookApp)
 // taking over for webpack-dev-server when in production
 if (process.env.NODE_ENV == 'production') {
   app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../build', 'index.html'));
   });
 }
 

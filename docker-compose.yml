@@ -38,6 +38,7 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+      - web-root:/build
     depends_on:
       - db
     environment:
@@ -64,7 +65,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./client/public
+      device: ./client/build
       o: bind
 networks:
   app-network:
