@@ -27,21 +27,26 @@ module.exports = class UserController {
   } */
 
   static isLoggedIn (req, res, next) {
+    console.log('checking if logged in...')
     if (req.isAuthenticated()) {
       next()
     }
     else {
       req.flash('error', 'Not logged in.')
-      res.redirect('/api/signin')
+      res.redirect('/api/user/error')
     }
   }
 
   async read (req, res, next) {
     try {
+      if (!req.query?.UserId) {
+        return req.user
+      }
       let user = await db.User.findOne({ where: { id: req.query.UserId } })
       return user
     } catch (err) {
-
+      req.flash('error', err)
+      res.redirect('/api/user/error')
     }
   }
 
@@ -213,7 +218,7 @@ module.exports = class UserController {
       const addressComponents = await GMaps.getFormattedAddress(req.body)
       if (typeof addressComponents == 'string') {
         req.flash('error', 'There was an issue validating your address.')
-        res.redirect('/api/signup')
+        res.redirect('/api/user/error')
         return
       }
       for (const field of [
@@ -228,13 +233,13 @@ module.exports = class UserController {
       ]) {
         if (!field.value) {
           req.flash('error', `${field.name} is required.`)
-          res.redirect('/api/signup')
+          res.redirect('/api/user/error')
           return
         }
       }
       if (!validator.isEmail(req.body.username)) {
         req.flash('error', 'Invalid email address')
-        res.redirect('/api/signup')
+        res.redirect('/api/user/error')
         return
       }
       if (
@@ -242,18 +247,19 @@ module.exports = class UserController {
         || !(req.body.lastName && validator.isAlpha(req.body.lastName))
       ) {
         req.flash('error', 'Name may only contain letters.')
-        res.redirect('/api/signup')
+        res.redirect('/api/user/error')
         return
       }
       if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })) {
         req.flash('error', "Password should be between 5 and 15 characters.")
-        res.redirect('/api/signup')
+        res.redirect('/api/user/error')
         return
       }
+      console.log('validated!!!')
       next()
     } catch (err) {
       req.flash('error', "There was an error signing up.")
-      res.redirect('/api/signup')
+      res.redirect('/api/user/error')
     }
   }
 
@@ -394,6 +400,7 @@ module.exports = class UserController {
 
   static async verifyReCaptcha(req, res, next) {
     try {
+      console.log(req.body.token)
       const { data } = await axios.post('https://www.google.com/recaptcha/api/siteverify', qs.stringify({
         secret: process.env.RECAPTCHA_SECRET,
         response: req.body.token

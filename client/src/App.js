@@ -1,4 +1,4 @@
-import { React }  from 'react';
+import { React, useEffect, useState }  from 'react';
 import { styled } from '@mui/material/styles';
 import HomeContainer from './components/containers/HomeContainer'
 import SignInContainer from './components/containers/SignInContainer'
@@ -9,6 +9,7 @@ import ProductContainer from './components/containers/ProductContainer'
 import ShopContainer from './components/containers/ShopContainer'
 import OrdersContainer from './components/containers/OrdersContainer'
 import CustomProductContainer from './components/containers/CustomProductContainer'
+import Maintenance from './components/Maintenance';
 import Box from '@mui/material/Box';
 import { useAuth } from './hooks/use-auth';
 import { useTheme } from '@mui/styles';
@@ -16,7 +17,7 @@ import { useTheme } from '@mui/styles';
 import CheckoutContainer from './components/containers/CheckoutContainer';
 import QuoteContainer from './components/containers/QuoteContainer';
 
-import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
+import { Route, Redirect, Switch, useHistory, withRouter } from "react-router-dom";
 import ResetPassword from './components/ResetPassword';
 import ProfileContainer from './components/containers/ProfileContainer';
 import AccountContainer from './components/containers/AccountContainer';
@@ -50,24 +51,32 @@ const StyledBox = styled(Box)((
 
 export default function App() {
   const auth = useAuth()
+  const history = useHistory()
+  const [location, setLocation] = useState('')
+  history.listen((newLocation, action) => {
+    if (newLocation.pathname != location)
+    setLocation(newLocation.pathname)
+  })
+
+  useEffect(() => {
+    auth.isLoggedIn()
+  }, [location])
   return (
-      <Router>
         <StyledBox>
           <div className={classes.root}>
             <DrawerContainer />
             <main className={classes.content}>
               <Box sx={{height: 64}} />
               <Switch>
-                <Route path='/' exact component={HomeContainer} key='/'/>
+                <Route path='/' exact component={auth.userData.loggedIn ? HomeContainer : Maintenance} key='/'/>
                 <Route path='/signin' component={SignInContainer} key='/signin'/>
                 <Route path='/signup' component={SignUpContainer}/>
                 <Route path='/forgotpassword' component={ForgotPasswordContainer}/>
                 <Route path='/resetpassword' component={ResetPassword}/>
-                <Route path='/products/custom/:id' children={<CustomProductContainer />} />
-                <Route path='/products/:id' children={<ProductContainer />} />
-                <Route path='/shop/:id' children={<ShopContainer />} />
                 <Route path='/signout' component={HomeContainer} key='/' beforeEnter/>
-                <Route path={["/dashboard", "/checkout", "/user"]}>
+                <Route path={["/dashboard", "/checkout", "/user"].concat([
+                  "/products", "/shop"
+                ])}>
                   {auth.userData.loggedIn ?
                     <Switch>
                       <Route path='/dashboard' component={DashboardContainer} />
@@ -77,6 +86,9 @@ export default function App() {
                       <Route path='/user/quotes/:id' component={QuoteContainer} />
                       <Route path='/user/profile' component={ProfileContainer}/>
                       <Route path='/user/account' component={AccountContainer}/>
+                      <Route path='/products/custom/:id' children={<CustomProductContainer />} />
+                      <Route path='/products/:id' children={<ProductContainer />} />
+                      <Route path='/shop/:id' children={<ShopContainer />} />
                     </Switch>
                   : <Redirect to="/signin" />}
                 </Route>
@@ -84,7 +96,6 @@ export default function App() {
             </main>
           </div>
         </StyledBox>
-      </Router>
   );
 }
 

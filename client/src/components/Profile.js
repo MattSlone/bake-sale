@@ -16,6 +16,7 @@ import { Redirect } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from '../hooks/use-auth';
 import isAlpha from 'validator/lib/isAlpha';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const PREFIX = 'Profile';
 
@@ -82,6 +83,7 @@ export default function Profile(props) {
   const [lat, setLat] = useState(props.user.lat)
   const [lng, setLng] = useState(props.user.lng)
   const [seller, setSeller] = useState(props.user.seller)
+  const [token, setToken] = useState('')
   const [validAddress, setValidAddress] = useState(false)
   const [message, setMessage] = useState('')
   let formData = {
@@ -93,7 +95,8 @@ export default function Profile(props) {
     lat: lat,
     lng: lng,
     zipcode: zipcode,
-    seller: seller
+    seller: seller,
+    token: token
   }
 
   const getFormattedAddress = () => {
@@ -122,34 +125,48 @@ export default function Profile(props) {
   }, [auth.userData.loading])
 
   const handleSubmit = e => {
-    e.preventDefault()
-    setMessage('')
-    getFormattedAddress()
+    const valid = validate()
+    if (valid.success) {
+      getFormattedAddress()
+    } else {
+      setMessage(valid.error)
+    }
+  }
+
+  const validate = () => {
+    const rtn = { error: '', success: false }
+    for (const field of [
+      { name: 'First name', value: firstName },
+      { name: 'Last name', value: lastName },
+      { name: 'Street', value: street },
+      { name: 'City', value: city },
+      { name: 'State', value: state },
+      { name: 'Zipcode', value: zipcode },
+      { name: 'ReCaptcha', value: token },
+    ]) {
+      if (!field.value) {
+        rtn.error = `${field.name} is required.`
+        return rtn
+      }
+    }
+    if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
+      rtn.error = 'Name may only contain letters.'
+      return rtn
+    }
+    rtn.success = true
+    return rtn
   }
 
   useEffect(() => {
     if (validAddress) {
-      for (const field of [
-        { name: 'First name', value: firstName },
-        { name: 'Last name', value: lastName },
-        { name: 'Street', value: street },
-        { name: 'City', value: city },
-        { name: 'State', value: state },
-        { name: 'Zipcode', value: zipcode },
-      ]) {
-        if (!field.value) {
-          setMessage(`${field.name} is required.`)
-          return
-        }
-      }
-      if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
-        setMessage('Name may only contain letters.')
-        return
-      }
       props.editUser(formData)
       setMessage('Your changes have been saved')
     }
   }, [validAddress])
+
+  function onChange(value) {
+    setToken(value);
+  }
 
   return (
     <StyledContainer component="main" maxWidth="xs">
@@ -249,13 +266,19 @@ export default function Profile(props) {
               />
             </Grid>
             <Grid item xs={12}>
+              <ReCAPTCHA
+                isolated={1}
+                sitekey="6LeSJQkhAAAAADzijHf5RNNIqdXgRDmcGkaQj3Rp"
+                onChange={onChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
               <Typography style={{color: 'red'}}>
                 {message}
               </Typography>
             </Grid>
           </Grid>
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"

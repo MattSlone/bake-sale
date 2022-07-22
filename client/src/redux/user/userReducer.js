@@ -16,7 +16,10 @@ import {
   GET_FORMATTED_ADDRESS_FAILURE,
   GET_FORMATTED_ADDRESS_SUCCESS,
   GET_FORMATTED_ADDRESS_REQUEST,
-  RESET_USER_ERROR
+  RESET_USER_ERROR,
+  IS_LOGGED_IN_FAILURE,
+  IS_LOGGED_IN_REQUEST,
+  IS_LOGGED_IN_SUCCESS
  } from './userTypes'
 
 const initialState = {
@@ -150,6 +153,19 @@ const userReducer = (state = initialState, action) => {
       lng: '',
       validAddress: false,
       error: action.payload
+    }
+    case IS_LOGGED_IN_REQUEST: return {
+      ...state,
+      loading: true
+    }
+    case IS_LOGGED_IN_SUCCESS: return {
+      ...state,
+      loggedIn: true,
+      error: ''
+    }
+    case IS_LOGGED_IN_FAILURE: return {
+      ...state,
+      loggedIn: false
     }
     default: return state
   }

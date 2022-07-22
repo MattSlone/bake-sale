@@ -1,12 +1,21 @@
 // Hook (use-auth.js)
-import React, { useState, useEffect, useContext, createContext } from "react";
+import React, { useContext, createContext } from "react";
 
 const authContext = createContext();
 // Provider component that wraps your app and makes auth object ...
 // ... available to any child component that calls useAuth().
-export function ProvideAuth({ children, userData, userSignIn, userSignUp, userSignOut, resetUserError }) {
+export function ProvideAuth({
+  children,
+  userData,
+  userSignIn,
+  userSignUp,
+  userSignOut,
+  isLoggedIn,
+  resetUserError
+}) {
   const auth = {
     userData,
+    isLoggedIn,
     userSignIn,
     userSignUp,
     userSignOut,

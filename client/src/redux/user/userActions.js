@@ -19,6 +19,9 @@ import {
   GET_FORMATTED_ADDRESS_FAILURE,
   GET_FORMATTED_ADDRESS_SUCCESS,
   GET_FORMATTED_ADDRESS_REQUEST,
+  IS_LOGGED_IN_FAILURE,
+  IS_LOGGED_IN_SUCCESS,
+  IS_LOGGED_IN_REQUEST,
   RESET_USER_ERROR
  } from './userTypes'
 
@@ -153,13 +156,32 @@ export const getFormattedAddressFailure = (error) => {
   }
 }
 
+export const isLoggedInRequest = () => {
+  return {
+    type: IS_LOGGED_IN_REQUEST
+  }
+}
+
+export const isLoggedInSuccess = () => {
+  return {
+    type: IS_LOGGED_IN_SUCCESS
+  }
+}
+
+export const isLoggedInFailure = (error) => {
+  return {
+    type: IS_LOGGED_IN_FAILURE,
+    payload: error
+  }
+}
+
 export const userSignUp = (formData) => {
   return async (dispatch) => {
     try {
       dispatch(userSignUpRequest())
       const res = await axios.post('/api/signup', formData)
-      if(res.data.error[0]) {
-        dispatch(userSignInFailure(res.data.error[0]))
+      if(res.data.error) {
+        dispatch(userSignUpFailure(res.data.error[0]))
       }
       else {
         dispatch(getShop({ UserId: res.data.success.id }))
@@ -167,6 +189,23 @@ export const userSignUp = (formData) => {
       }
     } catch(error) {
       dispatch(userSignUpFailure(error.message))
+    }
+  }
+}
+
+export const isLoggedIn = () => {
+  return async (dispatch) => {
+    try {
+      dispatch(isLoggedInRequest())
+      const res = await axios.get('/api/user')
+      if(res.data.error) {
+        dispatch(isLoggedInFailure(res.data.error))
+      }
+      else {
+        dispatch(isLoggedInSuccess())
+      }
+    } catch(err) {
+      dispatch(isLoggedInFailure(err))
     }
   }
 }

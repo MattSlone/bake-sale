@@ -11,20 +11,6 @@ module.exports = (app, passport) => {
     })
   })
 
-  app.get('/api/user',
-  UserController.isLoggedIn,
-  async (req, res, next) => {
-    try {
-      let user = await (new UserController).read(req, res, next)
-      res.send({
-        error: req.flash('error'),
-        success: user
-      })
-    } catch (err) {
-      console.log(err)
-    }
-  })
-
   app.get('/api/signup', (req, res, next) => {
     res.send({
       error: req.flash('error'),
@@ -68,6 +54,13 @@ module.exports = (app, passport) => {
     })
   })
 
+  app.get('/api/user/error', (req, res, next) => {
+    console.log(req.flash('error'))
+    res.send({
+      error: req.flash('error')
+    })
+  })
+
   app.get('/api/signout', (req, res, next) => {
     req.logout()
     res.json({ message: 'Successfully signed out' });
@@ -98,9 +91,8 @@ module.exports = (app, passport) => {
   })
 
   app.post('/api/signup',
-  UserController.verifyReCaptcha,
   UserController.validateSignUp,
-  passport.authenticate('local-signup', { failureRedirect: '/api/signup',failureFlash: true }),
+  passport.authenticate('local-signup', { failureRedirect: '/api/user/error',failureFlash: true }),
   async (req, res) => {
     try {
       await (new UserController).sendSignUpEmail(req)
@@ -113,7 +105,9 @@ module.exports = (app, passport) => {
     }
   })
 
-  app.post("/api/forgotpassword", UserController.validateForgotPassword, async (req, res, next) => {
+  app.post("/api/forgotpassword",
+  UserController.validateForgotPassword,
+  async (req, res, next) => {
     try {
       await (new UserController).forgotPassword(req, res, next)
       res.send({
@@ -130,7 +124,23 @@ module.exports = (app, passport) => {
     })
   })
 
-  app.post("/api/resetpassword", UserController.validateResetPassword, async (req, res, next) => {
+  app.get('/api/user',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
+    try {
+      let user = await (new UserController).read(req, res, next)
+      res.send({
+        success: user
+      })
+    } catch (err) {
+      req.flash('error', err)
+      res.redirect('api/user/error')
+    }
+  })
+
+  app.post("/api/resetpassword",
+  UserController.validateResetPassword,
+  async (req, res, next) => {
     try {
       await (new UserController).resetPassword(req, res, next)
       res.send({

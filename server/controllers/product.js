@@ -116,54 +116,58 @@ module.exports = class ProductController {
     }
 
     async list(req, res, next) {
-        try {
-            const user = req.user ? await db.User.findByPk(req.user.id) : {}
-            const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
-            const where = {
-                ...(req.query.shop && {ShopId: req.query.shop}),
-                ...(req.query.products && {id: req.query.products}),
-                ...((user.id && !req.query.shop && req.query.delivers) && {ShopId: shopIds}),
-                ...(req.query.category && { category: req.query.category }),
-                ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
-            }
-            let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
-            let limit = 6
-            const products = await db.Product.findAll({
-                where: where,
-                offset: offset,
-                limit: limit,
-                include: [
-                    db.Ingredient,
-                    db.Variety,
-                    db.Addon,
-                    db.ProductImage,
-                    {
-                        association: db.Product.Form,
-                        include: [ 
-                            {
-                                association: db.Form.Field,
-                                include: [ 
-                                    db.Option,
-                                    db.Constraint,
-                                    db.ParagraphValue,
-                                    {
-                                        association: db.Field.Value,
-                                        include: [
-                                            db.Quote
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            });
-            return products
+      try {
+        // remove this check when go live
+        if (!req.isAuthenticated()) {
+          return []
         }
-        catch(err) {
-            console.log('ERROR:', err)
-            return err
+        const user = req.user ? await db.User.findByPk(req.user.id) : {}
+        const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
+        const where = {
+            ...(req.query.shop && {ShopId: req.query.shop}),
+            ...(req.query.products && {id: req.query.products}),
+            ...((user.id && !req.query.shop && req.query.delivers) && {ShopId: shopIds}),
+            ...(req.query.category && { category: req.query.category }),
+            ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
         }
+        let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
+        let limit = 6
+        const products = await db.Product.findAll({
+            where: where,
+            offset: offset,
+            limit: limit,
+            include: [
+                db.Ingredient,
+                db.Variety,
+                db.Addon,
+                db.ProductImage,
+                {
+                    association: db.Product.Form,
+                    include: [ 
+                        {
+                            association: db.Form.Field,
+                            include: [ 
+                                db.Option,
+                                db.Constraint,
+                                db.ParagraphValue,
+                                {
+                                    association: db.Field.Value,
+                                    include: [
+                                        db.Quote
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+        return products
+      }
+      catch(err) {
+        console.log('ERROR:', err)
+        return err
+      }
     }
 
     async count(req, res, next) {

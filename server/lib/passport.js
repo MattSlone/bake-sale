@@ -39,6 +39,7 @@ module.exports = (passport) => {
           lng: req.body.lng,
           seller: req.body.seller,
           email: username,
+          active: 0,
           password: await User.generateHash(password),
         }
       });
@@ -55,7 +56,7 @@ module.exports = (passport) => {
   passport.use('local', new LocalStrategy(
   async function(username, password, done) {
     try {
-      let user = await User.findOne({ where: { email: username } });
+      let user = await User.findOne({ where: { username: username } });
       if (!user) {
         return done(null, false, { message: 'User does not exist.' }); // code 4 (user doesn't exist)
       }
