@@ -23,7 +23,7 @@ services:
       - 3000:3000
     volumes:
       - ./client:/app
-      - web-root:/build
+      - web-root:/app/build
       - /app/node_modules
     environment:
       - NODE_ENV=development
