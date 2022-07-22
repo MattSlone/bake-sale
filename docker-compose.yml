@@ -23,6 +23,7 @@ services:
       - 3000:3000
     volumes:
       - ./client:/app
+      - web-root:/build
       - /app/node_modules
     environment:
       - NODE_ENV=development
@@ -62,11 +63,6 @@ services:
       - app-network
 volumes:
   web-root:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./client/build
-      o: bind
 networks:
   app-network:
     driver: bridge
