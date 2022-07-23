@@ -8,8 +8,9 @@ ARG NODE_ENV
 ENV NODE_ENV ${NODE_ENV}
 
 COPY package.json /app
-RUN yarn build
+RUN yarn install --silent
 COPY . .
+RUN yarn build
 
 EXPOSE 3000
 CMD [ "yarn", "start" ]
