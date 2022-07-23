@@ -6,9 +6,6 @@ const UserController = require('../controllers/user'),
   multer = require('multer'),
   upload = multer({
     dest: '/uploads',
-    limits: {
-      fileSize: 1024 * 1024 * 9, // 1 MB (max file size)
-    },
     fileFilter: function(_req, file, cb){
       checkFileType(_req, file, cb);
     }
