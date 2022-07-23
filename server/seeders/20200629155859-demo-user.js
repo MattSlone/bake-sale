@@ -14,6 +14,7 @@ module.exports = {
       zipcode: '34240',
       lat: 27.351,
       lng: -82.4222,
+      active: 1,
       seller: true,
       createdAt: new Date(),
       updatedAt: new Date()
