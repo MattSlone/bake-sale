@@ -163,6 +163,10 @@ const Root = styled('div')((
 
   [`& .${classes.white}`]: {
     color: 'white'
+  },
+
+  [`& .${classes.logo}`]: {
+    display: 'flex'
   }
 }));
 
