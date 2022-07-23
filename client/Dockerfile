@@ -8,7 +8,7 @@ ARG NODE_ENV
 ENV NODE_ENV ${NODE_ENV}
 
 COPY package.json /app
-RUN yarn install --silent
+RUN yarn build
 COPY . .
 
 EXPOSE 3000
