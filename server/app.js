@@ -83,9 +83,11 @@ require('./routes/ingredient')(app)
 require('./routes/quote')(app)
 require('./routes/order')(app, webhookApp)
 
-app.get('/*', function (req, res) {
-  res.sendFile(path.join('/public', 'index.html'));
-});
+const root = require('path').join('/public')
+app.use(express.static(root));
+app.get("*", (req, res) => {
+    res.sendFile('index.html', { root });
+})
 
 // Default response for any other request
 app.use(function(req, res) {
