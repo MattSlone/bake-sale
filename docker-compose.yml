@@ -64,8 +64,13 @@ services:
     networks:
       - app-network
 volumes:
-  - web-root:
-  - data-volume:./data/mysql
+  web-root:
+  data-volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/mysql
+      o: bind
 networks:
   app-network:
     driver: bridge
