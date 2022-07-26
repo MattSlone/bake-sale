@@ -5,7 +5,7 @@ services:
     networks:
       - app-network
     volumes:
-      - data-volume:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql
   client:
     volumes:
       - ./client:/app
@@ -42,11 +42,6 @@ services:
       - app-network
 volumes:
   web-root:
-  data-volume:
-    driver_opts:
-      type: none
-      device: ${PWD}/data/mysql
-      o: bind
 networks:
   app-network:
     driver: bridge
