@@ -11,7 +11,9 @@ COPY package.json /app
 COPY yarn.lock /app
 RUN yarn install --silent
 COPY . .
-RUN yarn build
+
+COPY build.sh build.sh
+RUN chmod u+x build.sh && ./build.sh
 
 EXPOSE 3000
 CMD [ "yarn", "start" ]
