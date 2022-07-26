@@ -11,6 +11,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USERNAME: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     cap_add:
       - SYS_NICE
