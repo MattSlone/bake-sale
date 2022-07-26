@@ -1,4 +1,6 @@
-{
+const env = require('./environment')
+
+module.exports = {
   "development": {
     "username": "root",
     "password": "root",
@@ -14,9 +16,9 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "patissier",
-    "password": "M4c4r0n54r3t45ty(*)",
-    "database": "database_production",
+    "username": env.db.username,
+    "password": env.db.password,
+    "database": env.db.name,
     "host": "db",
     "dialect": "mysql"
   }

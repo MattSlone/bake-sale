@@ -1,10 +1,14 @@
 require('dotenv').config()
 
-console.log('in env file: ', process.env.NODE_ENV)
-module.exports.environment = {
+module.exports = {
   port: process.env.PORT,
   expressPort: process.env.EXPRESS_PORT,
   stripeWebhookPort: process.env.STRIPE_WEBHOOK_PORT,
+  db: {
+    name: process.env.DB_NAME,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD
+  },
   nodeEnv: process.env.NODE_ENV,
   baseUrl: process.env.BASE_URL,
   email: process.env.EMAIL,

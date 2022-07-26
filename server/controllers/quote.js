@@ -3,7 +3,7 @@
 const db = require('../models/index'),
   Email = require('email-templates'),
   nodemailer = require('nodemailer'),
-  { environment: env } = require('../config/environment')
+  env = require('../config/environment')
 
 module.exports = class QuoteController {
   async create (req, res, next) {

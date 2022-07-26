@@ -8,7 +8,7 @@ const User = require('../models/user'),
   validator = require('validator'),
   axios = require('axios'),
   qs = require('qs'),
-  { environment: env } = require('../config/environment')
+  env = require('../config/environment')
 
 module.exports = class UserController {
   /* static async isAdmin (req, res, next) {

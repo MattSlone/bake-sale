@@ -2,6 +2,10 @@ version: '3.7'
 
 services:
   db:
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: database_production
+      MYSQL_PASSWORD: root
     networks:
       - app-network
     volumes:

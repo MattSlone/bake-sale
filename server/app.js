@@ -6,7 +6,7 @@ const express = require('express'),
   flash = require('connect-flash'),
   app = express(),
   webhookApp = express(),
-  { environment: env } = require('./config/environment')
+  env = require('./config/environment')
 
 const { Sequelize, Transaction } = require('sequelize')
 
