@@ -5,7 +5,14 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const env = require('../config/environment')
 const basename = path.basename(__filename);
-const config = require(__dirname + '/../config/config.js')[env.nodeEnv];
+const nodeEnv = env.nodeEnv
+let config = require('../config/config')
+if (nodeEnv === 'production') {
+  config = config.production
+} else {
+  config = config.development
+}
+
 const db = {};
 
 let sequelize;
