@@ -4,8 +4,8 @@ services:
   db:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: database_production
-      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_PASSWORD: ${DB_USERNAME}
     networks:
       - app-network
     volumes:
@@ -16,7 +16,7 @@ services:
       - web-root:/app/build
       - /app/node_modules
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
       - CHOKIDAR_USEPOLLING=true
     networks:
       - app-network
@@ -26,7 +26,7 @@ services:
       - /app/node_modules
       - web-root:/public
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
     networks:
       - app-network
   webserver:
