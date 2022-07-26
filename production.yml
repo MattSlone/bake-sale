@@ -2,10 +2,6 @@ version: '3.7'
 
 services:
   db:
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_PASSWORD: ${DB_USERNAME}
     networks:
       - app-network
     volumes:
@@ -15,9 +11,6 @@ services:
       - ./client:/app
       - web-root:/app/build
       - /app/node_modules
-    environment:
-      - NODE_ENV=${NODE_ENV}
-      - CHOKIDAR_USEPOLLING=true
     networks:
       - app-network
   server:
@@ -25,8 +18,6 @@ services:
       - ./server:/app
       - /app/node_modules
       - web-root:/public
-    environment:
-      - NODE_ENV=${NODE_ENV}
     networks:
       - app-network
   webserver:
