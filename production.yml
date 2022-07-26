@@ -46,7 +46,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./data/mysql
+      device: /home/mslone/bake-sale/data/mysql
       o: bind
 networks:
   app-network:
