@@ -10,9 +10,9 @@ services:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USERNAME: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USERNAME: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
     cap_add:
       - SYS_NICE
   client:
@@ -37,7 +37,7 @@ services:
     depends_on:
       - db
     environment:
-      - NODE_ENV=${NODE_ENV}
-      - DB_NAME=${DB_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - NODE_ENV="${NODE_ENV}"
+      - DB_NAME="${DB_NAME}"
+      - DB_USERNAME="${DB_USERNAME}"
+      - DB_PASSWORD="${DB_PASSWORD}"
