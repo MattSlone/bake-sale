@@ -2,6 +2,7 @@ require('dotenv').config()
 const db = require('../models/index')
 const fetch = require('node-fetch')
 const axios = require('axios') // i forgot how fetch works and im lazy don't judge me
+const { environment: env } = require('../config/environment')
 
 const MILES_MULTIPLE = 0.000621371
 
@@ -29,7 +30,7 @@ module.exports = class GMaps {
       console.log('ADDRESS: ', address)
       const params = {
         query: address,
-        access_key: process.env.POSITION_STACK_API_KEY,
+        access_key: env.positionStackAPIKey,
       }
       const res = await axios.get(`http://api.positionstack.com/v1/forward`, { params })
       if(res.error) {

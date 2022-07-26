@@ -1,5 +1,4 @@
 'use strict'
-require('dotenv').config()
 const GMaps = require('../lib/gmaps')
 const User = require('../models/user'),
   db = require('../models/index'),
@@ -8,7 +7,8 @@ const User = require('../models/user'),
   jwt = require('jsonwebtoken'),
   validator = require('validator'),
   axios = require('axios'),
-  qs = require('qs')
+  qs = require('qs'),
+  { environment: env } = require('../config/environment')
 
 module.exports = class UserController {
   /* static async isAdmin (req, res, next) {
@@ -57,13 +57,13 @@ module.exports = class UserController {
         port: 465,
         secure: true, // use SSL
         auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS
+          user: env.email,
+          pass: env.emailPass
         }
       });
       const email = new Email({
         message: {
-          from: process.env.EMAIL
+          from: env.email
         },
         // uncomment below to send emails in development/test env:
         send: true,
@@ -93,7 +93,7 @@ module.exports = class UserController {
           time: Date(),
           userId: user.id,
         }
-        const token = jwt.sign(data, process.env.JWT_SECRET_KEY, {
+        const token = jwt.sign(data, env.jwtSecretKey, {
           expiresIn: '15m'
         });
         const transporter = nodemailer.createTransport({
@@ -101,13 +101,13 @@ module.exports = class UserController {
           port: 465,
           secure: true, // use SSL
           auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASS
+            user: env.email,
+            pass: env.emailPass
           }
         });
         const email = new Email({
           message: {
-            from: process.env.EMAIL
+            from: env.email
           },
           // uncomment below to send emails in development/test env:
           send: true,
@@ -121,7 +121,9 @@ module.exports = class UserController {
           },
           locals: {
             token: token,
-            name: user.firstName
+            name: user.firstName,
+            baseUrl: env.baseUrl,
+            port: env.port
           }
         })
       }
@@ -133,7 +135,7 @@ module.exports = class UserController {
   async resetPassword (req) {
     try {
       const token = req.body.token;
-      const verified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const verified = jwt.verify(token, env.jwtSecretKey);
       if (verified) {
         console.log('TOKEN DATA: ', verified)
         const user = await db.User.findByPk(verified.userId)
@@ -383,7 +385,7 @@ module.exports = class UserController {
         return
       }
       const token = req.body.token
-      const verified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const verified = jwt.verify(token, env.jwtSecretKey);
       if (!verified) {
         req.flash('error', "Invalid token.")
         res.redirect('/api/resetpassword')
@@ -402,7 +404,7 @@ module.exports = class UserController {
     try {
       console.log(req.body.token)
       const { data } = await axios.post('https://www.google.com/recaptcha/api/siteverify', qs.stringify({
-        secret: process.env.RECAPTCHA_SECRET,
+        secret: env.recaptchaSecret,
         response: req.body.token
       }))
       console.log(data)

@@ -14,10 +14,6 @@ services:
       MYSQL_PASSWORD: root
     cap_add:
       - SYS_NICE
-    networks:
-      - app-network
-    volumes:
-      - data-volume:/var/lib/mysql
   client:
     container_name: client
     build: ./client
@@ -25,13 +21,10 @@ services:
       - 3000:3000
     volumes:
       - ./client:/app
-      - web-root:/app/build
       - /app/node_modules
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-    networks:
-      - app-network
   server:
     container_name: server
     build: ./server
@@ -41,36 +34,7 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
-      - web-root:/public
     depends_on:
       - db
     environment:
       - NODE_ENV=development
-    networks:
-      - app-network
-  webserver:
-    image: nginx:mainline-alpine
-    container_name: webserver
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    volumes:
-      - web-root:/var/www/html
-      - ./nginx-conf:/etc/nginx/conf.d
-      #- certbot-etc:/etc/letsencrypt
-      #- certbot-var:/var/lib/letsencrypt
-    depends_on:
-      - server
-    networks:
-      - app-network
-volumes:
-  web-root:
-  data-volume:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./data/mysql
-      o: bind
-networks:
-  app-network:
-    driver: bridge

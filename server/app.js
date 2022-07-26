@@ -1,4 +1,3 @@
-require('dotenv').config()
 const express = require('express'),
   bodyParser = require('body-parser'),
   path = require('path'),
@@ -6,7 +5,8 @@ const express = require('express'),
   session = require('express-session'),
   flash = require('connect-flash'),
   app = express(),
-  webhookApp = express()
+  webhookApp = express(),
+  { environment: env } = require('./config/environment')
 
 const { Sequelize, Transaction } = require('sequelize')
 
@@ -94,5 +94,5 @@ app.use(function(req, res) {
     res.status(404);
 });
 
-app.listen(process.env.EXPRESS_PORT, () => console.log(`App listening at http://server:${process.env.EXPRESS_PORT}`))
-webhookApp.listen(4242, () => console.log(`Webhook App listening at http://server:4242`))
+app.listen(env.expressPort, () => console.log(`App listening at http://server:${env.expressPort}`))
+webhookApp.listen(env.stripeWebhookPort, () => console.log(`Webhook App listening at http://server:${env.stripeWebhookPort}`))

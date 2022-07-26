@@ -1,0 +1,53 @@
+version: '3.7'
+
+services:
+  db:
+    networks:
+      - app-network
+    volumes:
+      - data-volume:/var/lib/mysql
+  client:
+    volumes:
+      - ./client:/app
+      - web-root:/app/build
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - app-network
+  server:
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+      - web-root:/public
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      #- certbot-etc:/etc/letsencrypt
+      #- certbot-var:/var/lib/letsencrypt
+    depends_on:
+      - server
+    networks:
+      - app-network
+volumes:
+  web-root:
+  data-volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/mysql
+      o: bind
+networks:
+  app-network:
+    driver: bridge

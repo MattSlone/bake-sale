@@ -1,5 +1,5 @@
 p Hi #{name},
 p We received a request to reset your password at Bake.Sale. If this was you, follow the link below.
-- var href = "//localhost:3000/resetpassword?token=" + token;
+- var href = `//${baseURL}:${port}/resetpassword?token=${token}`;
 a(href=href) Reset Your Password
 p The link will expire in 15 minutes.

@@ -2,7 +2,8 @@
 
 const db = require('../models/index'),
   Email = require('email-templates'),
-  nodemailer = require('nodemailer')
+  nodemailer = require('nodemailer'),
+  { environment: env } = require('../config/environment')
 
 module.exports = class QuoteController {
   async create (req, res, next) {
@@ -118,13 +119,13 @@ module.exports = class QuoteController {
         port: 465,
         secure: true, // use SSL
         auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS
+          user: env.email,
+          pass: env.emailPass
         }
       });
       const email = new Email({
         message: {
-          from: process.env.EMAIL
+          from: env.email
         },
         // uncomment below to send emails in development/test env:
         send: true,
@@ -140,7 +141,9 @@ module.exports = class QuoteController {
           name: user.firstName,
           price: Number(quote.price).toFixed(2),
           productName: product.name,
-          id: quote.id
+          id: quote.id,
+          baseUrl: env.baseUrl,
+          port: env.port
         }
       })
     } catch (err) {
