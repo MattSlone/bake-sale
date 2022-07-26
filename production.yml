@@ -43,10 +43,9 @@ services:
 volumes:
   web-root:
   data-volume:
-    driver: local
     driver_opts:
       type: none
-      device: /home/mslone/bake-sale/data/mysql
+      device: ${PWD}/data/mysql
       o: bind
 networks:
   app-network:

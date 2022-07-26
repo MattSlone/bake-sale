@@ -8,6 +8,7 @@ ARG NODE_ENV
 ENV NODE_ENV ${NODE_ENV}
 
 COPY package.json /app
+COPY yarn.lock /app
 RUN yarn install --silent
 COPY . .
 RUN yarn build
