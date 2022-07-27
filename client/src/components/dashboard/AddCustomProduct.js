@@ -149,7 +149,7 @@ export default function AddCustomProduct (props) {
       case 2:
         valid = validPricingAndDelivery
         break
-      case 4:
+      case 3:
         valid.success = true
         break
       default:

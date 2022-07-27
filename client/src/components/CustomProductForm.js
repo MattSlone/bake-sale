@@ -95,7 +95,6 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
 
   const match = useRouteMatch()
 
-
   const renderField = (field, index) => {
     switch(field.type) {
       case 'text':
@@ -122,23 +121,13 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                 onChange={(e) => handleValueChange(e.target.value, index)}
               />
             </CardContent>
-            {formTitle === 'Form Preview' ? (
-              <Grid container justifyContent="flex-end">
-                <IconButton
-                  edge="start"
-                  aria-label="delete"
-                  onClick={() => {handleDeleteField(index)}}
-                  size="large">
-                  <DeleteIcon />
-                </IconButton>
-              </Grid>
-            ) : ''}
+            <DeleteButton title={title} index={index} handleDeleteField={handleDeleteField}/>
           </Card>
         );
       case 'select':
         return (
-          <Card className={classes.card}>
-            <CardContent className={classes.cardContent}>
+          <Card className={noshadow ? `${classes.noshadow} ${classes.card}` : classes.card}>
+            <CardContent className={noshadow ? `${classes.nopadding} ${classes.cardContent}` : classes.cardContent}>
               <Typography gutterBottom>
                 {field.prompt}
               </Typography>
@@ -156,21 +145,13 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                 </Select>
               </FormControl>
             </CardContent>
-            <Grid container justifyContent="flex-end">
-              <IconButton
-                edge="start"
-                aria-label="delete"
-                onClick={() => {handleDeleteField(index)}}
-                size="large">
-                <DeleteIcon />
-              </IconButton>
-            </Grid>
+            <DeleteButton title={title} index={index} handleDeleteField={handleDeleteField}/>
           </Card>
         );
       case 'multiselect':
         return (
-          <Card className={classes.card}>
-            <CardContent className={classes.cardContent}>
+          <Card className={noshadow ? `${classes.noshadow} ${classes.card}` : classes.card}>
+            <CardContent className={noshadow ? `${classes.nopadding} ${classes.cardContent}` : classes.cardContent}>
               <Typography gutterBottom>
                 {field.prompt}
               </Typography>
@@ -199,49 +180,32 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                 )}
               />
             </CardContent>
-            <Grid container justifyContent="flex-end">
-              <IconButton
-                edge="start"
-                aria-label="delete"
-                onClick={() => {handleDeleteField(index)}}
-                size="large">
-                <DeleteIcon />
-              </IconButton>
-            </Grid>
+            <DeleteButton title={title} index={index} handleDeleteField={handleDeleteField}/>
           </Card>
         );
-        case 'date':
-          return (
-            <Card className={classes.card}>
-              <CardContent className={classes.cardContent}>
-                <Typography gutterBottom>
-                  {field.prompt}
-                </Typography>
-                <LocalizationProvider dateAdapter={DateAdapter}>
+      case 'date':
+        return (
+          <Card className={noshadow ? `${classes.noshadow} ${classes.card}` : classes.card}>
+            <CardContent className={noshadow ? `${classes.nopadding} ${classes.cardContent}` : classes.cardContent}>
+              <Typography gutterBottom>
+                {field.prompt}
+              </Typography>
+              <LocalizationProvider dateAdapter={DateAdapter}>
                 <DatePicker
-                  margin="normal"
                   label={field.name}
                   format="MM/dd/yyyy"
                   value={field.value}
-                  onChange={(e, newValue) => handleValueChange(newValue, index)}
+                  onChange={(newValue) => handleValueChange(newValue, index)}
                   renderInput={(params) => <TextField {...params} />}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
                 />
-                </LocalizationProvider>
-              </CardContent>
-              <Grid container justifyContent="flex-end">
-                <IconButton
-                  edge="start"
-                  aria-label="delete"
-                  onClick={() => {handleDeleteField(index)}}
-                  size="large">
-                  <DeleteIcon />
-                </IconButton>
-              </Grid>
-            </Card>
-          );
+              </LocalizationProvider>
+            </CardContent>
+            <DeleteButton title={title} index={index} handleDeleteField={handleDeleteField}/>
+          </Card>
+        );
       default: 
         return
     }
@@ -256,6 +220,7 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
       {fields.map((field, index) => {
         return (
           <Grid item key={index} xs={12}>
+            {index}
             {renderField(field, index)}
           </Grid>
         )
@@ -263,4 +228,18 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
       </Grid>
     </StyledPaper>
   );
+}
+
+function DeleteButton({ title, index, handleDeleteField }) {
+  return ( title === 'Form Preview' &&
+    <Grid container justifyContent="flex-end">
+      <IconButton
+        edge="start"
+        aria-label="delete"
+        onClick={() => {handleDeleteField(index)}}
+        size="large">
+        <DeleteIcon />
+      </IconButton>
+    </Grid>
+  )
 }
