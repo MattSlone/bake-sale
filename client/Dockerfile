@@ -1,11 +1,11 @@
-ARG NODE_ENV
 FROM node:16-alpine
 RUN apk update && apk upgrade && apk add bash
 RUN rm -rf /app
 RUN mkdir /app
 WORKDIR /app
 
-ENV NODE_ENV ${NODE_ENV}
+ARG NODE_ENV
+ENV NODE_ENV "${NODE_ENV}"
 
 COPY package.json /app
 COPY yarn.lock /app
