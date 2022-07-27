@@ -16,7 +16,7 @@ require('./lib/passport')(passport)
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 /* DATABASE */
-const sequelize = new Sequelize('database_development', 'root', 'root', {
+const sequelize = new Sequelize(env.db.name, env.db.username, env.db.password, {
   host: 'db',
   dialect: 'mysql',
   //isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ

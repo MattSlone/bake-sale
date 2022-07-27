@@ -1,3 +1,5 @@
-if [ "${NODE_ENV}" = "production" ]; then 
-    yarn build
+echo "$1"
+if [ "$1" = "production" ]; 
+    then 
+        yarn build
 fi

@@ -10,9 +10,9 @@ services:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: "${DB_NAME}"
-      MYSQL_USER: "${DB_USERNAME}"
-      MYSQL_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_DATABASE: "${DB_NAME?err}"
+      MYSQL_USER: "${DB_USERNAME?err}"
+      MYSQL_PASSWORD: "${DB_PASSWORD?err}"
     cap_add:
       - SYS_NICE
   client:
@@ -20,7 +20,7 @@ services:
     build: 
       context: ./client
       args:
-        - "NODE_ENV:${NODE_ENV}"
+        - node_env="${NODE_ENV?err}"
     ports:
       - 3000:3000
     volumes:
@@ -40,7 +40,7 @@ services:
     depends_on:
       - db
     environment:
-      - "NODE_ENV=${NODE_ENV}"
-      - "DB_NAME=${DB_NAME}"
-      - "DB_USERNAME=${DB_USERNAME}"
-      - "DB_PASSWORD=${DB_PASSWORD}"
+      - "NODE_ENV=${NODE_ENV?err}"
+      - "DB_NAME=${DB_NAME?err}"
+      - "DB_USERNAME=${DB_USERNAME?err}"
+      - "DB_PASSWORD=${DB_PASSWORD?err}"
