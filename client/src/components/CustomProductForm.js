@@ -220,7 +220,6 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
       {fields.map((field, index) => {
         return (
           <Grid item key={index} xs={12}>
-            {index}
             {renderField(field, index)}
           </Grid>
         )
