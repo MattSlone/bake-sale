@@ -3,6 +3,7 @@
 const stripe = require('stripe')('sk_test_51KMDSaL7rHJy0SQF5Djaz08o3ohWMz4GHR6ULmdWnfAKPKBGGw6ng0aY0J7sAdyE38oPl3kSXy5ZFLja6ZaiXQUy005Glqz45I');
 const endpointSecret = 'whsec_a0b9ca1aee5f89621e7798cb21daa56f9156be5a779e9e394d0d199e58d434ee'
 const db = require('../models/index')
+const env = require('../config/environment')
 
 module.exports = class StripeAPI {
   async createAccount () {
@@ -19,8 +20,8 @@ module.exports = class StripeAPI {
       const urlString = edit ? 'edit' : 'create'
       const accountLink = await stripe.accountLinks.create({
         account: account,
-        refresh_url: `http://localhost:3000/dashboard/shop/${urlString}/stripe/reauth`,
-        return_url: `http://localhost:3000/dashboard/shop/${urlString}/stripe/return`,
+        refresh_url: `http://${env.baseUrl}:${env.port}/dashboard/shop/${urlString}/stripe/reauth`,
+        return_url: `http://${env.baseUrl}:${env.port}/dashboard/shop/${urlString}/stripe/return`,
         type: 'account_onboarding',
       });
       return accountLink

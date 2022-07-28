@@ -59,13 +59,21 @@ export default function Request(props)
   const [price, setPrice] = useState(Number(quote.price).toFixed(2))
   const [open, setOpen] = useState(false);
   const [quoted, setQuoted] = useState(quote.QuoteStatusId != 1)
-  console.log(quote)
+
+  useEffect(() => {
+    setQuote(props.quote.quotes.find(quote => quote.id == id))
+  }, [props.quote])
+
+  useEffect(() => {
+    setQuoted(quote.QuoteStatusId != 1)
+  }, [quote])
 
   const handleSubmit = () => {
     props.setQuotePrice({
       price: price,
       QuoteId: quote.id
     })
+    props.getQuotes([quote.id])
     setOpen(false)
   }
 

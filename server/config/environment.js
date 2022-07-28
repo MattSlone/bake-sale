@@ -1,7 +1,5 @@
 require('dotenv').config()
 
-console.log(process.env.NODE_ENV)
-
 module.exports = {
   port: process.env.PORT,
   expressPort: process.env.EXPRESS_PORT,
