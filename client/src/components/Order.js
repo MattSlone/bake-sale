@@ -97,6 +97,8 @@ export default function Order({ order }) {
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
   const [zipcode, setZipcode] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
 
   useEffect(async () => {
     order.fulfillment == 'pickup' ? getPickupAddress() : getDeliveryAddress()
@@ -152,7 +154,9 @@ export default function Order({ order }) {
         setCity(pickupAddress.city)
         setState(pickupAddress.state)
         setZipcode(pickupAddress.zipcode)
-        console.log(res.data.success)
+        const shopContact = res.data.success.ShopContact
+        setPhone(shopContact.phone)
+        setEmail(shopContact.email)
       }
     } catch(error) {
       console.log('Error getting pickup address')
@@ -236,6 +240,22 @@ export default function Order({ order }) {
                   </ListItemText>
                 </ListItem>
               </> }
+              <Divider />
+              <Typography size="1" sx={{fontWeight: 'bold', padding: '4px 0px 4px 0px'}}>
+                Shop Contact:
+              </Typography>
+              <ListItem disableGutters>
+                <ListItemText>
+                  <Box component="span" fontWeight="bold">Email: </Box>
+                  {email}
+                </ListItemText>
+              </ListItem>
+              <ListItem disableGutters>
+                <ListItemText>
+                  <Box component="span" fontWeight="bold">Phone: </Box>
+                  {phone}
+                </ListItemText>
+              </ListItem>
               {(!order.Product.custom) && 
               <>
                 <Divider />

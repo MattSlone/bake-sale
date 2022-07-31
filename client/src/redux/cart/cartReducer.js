@@ -48,7 +48,8 @@ const cartReducer = (state = initialState, action) => {
     }
     case CHECKOUT_REQUEST: return {
       ...state,
-      loading: true
+      loading: true,
+      error: ''
     }
     case CHECKOUT_SUCCESS: return {
       ...state,
@@ -59,7 +60,6 @@ const cartReducer = (state = initialState, action) => {
     case CHECKOUT_FAILURE: return {
       ...state,
       loading: false,
-      clientSecret: initialState.clientSecret,
       error: action.payload
     }
     case RESET_CART: return initialState

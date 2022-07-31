@@ -147,6 +147,7 @@ export default function CustomProduct(props)
     if (valid.success) {
       props.requestQuote({
         ...quote,
+        fulfillment: fulfillment,
         productId: product.id,
         values: mapValuesToFields()
       })

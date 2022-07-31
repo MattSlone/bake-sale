@@ -12,6 +12,7 @@ module.exports = class QuoteController {
       const quote = await db.Quote.create({
         status: req.body.status,
         ProductId: req.body.productId,
+        fulfillment: req.body.fulfillment,
         Values: req.body.values,
         UserId: req.user.id,
         QuoteStatusId: requestedStatus.id

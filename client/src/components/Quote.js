@@ -39,7 +39,7 @@ export default function  Quote(props) {
         product: tempQuote.Product,
         personalization: '',
         variation: 1, // variation = quantity
-        fulfillment: '',
+        fulfillment: tempQuote.fulfillment,
         addons: [],
         clientSidePrice: tempQuote.price,
         quantity: 1,

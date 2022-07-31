@@ -41,9 +41,7 @@ module.exports = class ProductController {
                                 association: db.Form.Field,
                                 include: [ 
                                     db.Option,
-                                    db.Constraint,
-                                    db.Value,
-                                    db.ParagraphValue
+                                    db.Constraint
                                 ]
                             }
                         ]
@@ -190,40 +188,123 @@ module.exports = class ProductController {
         }
     }
 
-    async updateProductIngredients(userId, product, ingredients) {
-        const updateUserIngredients = (await Promise.all(ingredients.map(async newIngredient => {
-            const ingredient = await db.Ingredient.findOne({
-                where: { 
-                    name: newIngredient.name
+  async updateProductIngredients(userId, product, ingredients) {
+      const updateUserIngredients = (await Promise.all(ingredients.map(async newIngredient => {
+          const ingredient = await db.Ingredient.findOne({
+              where: { 
+                  name: newIngredient.name
+              },
+              include: { model: db.Product, include: { model: db.Shop, include: {
+                model: db.User,
+                where: {
+                    id: userId
                 },
-                include: { model: db.Product, include: { model: db.Shop, include: {
-                  model: db.User,
-                  where: {
-                      id: userId
-                  },
-                  required: true
-                }}}
-            })
-            return ingredient ? ingredient : false
-        }))).filter(ingredient => ingredient)
-        let newIngredients = ingredients.filter(ingredient => {
-            return !updateUserIngredients.map(ingredient => ingredient.name)
-                .includes(ingredient.name)
-        })
-        newIngredients = await db.Ingredient.bulkCreate(newIngredients, { returning: true })
-        await product.addIngredients(newIngredients.concat(updateUserIngredients))
-        const deletedIngredients = await db.Ingredient.findAll({
-            where: {
-                name: {[Op.notIn]:newIngredients.concat(updateUserIngredients)
-                    .map(ingredient => ingredient.name)}
-            },
+                required: true
+              }}}
+          })
+          return ingredient ? ingredient : false
+      }))).filter(ingredient => ingredient)
+      let newIngredients = ingredients.filter(ingredient => {
+          return !updateUserIngredients.map(ingredient => ingredient.name)
+              .includes(ingredient.name)
+      })
+      newIngredients = await db.Ingredient.bulkCreate(newIngredients, { returning: true })
+      await product.addIngredients(newIngredients.concat(updateUserIngredients))
+      const deletedIngredients = await db.Ingredient.findAll({
+          where: {
+              name: {[Op.notIn]:newIngredients.concat(updateUserIngredients)
+                  .map(ingredient => ingredient.name)}
+          },
+          include: {
+              model: db.Product,
+              where: { id: product.id }
+          }
+      })
+      await product.removeIngredients(deletedIngredients)
+  }
+
+  async upsertFieldAssociation(field, model, data, hasMany = false) {
+    let associatedInstances = await Promise.all(data.map(async values => {
+      const [instance, created] = await model.upsert(hasMany ? {...values} : {
+        ...values,
+        FieldId: field.id
+      }, {
+        include: hasMany ? [db.Field] : []
+      });
+      return instance
+    }))
+    return associatedInstances
+  }
+
+  async updateCustomProductFields(product, fields) {
+    const updateCustomFields = (await Promise.all(fields.map(async newField => {
+      const field = await db.Field.findOne({
+        where: {
+            name: newField.name,
+            deleted: false
+        },
+        include: [
+          {
+            model: db.Form,
             include: {
-                model: db.Product,
-                where: { id: product.id }
+              model: db.Product,
+              where: {
+                id: product.id
+              },
+              required: true
             }
+          },
+          db.Option,
+          db.Constraint
+        ]
+      })
+      if (field) {
+        field.name = newField.name
+        field.prompt = newField.prompt
+        await field.save()
+        let constraints = await this.upsertFieldAssociation(field, db.Constraint, newField.constraints)
+        await field.setConstraints(constraints.map(constraint => constraint.id))
+        await db.Constraint.destroy({
+            where: { FieldId: null }
         })
-        await product.removeIngredients(deletedIngredients)
+        let options = await this.upsertFieldAssociation(field, db.Option, newField.options)
+        await field.setOptions(options.map(option => option.id))
+        await db.Option.destroy({
+            where: { FieldId: null }
+        })
+      }
+      return field ? field : false
+    }))).filter(field => field)
+    let newFields = fields.filter(field => {
+      return !updateCustomFields.map(field => field.name).includes(field.name)
+    }).map(field => {
+      return {
+        ...field,
+        FormId: product.Form.id
+      }
+    })
+    newFields = await db.Field.bulkCreate(newFields, {
+      include: [db.Option, db.Constraint],
+      returning: true
+    })
+    const deletedFields = await db.Field.findAll({
+      where: {
+        name: {[Op.notIn]:newFields.concat(updateCustomFields).map(field => field.name)}
+      },
+      include: {
+        model: db.Form,
+        include: {
+          model: db.Product,
+          where: { id: product.id },
+          required: true
+        }
+      }
+    })
+    for (let field of deletedFields) {
+      field.deleted = true
+      await field.save()
     }
+  }
 
     async addImages(req, res, next) {
         try {
@@ -281,7 +362,7 @@ module.exports = class ProductController {
         );
         product = await db.Product.findByPk(req.body.product.id, 
           {
-            include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
+            include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage, db.Form]
           }
         )
         let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
@@ -295,6 +376,7 @@ module.exports = class ProductController {
           where: { ProductId: null }
         })
         await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
+        await this.updateCustomProductFields(product, req.body.product.fields)
         product = await db.Product.findByPk(req.body.product.id, 
           {
             include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
@@ -316,9 +398,10 @@ module.exports = class ProductController {
           required: true
         }
       })
-      console.log('RIGHT HERREEEEE: ', product)
-      product.inventory = product.inventory - product.Varieties[0].quantity * quantity
-      await product.save()
+      if (!product.custom) {
+        product.inventory = product.inventory - product.Varieties[0].quantity * quantity
+        await product.save()
+      }
     }
 
     async upsertAssociation(product, model, data, hasMany = false) {

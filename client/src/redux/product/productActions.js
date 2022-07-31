@@ -129,7 +129,8 @@ export const getProductsSuccess = (products) => {
                 : [],
               value: field.Value
                 ? field.Value.value
-                : (field.ParagraphValue ? field.ParagraphValue.value : '')
+                : (field.ParagraphValue ? field.ParagraphValue.value : ''),
+              deleted: field.deleted
             }
           })
         }

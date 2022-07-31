@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState, useEffect, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import { useLocation } from 'react-router-dom';
 const stripePromise = loadStripe("pk_test_51KMDSaL7rHJy0SQFdZI0Q9HFv1wbLuCHm6AuVequIPtqFCa738z7EjGXncDblPZowGe8ALzhjbwh9W25NtejoyxW00YxzwtmYo");
 import './Checkout.css'
 
@@ -25,26 +26,41 @@ const StyledContainer = styled(Container)((
   padding: theme.spacing(2),
 }));
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
 export default function  Checkout(props) {
-  const [clientSecret, setClientSecret] = useState("")
+  const query = useQuery()
+  const [clientSecret, setClientSecret] = useState(query.get('payment_intent_client_secret'))
   const [message, setMessage] = useState("")
   const [paymentComplete, setPaymentComplete] = useState(false)
-
-  useEffect(async () => {
+  useEffect(() => {
     if (props.cart.products.length > 0) {
       props.checkout(props.cart.products)
+    } else {
+      setClientSecret('')
     }
   }, [props.cart.products]);
 
   useEffect(() => {
-    setMessage('')
-    setClientSecret('')
-    if (props.cart.clientSecret) {
-      setClientSecret(props.cart.clientSecret)
-    } else {
-      setMessage(props.cart.error)
+    console.log('heree 1')
+    if (paymentComplete) {
+      props.resetCart()
     }
-  }, [props.cart.clientSecret]);
+  }, [paymentComplete])
+
+  useEffect(() => {
+    if (props.cart.loading == false) {
+      if (props.cart.error) {
+        setMessage(props.cart.error)
+      } else {
+        setClientSecret(props.cart.clientSecret)
+      }
+    }
+  }, [props.cart.loading])
 
   const appearance = {
     theme: 'stripe',
@@ -81,6 +97,13 @@ export default function  Checkout(props) {
         <Typography style={ { color: 'red' } }>
           {message}
         </Typography>
+        <div className={classes.paymentForm}>
+          {clientSecret && (
+            <Elements options={options} stripe={stripePromise}>
+              <CheckoutForm setPaymentComplete={setPaymentComplete} resetCart={props.resetCart} />
+            </Elements>
+          )}
+        </div>
       </div>
       :
       <Typography variant="h6" gutterBottom>
@@ -88,13 +111,7 @@ export default function  Checkout(props) {
         Check your email for an order confirmation.
       </Typography>
       }
-      <div className={classes.paymentForm}>
-        {clientSecret && (
-          <Elements options={options} stripe={stripePromise}>
-            <CheckoutForm setPaymentComplete={setPaymentComplete} resetCart={props.resetCart} />
-          </Elements>
-        )}
-      </div>
+      
     </StyledContainer>
   );
 }

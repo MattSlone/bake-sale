@@ -218,11 +218,11 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
       </Typography>
       <Grid spacing={2} container direction="column">
       {fields.map((field, index) => {
-        return (
+        return !field.deleted ? (
           <Grid item key={index} xs={12}>
             {renderField(field, index)}
           </Grid>
-        )
+        ) : ''
       })}
       </Grid>
     </StyledPaper>

@@ -20,7 +20,11 @@ module.exports = (sequelize, DataTypes) => {
   Field.init({
     name: DataTypes.STRING,
     prompt: DataTypes.STRING,
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'Field',

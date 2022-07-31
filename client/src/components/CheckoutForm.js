@@ -30,7 +30,6 @@ export default function CheckoutForm({ resetCart, createOrder, setPaymentComplet
         case "succeeded":
           setMessage("Payment succeeded!");
           setPaymentComplete(true)
-          resetCart()
           break;
         case "processing":
           setMessage("Your payment is processing.");
@@ -53,7 +52,6 @@ export default function CheckoutForm({ resetCart, createOrder, setPaymentComplet
       // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
-
     setIsLoading(true);
 
     const { error } = await stripe.confirmPayment({
@@ -74,7 +72,7 @@ export default function CheckoutForm({ resetCart, createOrder, setPaymentComplet
     } else {
       setMessage("An unexpected error occured.");
     }
-
+    
     setIsLoading(false);
   };
 
