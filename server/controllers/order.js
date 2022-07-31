@@ -236,12 +236,16 @@ module.exports = class OrderController {
 
   async list(req, res, next) {
     const shop = req.query.forShop ? await db.Shop.findOne({ where: { UserId: req.user.id } }) : null
+    if (req.query.forShop && !shop) {
+      return []
+    }
     const completedStatus = await db.OrderStatus.findOne({ where: { status: 'completed' } })
     const where = {
       OrderStatusId: completedStatus.id,
       ...(!shop && {UserId: req.user.id}),
-      ...(req.query.orderId && {id: req.query.orderId })
+      ...(req.query.id && {id: [req.query.id] })
     }
+
     try {
         const orders = await db.Order.findAll({
             where: where,
@@ -266,17 +270,19 @@ module.exports = class OrderController {
                 }
               },
               db.Addon,
+              {
+                model: db.User,
+                attributes: [
+                  'firstName',
+                  'lastName',
+                  'street',
+                  'street2',
+                  'city',
+                  'state',
+                  'zipcode'
+                ]
+              },
               ...(shop ? [
-                {
-                  model: db.User,
-                  attributes: [
-                    'firstName',
-                    'lastName',
-                    'street',
-                    'city',
-                    'state',
-                    'zipcode']
-                },
                 {
                   model: db.Transfer,
                   attributes: ['amount']

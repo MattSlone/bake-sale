@@ -75,6 +75,7 @@ export const getOrders = (formData = null) => {
       const res = await axios.get('/api/orders', {
         params: formData
       })
+      console.log(res.data)
       if(res.data.error[0]) {
         dispatch(getOrdersFailure(res.data.error[0]))
       }

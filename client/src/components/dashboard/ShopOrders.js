@@ -55,8 +55,9 @@ export default function ShopOrders(props) {
             <TableRow key={row.id}>
               <TableCell>{row.createdAt}</TableCell>
               <TableCell>{row.name}</TableCell>
-              <TableCell>Matt</TableCell>
-              <RouterLink to={`/dashboard/orders/${row.id}`}>View Order</RouterLink>
+              <TableCell>{`${row.User.firstName} ${row.User.lastName}`}</TableCell>
+              <TableCell><RouterLink to={`/dashboard/orders/${row.id}`}>View Order</RouterLink></TableCell>
+              
             </TableRow>
           )) : ''}
         </TableBody>

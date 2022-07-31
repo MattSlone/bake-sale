@@ -28,7 +28,7 @@ export default function Quotes(props) {
   const [quotes, setQuotes] = useState([])
 
   useEffect(() => {
-    props.getQuotes()
+    props.getQuotes({ forShop: true })
   }, [])
 
   useEffect(() => {

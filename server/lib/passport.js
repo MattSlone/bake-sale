@@ -32,6 +32,7 @@ module.exports = (passport) => {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           street: req.body.street,
+          street2: req.body.street2,
           city: req.body.city,
           state: req.body.state,
           zipcode: req.body.zipcode,

@@ -49,7 +49,7 @@ export default function ShopOrder(props)
   let { id } = useParams()
 
   useEffect(() => {
-    props.getOrders({ orders: [id], forShop: true })
+    props.getOrders({ id: [id], forShop: true })
   }, [id])
 
   useEffect(() => {
@@ -64,11 +64,11 @@ export default function ShopOrder(props)
   }
 
   const getBuyerAddress = () => {
-    return `${order.User.street}, ${order.User.city}, ${order.User.state} ${order.User.zipcode}`
+    return `${order.User.street}${order.User.street2 ? ' ' + order.User.street2 : ''}, ${order.User.state} ${order.User.zipcode}`
   }
 
   const getShopAddress = () => {
-    return `${order.User.street}, ${order.User.city}, ${order.User.state} ${order.User.zipcode}`
+    return `${order.User.street}${order.User.street2 ? ' ' + order.User.street2 : ''}, ${order.User.city}, ${order.User.state} ${order.User.zipcode}`
   }
 
   const convertTo12HourTime = time => {

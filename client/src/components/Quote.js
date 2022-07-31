@@ -29,7 +29,7 @@ export default function  Quote(props) {
   }, []);
 
   useEffect(async () => {
-    props.getQuotes()
+    props.getQuotes({ forUser: true })
   }, [props.resetCart]);
 
   useEffect(() => {

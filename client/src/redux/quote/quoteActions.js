@@ -80,7 +80,7 @@ export const requestQuote = (formData) => {
         dispatch(requestQuoteFailure(res.data.error[0]))
       } else {
         dispatch(requestQuoteSuccess(res.data.success))
-        dispatch(getQuotes({ product: res.data.success.ProductId }))
+        dispatch(getQuotes({ forUser: true, product: res.data.success.ProductId }))
       }
     } catch (error) {
       dispatch(requestQuoteFailure(error.message))
@@ -97,7 +97,7 @@ export const setQuotePrice = (formData) => {
         dispatch(setQuotePriceFailure(res.data.error[0]))
       } else {
         dispatch(setQuotePriceSuccess())
-        dispatch(getQuotes())
+        dispatch(getQuotes({ forShop: true }))
       }
     } catch (error) {
       dispatch(setQuotePriceFailure(error.message))

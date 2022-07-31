@@ -12,7 +12,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     addToCart: (formData) => dispatch(addToCart(formData)),
-    getQuotes: () => dispatch(getQuotes()),
+    getQuotes: (formData) => dispatch(getQuotes(formData)),
     resetCart: () => dispatch(resetCart())
   }
 }

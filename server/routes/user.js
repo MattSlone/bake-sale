@@ -96,9 +96,10 @@ module.exports = (app, passport) => {
   async (req, res) => {
     try {
       await (new UserController).sendSignUpEmail(req)
+      req.logout()
       res.send({
         error: false,
-        success: req.user
+        success: true //req.user
       })
     } catch (err) {
       console.log(err)

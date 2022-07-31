@@ -98,6 +98,7 @@ export default function PickupAndDeliveryOptions(props) {
   const edit = match.path.includes('edit')
   const [circle, setCircle] = useState('')
   const [street, setStreet] = useState(props.shop.pickupAddress.street)
+  const [street2, setStreet2] = useState(props.shop.pickupAddress.street2)
   const [city, setCity] = useState(props.shop.pickupAddress.city)
   const [state, setState] = useState(props.shop.pickupAddress.state)
   const [zipcode, setZipcode] = useState(props.shop.pickupAddress.zipcode)
@@ -220,7 +221,10 @@ export default function PickupAndDeliveryOptions(props) {
         rtn.error = res.data.error[0]
         return rtn
       }
-      props.getFormattedShopAddressSuccess(res.data.success)
+      props.getFormattedShopAddressSuccess({
+        ...res.data.success,
+        street2: street2
+      })
       rtn.success = true
       return rtn
     } catch(error) {
@@ -488,6 +492,15 @@ export default function PickupAndDeliveryOptions(props) {
                           label="Street"
                           variant="outlined"
                           onChange={(e) => {setStreet(e.target.value)}}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          className={classes.addressField}
+                          value={street}
+                          label="Apartment, suite, etc."
+                          variant="outlined"
+                          onChange={(e) => {setStreet2(e.target.value)}}
                         />
                       </Grid>
                       <Grid item>

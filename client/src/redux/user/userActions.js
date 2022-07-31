@@ -184,8 +184,8 @@ export const userSignUp = (formData) => {
         dispatch(userSignUpFailure(res.data.error[0]))
       }
       else {
-        dispatch(getShop({ UserId: res.data.success.id }))
-        dispatch(userSignUpSuccess(res.data))
+        // dispatch(getShop({ UserId: res.data.success.id }))
+        dispatch(userSignUpSuccess())
       }
     } catch(error) {
       dispatch(userSignUpFailure(error.message))

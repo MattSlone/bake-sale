@@ -154,6 +154,7 @@ module.exports = class UserController {
         ...(req.body.firstName && { firstName: req.body.firstName }),
         ...(req.body.lastName && { lastName: req.body.lastName }),
         ...(req.body.street && { street: req.body.street }),
+        ...(req.body.street2 && { secondary: req.body.street2 }),
         ...(req.body.city && { city: req.body.city }),
         ...(req.body.state && { state: req.body.state }),
         ...(req.body.zipcode && { zipcode: req.body.zipcode }),
@@ -257,7 +258,6 @@ module.exports = class UserController {
         res.redirect('/api/user/error')
         return
       }
-      console.log('validated!!!')
       next()
     } catch (err) {
       req.flash('error', "There was an error signing up.")

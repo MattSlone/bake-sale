@@ -77,6 +77,7 @@ export default function Profile(props) {
   const [firstName, setFirstName] = useState(props.user.firstName)
   const [lastName, setLastName] = useState(props.user.lastName)
   const [street, setStreet] = useState(props.user.street)
+  const [street2, setStreet2] = useState(props.user.street2)
   const [city, setCity] = useState(props.user.city)
   const [state, setState] = useState(props.user.state)
   const [zipcode, setZipcode] = useState(props.user.zipcode)
@@ -90,6 +91,7 @@ export default function Profile(props) {
     firstName: firstName,
     lastName: lastName,
     street: street,
+    street2: street2,
     city: city,
     state: state,
     lat: lat,
@@ -110,6 +112,7 @@ export default function Profile(props) {
   useEffect(() => {
     if (auth.userData.loading === false && auth.userData.validAddress === true) {
       setStreet(auth.userData.street)
+      setStreet2(auth.userData.street2)
       setCity(auth.userData.city)
       setState(auth.userData.state)
       setZipcode(auth.userData.zipcode)
@@ -218,6 +221,19 @@ export default function Profile(props) {
                 autoComplete="street"
                 value={street}
                 onChange={e => setStreet(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="street2"
+                label="Apartment, suite, etc."
+                name="street2"
+                autoComplete="street2"
+                value={street2}
+                onChange={e => setStreet2(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>

@@ -73,7 +73,7 @@ export default function Request(props)
       price: price,
       QuoteId: quote.id
     })
-    props.getQuotes([quote.id])
+    props.getQuotes({ forShop: true, id: [quote.id] })
     setOpen(false)
   }
 

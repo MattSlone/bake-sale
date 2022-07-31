@@ -33,6 +33,7 @@ import {
     status: '',
     pickupAddress: {
       street: '',
+      street2: '',
       city: '',
       state: 'Florida',
       zipcode: '',

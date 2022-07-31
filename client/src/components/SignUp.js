@@ -83,6 +83,7 @@ export default function SignUp(props) {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [street, setStreet] = useState('')
+  const [street2, setStreet2] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
   const [lat, setLat] = useState(0)
@@ -97,6 +98,7 @@ export default function SignUp(props) {
     firstName: firstName,
     lastName: lastName,
     street: street,
+    street2: street2,
     city: city,
     state: state,
     lat: lat,
@@ -183,6 +185,12 @@ export default function SignUp(props) {
     }
   }, [validAddress])
 
+  useEffect(() => {
+    if (auth.userData.loading == false && !auth.userData.error) {
+      <Redirect to='/signin' />
+    }
+  }, auth.userSignUp)
+
   if(auth.userData.loggedIn == true) {
     return (
       <Redirect to='/' />
@@ -266,6 +274,18 @@ export default function SignUp(props) {
                 autoComplete="street"
                 value={street}
                 onChange={e => setStreet(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="street2"
+                label="Apartment, suite, etc."
+                name="street2"
+                autoComplete="street2"
+                value={street2}
+                onChange={e => setStreet2(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>

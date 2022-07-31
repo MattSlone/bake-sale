@@ -32,11 +32,33 @@ module.exports = class QuoteController {
   async list(req, res, next) {
     try {
       let quotes = [];
+      let valid = false
+      if (!(req.query.forShop || req.query.forUser)) {
+        return quotes
+      }
       const shop = await db.Shop.findOne({ where: { UserId: req.user.id } })
+      if (req.query.forShop) {
+        if (!shop) {
+          return quotes
+        }
+        if (req.query.id) {
+          const quote = await db.Quote.findOne({ where: { ShopId: shop.id, id: req.query.id }})
+          if (!quote) {
+            return quotes
+          }
+        }
+      }
+      if (req.query.forUser) {
+        const quote = db.Quote.findOne({ where: { ProductId: req.query.product, UserId: req.user.id } })
+        if (!quote) {
+          return quotes
+        }
+      }
       const products = shop ? await db.Product.findAll({ where: { ShopId: shop.id } }) : []
       const productIds = products.map(product => product.id)
       const where = {
-        ...(productIds && {ProductId: productIds}),
+        ...(!req.query.id && productIds && {ProductId: productIds}),
+        ...(req.query.id && { id: req.query.id }),
         ...(req.query.product && {ProductId: req.query.product})
       }
       quotes = await db.Quote.findAll({

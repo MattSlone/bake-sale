@@ -94,6 +94,7 @@ const StyledCard = styled(Card)((
 export default function Order({ order }) {
 
   const [street, setStreet] = useState('')
+  const [street2, setStreet2] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
   const [zipcode, setZipcode] = useState('')
@@ -101,14 +102,17 @@ export default function Order({ order }) {
   const [phone, setPhone] = useState('')
 
   useEffect(async () => {
-    order.fulfillment == 'pickup' ? getPickupAddress() : getDeliveryAddress()
+    await getShopDetails()
+    if (order.fulfillment !== 'pickup') {
+      await getShippingOrDeliveryAddress()
+    }
   }, [])
 
   const capitalize = function(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
   }
 
-  const getDeliveryAddress = async () => {
+  const getShippingOrDeliveryAddress = async () => {
     try {
       const res = await axios.get('/api/user', {
         params: {
@@ -116,12 +120,13 @@ export default function Order({ order }) {
           forOrder: true
         }
       })
-      if(res.data.error[0]) {
+      if(res.data.error) {
         console.log(res.data.error[0])
       }
       else {
         const user = res.data.success
         setStreet(user.street)
+        setStreet2(user.street2)
         setCity(user.city)
         setState(user.state)
         setZipcode(user.zipcode)
@@ -137,7 +142,7 @@ export default function Order({ order }) {
     return `${(hoursMin[0] % 12) || 12}:${hoursMin[1]}${hoursMin[0] >= 12 ? 'pm' : 'am'}`;
   }
 
-  const getPickupAddress = async () => {
+  const getShopDetails = async () => {
     try {
       const res = await axios.get('/api/shop', {
         params: {
@@ -149,14 +154,16 @@ export default function Order({ order }) {
         console.log(res.data.error[0])
       }
       else {
-        const pickupAddress = res.data.success.PickupAddress
-        setStreet(pickupAddress.street)
-        setCity(pickupAddress.city)
-        setState(pickupAddress.state)
-        setZipcode(pickupAddress.zipcode)
         const shopContact = res.data.success.ShopContact
         setPhone(shopContact.phone)
         setEmail(shopContact.email)
+        if (order.fulfillment == 'pickup') {
+          const pickupAddress = res.data.success.PickupAddress
+          setStreet(pickupAddress.street)
+          setCity(pickupAddress.city)
+          setState(pickupAddress.state)
+          setZipcode(pickupAddress.zipcode)
+        }
       }
     } catch(error) {
       console.log('Error getting pickup address')
@@ -209,18 +216,17 @@ export default function Order({ order }) {
                   {capitalize(order.fulfillment)}
                 </ListItemText>
               </ListItem>
-              {(order.fulfillment == 'pickup' || order.fulfillment == 'delivery') && 
               <ListItem disableGutters>
                 <ListItemText>
                 <Box display="flex" flexDirection="column">
                   <Box component="span" fontWeight="bold">{capitalize(order.fulfillment)} Location:</Box>
                   <Box>{street}</Box>
+                  {street2 && <Box>{street2}</Box>}
                   <Box>{city}, {state}</Box>
                   <Box>{zipcode}</Box>
                 </Box>
                 </ListItemText>
               </ListItem>
-              }
               {order.fulfillment == 'pickup' &&
               <>
                 <ListItem disableGutters>

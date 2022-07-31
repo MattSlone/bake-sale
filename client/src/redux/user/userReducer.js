@@ -30,6 +30,7 @@ const initialState = {
   firstName: '',
   lastName: '',
   street: '',
+  street2: '',
   city: '',
   state: '',
   zipcode: '',
@@ -46,19 +47,7 @@ const userReducer = (state = initialState, action) => {
     }
     case USER_SIGNUP_SUCCESS: return {
       ...state,
-      loggedIn: true,
-      user: action.payload,
-      firstName: action.payload.success.firstName,
-      lastName: action.payload.success.lastName,
-      street: action.payload.success.street,
-      city: action.payload.success.city,
-      state: action.payload.success.state,
-      zipcode: action.payload.success.zipcode,
-      seller: action.payload.success.seller,
-      email: action.payload.success.email,
-      username: action.payload.success.username,
-      shopId: action.payload.success.shopId,
-      error: ''
+      loading: false
     }
     case USER_SIGNUP_FAILURE: return {
       user: false,
@@ -73,6 +62,7 @@ const userReducer = (state = initialState, action) => {
       firstName: action.payload.success.firstName,
       lastName: action.payload.success.lastName,
       street: action.payload.success.street,
+      street2: action.payload.success.street2,
       city: action.payload.success.city,
       state: action.payload.success.state,
       zipcode: action.payload.success.zipcode,
@@ -114,6 +104,7 @@ const userReducer = (state = initialState, action) => {
       firstName: action.payload.firstName,
       lastName: action.payload.lastName,
       street: action.payload.street,
+      street2: action.payload.street2,
       city: action.payload.city,
       state: action.payload.state,
       zipcode: action.payload.zipcode,
