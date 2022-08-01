@@ -32,7 +32,6 @@ module.exports = class QuoteController {
   async list(req, res, next) {
     try {
       let quotes = [];
-      let valid = false
       if (!(req.query.forShop || req.query.forUser)) {
         return quotes
       }
@@ -42,7 +41,19 @@ module.exports = class QuoteController {
           return quotes
         }
         if (req.query.id) {
-          const quote = await db.Quote.findOne({ where: { ShopId: shop.id, id: req.query.id }})
+          const quote = await db.Quote.findOne({
+             where: { id: req.query.id },
+             include: {
+              model: db.Product,
+              include: {
+                model: db.Shop,
+                where: {
+                  id: shop.id
+                },
+                required: true
+              }
+             }
+          })
           if (!quote) {
             return quotes
           }

@@ -89,6 +89,7 @@ export const requestQuote = (formData) => {
 }
 
 export const setQuotePrice = (formData) => {
+  console.log(formData)
   return async (dispatch) => {
     dispatch(setQuotePriceRequest())
     try {
@@ -97,7 +98,7 @@ export const setQuotePrice = (formData) => {
         dispatch(setQuotePriceFailure(res.data.error[0]))
       } else {
         dispatch(setQuotePriceSuccess())
-        dispatch(getQuotes({ forShop: true }))
+        dispatch(getQuotes({ forShop: true, product: res.data.success.ProductId }))
       }
     } catch (error) {
       dispatch(setQuotePriceFailure(error.message))

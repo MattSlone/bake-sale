@@ -55,7 +55,7 @@ export default function Quotes(props) {
               <TableCell>{row.createdAt}</TableCell>
               <TableCell>{row.Product.name}</TableCell>
               <TableCell>Matt</TableCell>
-              <RouterLink to={`/dashboard/requests/${row.id}`}>View Request</RouterLink>
+              <TableCell><RouterLink to={`/dashboard/requests/${row.id}`}>View Request</RouterLink></TableCell>
             </TableRow>
           )) : ''}
         </TableBody>
