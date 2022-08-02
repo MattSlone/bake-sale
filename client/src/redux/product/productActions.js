@@ -1,4 +1,5 @@
 import axios from 'axios'
+import productReducer from './productReducer'
 
 import {
   SET_PRODUCT_IMAGES_PREVIEW,
@@ -122,11 +123,11 @@ export const getProductsSuccess = (products) => {
               name: field.name,
               type: field.type,
               options: field.Options ? field.Options.map(option => option.name) : [],
-              constraints: field.Constraints
-                ? field.Constraints.map(constraint => {
-                    return { [constraint.name]: constraint.value }
-                  })
-                : [],
+              constraints: field.Constraints ?
+                field.Constraints.reduce(
+                  (prev, curr) => ({ ...prev, [curr.name]: curr.value}), {}
+                )
+              : [],
               value: field.Value
                 ? field.Value.value
                 : (field.ParagraphValue ? field.ParagraphValue.value : ''),
@@ -135,6 +136,7 @@ export const getProductsSuccess = (products) => {
           })
         }
       }
+      console.log(product)
       return product
     })
     return {
@@ -310,7 +312,7 @@ export const editProduct = (formData) => {
 }
 
 const mapFields = (fields) => {
-  fields.map((field) => {
+  fields = fields.map((field) => {
     let mappedField = {
       name: field.name,
       prompt: field.prompt,
@@ -318,10 +320,10 @@ const mapFields = (fields) => {
       Options: field.options.map(option => {
         return { name: option }
       }),
-      Constraints: Object.entries(field.constraints).map((key, value) => {
+      Constraints: Object.entries(field.constraints).map(constraint => {
         return {
-          name: key,
-          value: value
+          name: constraint[0],
+          value: constraint[1]
         }
       }),
       Value: { value: field.value }

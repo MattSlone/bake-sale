@@ -11,7 +11,7 @@ import Paper from '@mui/material/Paper';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Checkbox from '@mui/material/Checkbox';
-import Autocomplete from '@mui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useRouteMatch } from "react-router-dom";
@@ -159,22 +159,21 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                 multiple
                 id={field.name}
                 options={field.options}
-                value={field.value}
+                value={field.value ? field.value : undefined}
                 onChange={(e, newValue) => handleValueChange(newValue, index)}
                 disableCloseOnSelect
                 getOptionLabel={(option) => option}
-                renderOption={(option, { selected }) => (
-                  <React.Fragment>
-                    <Checkbox
-                      icon={icon}
-                      checkedIcon={checkedIcon}
-                      style={{ marginRight: 8 }}
-                      checked={selected}
-                    />
-                    {option}
-                  </React.Fragment>
+                renderOption={(props, option, { selected }) => (
+                  <li {...props}>
+                  <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option}
+                </li>
                 )}
-                style={{ width: 500 }}
                 renderInput={(params) => (
                   <TextField {...params} variant="outlined" label={field.name} />
                 )}

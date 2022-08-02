@@ -7,7 +7,8 @@ const GMaps = require('../lib/gmaps');
 const shop = require('../routes/shop');
 const fsAsync = require('fs').promises
 const fs = require("fs")
-const validator = require('validator')
+const validator = require('validator');
+const { sequelize } = require('../models/index');
 
 module.exports = class ProductController {
     async create (req, res, next) {
@@ -224,7 +225,8 @@ module.exports = class ProductController {
   }
 
   async upsertFieldAssociation(field, model, data, hasMany = false) {
-    let associatedInstances = await Promise.all(data.map(async values => {
+    let associatedInstances = await Promise.all([].concat(data).map(async values => {
+      console.log(values)
       const [instance, created] = await model.upsert(hasMany ? {...values} : {
         ...values,
         FieldId: field.id
@@ -237,6 +239,7 @@ module.exports = class ProductController {
   }
 
   async updateCustomProductFields(product, fields) {
+    console.log(fields)
     const updateCustomFields = (await Promise.all(fields.map(async newField => {
       const field = await db.Field.findOne({
         where: {
@@ -262,12 +265,12 @@ module.exports = class ProductController {
         field.name = newField.name
         field.prompt = newField.prompt
         await field.save()
-        let constraints = await this.upsertFieldAssociation(field, db.Constraint, newField.constraints)
+        let constraints = await this.upsertFieldAssociation(field, db.Constraint, newField.Constraints)
         await field.setConstraints(constraints.map(constraint => constraint.id))
         await db.Constraint.destroy({
             where: { FieldId: null }
         })
-        let options = await this.upsertFieldAssociation(field, db.Option, newField.options)
+        let options = await this.upsertFieldAssociation(field, db.Option, newField.Options)
         await field.setOptions(options.map(option => option.id))
         await db.Option.destroy({
             where: { FieldId: null }
@@ -283,9 +286,12 @@ module.exports = class ProductController {
         FormId: product.Form.id
       }
     })
-    newFields = await db.Field.bulkCreate(newFields, {
-      include: [db.Option, db.Constraint],
-      returning: true
+    await sequelize.transaction(async () => {
+      for (let field of newFields) {
+        await db.Field.create(field, {
+          include: [db.Option, db.Constraint]
+        })
+      }
     })
     const deletedFields = await db.Field.findAll({
       where: {
