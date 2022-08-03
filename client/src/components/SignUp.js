@@ -336,7 +336,7 @@ export default function SignUp(props) {
             <Grid item xs={12}>
               <ReCAPTCHA
                 isolated={1}
-                sitekey="6LeSJQkhAAAAADzijHf5RNNIqdXgRDmcGkaQj3Rp"
+                sitekey={process.env.REACT_APP_RECAPTCHA_KEY}
                 onChange={onChange}
               />
             </Grid>
