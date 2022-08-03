@@ -159,7 +159,7 @@ export default function CustomProductForm({fields, setFields = null, title, nosh
                 multiple
                 id={field.name}
                 options={field.options}
-                value={field.value ? field.value : undefined}
+                value={field.value ? field.value : []}
                 onChange={(e, newValue) => handleValueChange(newValue, index)}
                 disableCloseOnSelect
                 getOptionLabel={(option) => option}

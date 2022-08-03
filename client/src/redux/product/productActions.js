@@ -317,6 +317,7 @@ const mapFields = (fields) => {
       name: field.name,
       prompt: field.prompt,
       type: field.type,
+      deleted: field.deleted,
       Options: field.options.map(option => {
         return { name: option }
       }),

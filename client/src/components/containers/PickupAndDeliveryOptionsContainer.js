@@ -6,8 +6,11 @@ import {
   setPickupSchedule,
   setContact,
   getFormattedShopAddress,
+  getFormattedShopAddressRequest,
+  getFormattedAddressFailure,
   getFormattedShopAddressSuccess,
-  setValidShop
+  setValidShop,
+  getFormattedShopAddressFailure
  } from '../../redux'
 
 const mapStateToProps = state => {
@@ -24,6 +27,8 @@ const mapDispatchToProps = dispatch => {
     setContact: (contact) => dispatch(setContact(contact)),
     getFormattedShopAddress: (formData) => dispatch(getFormattedShopAddress(formData)),
     getFormattedShopAddressSuccess: (formData) => dispatch(getFormattedShopAddressSuccess(formData)),
+    getFormattedShopAddressRequest: () => dispatch(getFormattedShopAddressRequest()),
+    getFormattedShopAddressFailure: (error) => dispatch(getFormattedShopAddressFailure(error)),
     setValidShop: (status) => dispatch(setValidShop(status))
   }
 }

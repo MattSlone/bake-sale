@@ -20,8 +20,8 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import isEmail from 'validator/lib/isEmail';
 import isMobilePhone from 'validator/lib/isMobilePhone';
-import { setValidShop } from '../../redux';
 import axios from 'axios'
+import ReCAPTCHA from "react-google-recaptcha";
 
 const PREFIX = 'PickupAndDeliveryOptions';
 
@@ -106,6 +106,7 @@ export default function PickupAndDeliveryOptions(props) {
   const [contactType, setContactType] = useState('none')
   const [phone, setPhone] = useState(props.shop.contact.phone)
   const [email, setEmail] = useState(props.shop.contact.email)
+  const [token, setToken] = useState('')
   const [message, setMessage] = useState('')
   const [pickupSchedule, setPickupSchedule] = useState(props.shop.pickupSchedule);
   const [pickupScheduleChecked, setPickupScheduleChecked] = useState({
@@ -134,6 +135,10 @@ export default function PickupAndDeliveryOptions(props) {
     }
   }, [validAddress, validPickupSchedule, validShopContact, validDeliveryArea])
 
+  function onChange(value) {
+    setToken(value);
+  }
+
   const validateAddressFields = () => {
     let rtn = {
       error: '',
@@ -143,7 +148,8 @@ export default function PickupAndDeliveryOptions(props) {
       { name: 'Street', value: street },
       { name: 'City', value: city },
       { name: 'State', value: state },
-      { name: 'Zipcode', value: zipcode }
+      { name: 'Zipcode', value: zipcode },
+      { name: 'ReCaptcha', value: token }
     ]) {
       if (!field.value) {
         rtn.error = `${field.name} is required.`
@@ -216,9 +222,11 @@ export default function PickupAndDeliveryOptions(props) {
       success: false
     }
     try {
+      props.getFormattedShopAddressRequest()
       const res = await axios.post('/api/user/address/components', formData)
       if(res.data.error) {
         rtn.error = res.data.error[0]
+        props.getFormattedShopAddressFailure(rtn.error)
         return rtn
       }
       props.getFormattedShopAddressSuccess({
@@ -244,13 +252,15 @@ export default function PickupAndDeliveryOptions(props) {
         street: street,
         city: city,
         state: 'Florida',
-        zipcode: zipcode
+        zipcode: zipcode,
+        token: token
       })
       if (!newValidAddress.success) {
         if (newValidAddress.error) {
           rtn.error = newValidAddress.error
         }
       } else {
+        setToken('')
         rtn.success = true
       }
     } else {
@@ -258,6 +268,14 @@ export default function PickupAndDeliveryOptions(props) {
     }
     return rtn
   }
+
+  useEffect(() => {
+    if (props.shop.loading) {
+      setMessage('loading...')
+    } else {
+      setMessage('')
+    }
+  }, [props.shop.loading])
 
   const validate = async () => {
     try {
@@ -497,7 +515,7 @@ export default function PickupAndDeliveryOptions(props) {
                       <Grid item>
                         <TextField
                           className={classes.addressField}
-                          value={street}
+                          value={street2}
                           label="Apartment, suite, etc."
                           variant="outlined"
                           onChange={(e) => {setStreet2(e.target.value)}}
@@ -528,6 +546,13 @@ export default function PickupAndDeliveryOptions(props) {
                           label="Zipcode"
                           variant="outlined"
                           onChange={(e) => {setZipcode(e.target.value)}}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <ReCAPTCHA
+                          isolated={1}
+                          sitekey="6LeSJQkhAAAAADzijHf5RNNIqdXgRDmcGkaQj3Rp"
+                          onChange={onChange}
                         />
                       </Grid>
                     </Grid>

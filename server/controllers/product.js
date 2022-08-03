@@ -239,7 +239,6 @@ module.exports = class ProductController {
   }
 
   async updateCustomProductFields(product, fields) {
-    console.log(fields)
     const updateCustomFields = (await Promise.all(fields.map(async newField => {
       const field = await db.Field.findOne({
         where: {
@@ -279,7 +278,7 @@ module.exports = class ProductController {
       return field ? field : false
     }))).filter(field => field)
     let newFields = fields.filter(field => {
-      return !updateCustomFields.map(field => field.name).includes(field.name)
+      return !updateCustomFields.map(field => field.name).includes(field.name) && !field.deleted
     }).map(field => {
       return {
         ...field,

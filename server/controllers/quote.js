@@ -1,5 +1,6 @@
 'use strict'
 
+const { CurrencyCodes } = require('validator/lib/isISO4217')
 const db = require('../models/index'),
   Email = require('email-templates'),
   nodemailer = require('nodemailer'),
@@ -8,12 +9,27 @@ const db = require('../models/index'),
 module.exports = class QuoteController {
   async create (req, res, next) {
     try {
+      let values = await Promise.all(req.body.values.map(async fieldValue => {
+        const field = await db.Field.findByPk(fieldValue.FieldId)
+        if (field.deleted) {
+          return false
+        }
+        if(Array.isArray(fieldValue.value)) {
+          // multiselect field
+          return fieldValue.value.map(value => {
+            return { FieldId: fieldValue.FieldId, value: value }
+          })
+        }
+        return fieldValue
+      }))
+      values = values.filter(value => value).flat()
+      console.log(values)
       const requestedStatus = await db.QuoteStatus.findOne({ where: { status: 'requested' } })
       const quote = await db.Quote.create({
         status: req.body.status,
         ProductId: req.body.productId,
         fulfillment: req.body.fulfillment,
-        Values: req.body.values,
+        Values: values,
         UserId: req.user.id,
         QuoteStatusId: requestedStatus.id
       }, {

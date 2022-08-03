@@ -107,7 +107,7 @@ export default function CustomProduct(props)
       { name: 'Fulfillment', value: fulfillment },
       ...fields
     ]) {
-      if (!field.value) {
+      if (!field.value && !field.deleted) {
         rtn.error = `${field.name} is required.`
         return rtn
       }
