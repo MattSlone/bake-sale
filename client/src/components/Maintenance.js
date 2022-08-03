@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import Link from '@mui/material/Link'
 import { Redirect, useLocation, Link as RouterLink } from "react-router-dom";
 import axios from 'axios'
@@ -18,7 +18,7 @@ const PREFIX = 'Maintenance';
 const classes = {
 };
 
-const StyledContainer = styled(Container)((
+const StyledBox = styled(Box)((
   {
     theme
   }
@@ -28,10 +28,10 @@ const StyledContainer = styled(Container)((
 
 export default function Maintenance() {
   return (
-    <StyledContainer>
+    <StyledBox>
       <Typography>
         Under Construction. <RouterLink to="/signup">Sign up</RouterLink> to be notified when we are close to launch.
       </Typography>
-    </StyledContainer>
+    </StyledBox>
   );
 }

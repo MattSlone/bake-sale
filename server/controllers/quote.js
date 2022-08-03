@@ -9,6 +9,7 @@ const db = require('../models/index'),
 module.exports = class QuoteController {
   async create (req, res, next) {
     try {
+      // handle deleted and multiselect fields
       let values = await Promise.all(req.body.values.map(async fieldValue => {
         const field = await db.Field.findByPk(fieldValue.FieldId)
         if (field.deleted) {
@@ -23,7 +24,6 @@ module.exports = class QuoteController {
         return fieldValue
       }))
       values = values.filter(value => value).flat()
-      console.log(values)
       const requestedStatus = await db.QuoteStatus.findOne({ where: { status: 'requested' } })
       const quote = await db.Quote.create({
         status: req.body.status,

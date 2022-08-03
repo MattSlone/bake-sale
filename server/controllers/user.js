@@ -73,10 +73,10 @@ module.exports = class UserController {
       await email.send({
         template: 'signup',
         message: {
-          to: 'slonem01@gmail.com'
+          to: req.user.username
         },
         locals: {
-          name: 'Matthew Slone'
+          name: req.user.firstName
         }
       })
     } catch (err) {
