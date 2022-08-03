@@ -37,6 +37,7 @@ const initialState = {
   seller: false,
   validAddress: false,
   error: '',
+  message: ''
 }
 
 const userReducer = (state = initialState, action) => {
@@ -47,10 +48,12 @@ const userReducer = (state = initialState, action) => {
     }
     case USER_SIGNUP_SUCCESS: return {
       ...state,
-      loading: false
+      loading: false,
+      message: action.payload.message
     }
     case USER_SIGNUP_FAILURE: return {
       user: false,
+      loading: false,
       error: action.payload
     }
     case USER_SIGNIN_REQUEST: return {
@@ -70,7 +73,8 @@ const userReducer = (state = initialState, action) => {
       email: action.payload.success.email,
       username: action.payload.success.username,
       user: action.payload,
-      error: ''
+      error: '',
+      loading: false
     }
     case USER_SIGNIN_FAILURE: return {
       loading: false,
@@ -89,7 +93,8 @@ const userReducer = (state = initialState, action) => {
     }
     case RESET_USER_ERROR: return {
       ...state,
-      error: ''
+      error: '',
+      message: ''
     }
     case EDIT_USER_REQUEST: return {
       ...state,
@@ -152,11 +157,13 @@ const userReducer = (state = initialState, action) => {
     case IS_LOGGED_IN_SUCCESS: return {
       ...state,
       loggedIn: true,
+      loading: false,
       error: ''
     }
     case IS_LOGGED_IN_FAILURE: return {
       ...state,
-      loggedIn: false
+      loggedIn: false,
+      loading: false
     }
     default: return state
   }

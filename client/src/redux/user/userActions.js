@@ -185,7 +185,7 @@ export const userSignUp = (formData) => {
       }
       else {
         // dispatch(getShop({ UserId: res.data.success.id }))
-        dispatch(userSignUpSuccess())
+        dispatch(userSignUpSuccess({ message: 'You\'re signed up! Check your email for confirmation.' }))
       }
     } catch(error) {
       dispatch(userSignUpFailure(error.message))
@@ -282,13 +282,13 @@ export const getFormattedAddress = (formData) => {
       dispatch(getFormattedAddressRequest())
       const res = await axios.post('/api/user/address/components', formData)
       if(res.data.error) {
-        dispatch(getFormattedAddressFailure(res.data.error[0]))
+        dispatch(getFormattedAddressFailure(res.data.error))
       }
       else {
         dispatch(getFormattedAddressSuccess(res.data.success))
       }
     } catch(error) {
-      dispatch(getFormattedAddressFailure(error.message))
+      dispatch(getFormattedAddressFailure(error))
     }
   }
 }

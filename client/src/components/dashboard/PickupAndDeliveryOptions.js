@@ -22,6 +22,7 @@ import isEmail from 'validator/lib/isEmail';
 import isMobilePhone from 'validator/lib/isMobilePhone';
 import axios from 'axios'
 import ReCAPTCHA from "react-google-recaptcha";
+import { useIsMount } from '../../hooks/useIsMount';
 
 const PREFIX = 'PickupAndDeliveryOptions';
 
@@ -91,8 +92,9 @@ function getSteps() {
 }
 
 export default function PickupAndDeliveryOptions(props) {
-
+  let recaptcha
   const [activeStep, setActiveStep] = React.useState(0);
+  const isMount = useIsMount()
   const steps = getSteps();
   const match = useRouteMatch()
   const edit = match.path.includes('edit')
@@ -123,6 +125,7 @@ export default function PickupAndDeliveryOptions(props) {
   const [validPickupSchedule, setValidPickupSchedule] = useState(edit ? {valid: true} : {valid: false})
   const [validShopContact, setValidShopContact] = useState(edit ? {valid: true} : {valid: false})
   const [validDeliveryArea, setValidDeliveryArea] = useState(edit ? {valid: true} : {valid: false})
+  const [goNext, setGoNext] = useState(false)
 
   useEffect(() => {
     if ([
@@ -246,6 +249,7 @@ export default function PickupAndDeliveryOptions(props) {
       error: '',
       success: false
     }
+    recaptcha.reset()
     let validFields = validateAddressFields()
     if (validFields.success) {
       let newValidAddress = await getFormattedShopAddress({
@@ -274,6 +278,11 @@ export default function PickupAndDeliveryOptions(props) {
       setMessage('loading...')
     } else {
       setMessage('')
+      if (goNext == true) {
+        props.setChildStep((prevActiveStep) => prevActiveStep + 1)
+        setActiveStep((prevActiveStep) => prevActiveStep + 1)
+        setGoNext(false)
+      }
     }
   }, [props.shop.loading])
 
@@ -391,8 +400,9 @@ export default function PickupAndDeliveryOptions(props) {
 
   const handleNext = async () => {
     if (await validate()) {
-      props.setChildStep((prevActiveStep) => prevActiveStep + 1);
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      setGoNext(true)
+    } else {
+      setGoNext(false)
     }
   };
 
@@ -426,7 +436,8 @@ export default function PickupAndDeliveryOptions(props) {
     if (activeStep == 3) {
       validate()
     }
-  }, [radius, circle])
+  }, [radius])
+
   const validateDeliveryArea = () => {
     console.log('validating delivery area...')
     let rtn = {
@@ -550,7 +561,7 @@ export default function PickupAndDeliveryOptions(props) {
                       </Grid>
                       <Grid item xs={12}>
                         <ReCAPTCHA
-                          isolated={1}
+                          ref={el => { recaptcha = el }}
                           sitekey={process.env.REACT_APP_RECAPTCHA_KEY}
                           onChange={onChange}
                         />

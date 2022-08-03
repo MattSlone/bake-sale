@@ -19,7 +19,9 @@ require('datejs')
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
     try {
+      console.log('we got this FAR')
       const shopAmounts = await this.mapCartToShopAmounts(req, req.body.items)
+      console.log('not inside mapCartToShopAmounts')
       const totalAmount = shopAmounts.map(shopAmount => shopAmount.amount)
         .reduce((prev, curr) => prev + curr)
       
@@ -40,6 +42,8 @@ module.exports = class OrderController {
           // addon: {"addon name": true if added / false if not}
           const addonIds = Object.entries(item.addons).map(addon => addon[1] ? addon[0] : null)
             .filter(addon => addon !== null)
+          
+          console.log('PRODUCT: ', item.product)
           const variation = await db.Variety.findOne({
             where: {
               ProductId: item.product.id,
@@ -73,6 +77,7 @@ module.exports = class OrderController {
 
   async mapCartToShopAmounts(req, items) {
     try {
+      console.log('inside mapCartToShopAmounts')
       const shops = items.map(item => item.product.ShopId)
         .filter((shop, index, shops) => shops.indexOf(shop) === index) // unique shops
 

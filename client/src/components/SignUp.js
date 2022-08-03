@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -77,7 +77,7 @@ function Copyright() {
 
 export default function SignUp(props) {
   const auth = useAuth()
-
+  let recaptcha
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
@@ -119,18 +119,30 @@ export default function SignUp(props) {
   }
 
   useEffect(() => {
-    if (auth.userData.loading === false && auth.userData.validAddress === true) {
-      setStreet(props.userData.street)
-      setCity(props.userData.city)
-      setState(props.userData.state)
-      setZipcode(props.userData.zipcode)
-      setLat(props.userData.lat)
-      setLng(props.userData.lng)
-      setValidAddress(true)
+    auth.resetUserError()
+  }, [])
+
+  useEffect(() => {
+    if (auth.userData.loading) {
+      setMessage('loading...')
     } else {
-      setValidAddress(false)
-      if (auth.userData.error) {
-        setMessage(auth.userData.error)
+      setMessage('')
+      if (auth.userData.message) {
+        setMessage(auth.userData.message)
+      }
+      if (auth.userData.validAddress === true) {
+        setStreet(props.userData.street)
+        setCity(props.userData.city)
+        setState(props.userData.state)
+        setZipcode(props.userData.zipcode)
+        setLat(props.userData.lat)
+        setLng(props.userData.lng)
+        setValidAddress(true)
+      } else {
+        setValidAddress(false)
+        if (auth.userData.error) {
+          setMessage(auth.userData.error)
+        }
       }
     }
   }, [auth.userData.loading])
@@ -139,6 +151,7 @@ export default function SignUp(props) {
     const valid = validate()
     if (valid.success) {
       setMessage('')
+      recaptcha.reset()
       getFormattedAddress()
     } else {
       setMessage(valid.error)
@@ -184,12 +197,6 @@ export default function SignUp(props) {
       auth.userSignUp(formData)
     }
   }, [validAddress])
-
-  useEffect(() => {
-    if (auth.userData.loading == false && !auth.userData.error) {
-      <Redirect to='/signin' />
-    }
-  }, auth.userSignUp)
 
   if(auth.userData.loggedIn == true) {
     return (
@@ -335,7 +342,7 @@ export default function SignUp(props) {
             </Grid>
             <Grid item xs={12}>
               <ReCAPTCHA
-                isolated={1}
+                ref={el => { recaptcha = el }}
                 sitekey={process.env.REACT_APP_RECAPTCHA_KEY}
                 onChange={onChange}
               />

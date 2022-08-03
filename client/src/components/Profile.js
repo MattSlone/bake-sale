@@ -12,8 +12,6 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { Redirect } from "react-router-dom";
-import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from '../hooks/use-auth';
 import isAlpha from 'validator/lib/isAlpha';
 import ReCAPTCHA from "react-google-recaptcha";
@@ -74,6 +72,7 @@ function Copyright() {
 
 export default function Profile(props) {
   const auth = useAuth()
+  let recaptcha
   const [firstName, setFirstName] = useState(props.user.firstName)
   const [lastName, setLastName] = useState(props.user.lastName)
   const [street, setStreet] = useState(props.user.street)
@@ -110,19 +109,24 @@ export default function Profile(props) {
   }, [])
 
   useEffect(() => {
-    if (auth.userData.loading === false && auth.userData.validAddress === true) {
-      setStreet(auth.userData.street)
-      setStreet2(auth.userData.street2)
-      setCity(auth.userData.city)
-      setState(auth.userData.state)
-      setZipcode(auth.userData.zipcode)
-      setLat(auth.userData.lat)
-      setLng(auth.userData.lng)
-      setValidAddress(true)
+    if (auth.userData.loading) {
+      setMessage('validating address...')
     } else {
-      setValidAddress(false)
-      if (auth.userData.error) {
-        setMessage(auth.userData.error)
+      setMessage('')
+      if (auth.userData.validAddress === true) {
+        setStreet(auth.userData.street)
+        setStreet2(auth.userData.street2)
+        setCity(auth.userData.city)
+        setState(auth.userData.state)
+        setZipcode(auth.userData.zipcode)
+        setLat(auth.userData.lat)
+        setLng(auth.userData.lng)
+        setValidAddress(true)
+      } else {
+        setValidAddress(false)
+        if (auth.userData.error) {
+          setMessage(auth.userData.error)
+        }
       }
     }
   }, [auth.userData.loading])
@@ -130,6 +134,7 @@ export default function Profile(props) {
   const handleSubmit = e => {
     const valid = validate()
     if (valid.success) {
+      recaptcha.reset()
       getFormattedAddress()
     } else {
       setMessage(valid.error)
@@ -283,7 +288,7 @@ export default function Profile(props) {
             </Grid>
             <Grid item xs={12}>
               <ReCAPTCHA
-                isolated={1}
+                ref={el => { recaptcha = el }}
                 sitekey={process.env.REACT_APP_RECAPTCHA_KEY}
                 onChange={onChange}
               />

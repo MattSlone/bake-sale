@@ -40,7 +40,7 @@ module.exports = (app, passport) => {
     console.log(addressComponents)
     if (typeof addressComponents == 'string') {
       req.flash('error', 'There was an issue validating your address.')
-      res.redirect('/api/user/address/components')
+      res.redirect('/api/user/error')
       return
     }
     res.send({
@@ -55,7 +55,6 @@ module.exports = (app, passport) => {
   })
 
   app.get('/api/user/error', (req, res, next) => {
-    console.log(req.flash('error'))
     res.send({
       error: req.flash('error')
     })
@@ -99,7 +98,7 @@ module.exports = (app, passport) => {
       req.logout()
       res.send({
         error: false,
-        success: true //req.user
+        success: true
       })
     } catch (err) {
       console.log(err)

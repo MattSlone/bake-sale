@@ -90,7 +90,7 @@ export default function SignIn({ userSignIn, userData }) {
     if (auth.userData.error) {
       setMessage(auth.userData.error)
     }
-  }, [auth.userData.loading])
+  }, [auth.userData.error])
 
   const handleSubmit = e => {
     e.preventDefault()

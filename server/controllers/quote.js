@@ -75,7 +75,7 @@ module.exports = class QuoteController {
           }
         }
       }
-      if (req.query.forUser) {
+      if (req.query.forUser && req.query.product) {
         const quote = db.Quote.findOne({ where: { ProductId: req.query.product, UserId: req.user.id } })
         if (!quote) {
           return quotes
