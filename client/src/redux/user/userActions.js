@@ -199,7 +199,7 @@ export const userSignUp = (formData) => {
         dispatch(userSignUpFailure("There was an issue signing up"))
         return
       }
-      dispatch(userSignUpFailure(error))
+      dispatch(userSignUpFailure(JSON.stringify(error)))
     }
   }
 }

@@ -184,7 +184,7 @@ export default function SignUp(props) {
       rtn.error = 'Invalid email address'
       return rtn
     }
-    if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
+    if (!(firstName && isAlpha(firstName.replace(/\s/g, ""))) || !(lastName && isAlpha(lastName.replace(/\s/g, "")))) {
       rtn.error = 'Name may only contain letters.'
       return rtn
     }

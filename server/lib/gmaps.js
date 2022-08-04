@@ -24,7 +24,7 @@ module.exports = class GMaps {
     return (meters * MILES_MULTIPLE)
   }
 
-  static async getFormattedAddress({ street, city, state, zipcode }) {
+  /*static async getFormattedAddress({ street, city, state, zipcode }) {
     try {
       const address = `${street} ${city}, ${state} ${zipcode}`
       console.log('ADDRESS: ', address)
@@ -52,27 +52,67 @@ module.exports = class GMaps {
       }
       return error
     }
+  } */
+
+  static async getFormattedAddress({ street, city, state, zipcode }) {
+    try {
+      const address = `${street} ${city}, ${state} ${zipcode}`
+      console.log('ADDRESS: ', address)
+      const res = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${env.gmapsKey}`
+      )
+      console.log(res)
+      if(res.error_message) {
+        return res.error_message
+      } else if (res.data.status != "OK") {
+        return "There was an issue validating your address."
+      }
+      else {
+        const addressComponents = this.convertFormattedAddressToObject(
+          res.data.results[0]
+        )
+        return {
+          ...addressComponents,
+          street: `${addressComponents.street_number} ${addressComponents.route}`,
+          city: addressComponents.locality,
+          state: addressComponents.administrative_area_level_1,
+          zipcode: addressComponents.postal_code,
+          latitude: addressComponents.lat,
+          longitude: addressComponents.lng,
+        }
+      }
+    } catch (error) {
+      console.log('GET FORMATTED ADDRESS ERROR: ', error, '\nEND ERROR\n')
+      if (error.response) {
+        return error.response.statusText
+      }
+      return error
+    }
   }
 
   /**
    * For Google Maps GeoCoding API if ever decide to use again
   **/
-  static convertFormattedAddressToObject(addressComponentsArray) {
-    const addressComponents = Object.fromEntries(addressComponentsArray.filter(
+  static convertFormattedAddressToObject(data) {
+    const addressComponents = Object.fromEntries(data.address_components.filter(
       component => {
         // these tyes are wrong, they were right at some point tho...
         const types = component.types.filter(type => [
-          'name',
+          'street_number',
+          'route',
           'locality',
-          'region',
+          'administrative_area_level_1',
           'postal_code'].includes(type))
           return types.length > 0
       }
     ).map(component => [component.types[0], component.long_name]))
-    if (Object.keys(addressComponents).length < 4) {
+    if (Object.keys(addressComponents).length < 5) {
       return "There was an issue validating your address."
     }
-    return addressComponents
+    return {
+      ...addressComponents,
+      ...data.geometry.location
+    }  
   }
 }
 

@@ -202,10 +202,10 @@ import {
         loading: false,
         pickupAddress: {
           ...state.pickupAddress,
-          street: action.payload.name,
-          city: action.payload.locality,
-          state: action.payload.region,
-          zipcode: action.payload.postal_code,
+          street: action.payload.street,
+          city: action.payload.city,
+          state: action.payload.state,
+          zipcode: action.payload.zipcode,
           lat: action.payload.latitude,
           lng: action.payload.longitude,
           validAddress: true

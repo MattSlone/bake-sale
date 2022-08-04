@@ -204,7 +204,12 @@ module.exports = class UserController {
         return
       }
       const user = await db.User.findOne({ where: { username: req.body.username } })
-      if (!user?.active) {
+      if (!user) {
+        req.flash('error', "Account does not exist.")
+        res.redirect('/api/signin')
+        return
+      }
+      if (!user.active) {
         req.flash('error', "Your account is not active.")
         res.redirect('/api/signin')
         return
@@ -218,12 +223,6 @@ module.exports = class UserController {
 
   static async validateSignUp(req, res, next) {
     try {
-      const addressComponents = await GMaps.getFormattedAddress(req.body)
-      if (typeof addressComponents == 'string') {
-        req.flash('error', 'There was an issue validating your address.')
-        res.redirect('/api/user/error')
-        return
-      }
       for (const field of [
         { name: 'First name', value: req.body.firstName },
         { name: 'Last name', value: req.body.lastName },
@@ -246,8 +245,8 @@ module.exports = class UserController {
         return
       }
       if (
-        !(req.body.firstName && validator.isAlpha(req.body.firstName)) 
-        || !(req.body.lastName && validator.isAlpha(req.body.lastName))
+        !(req.body.firstName && validator.isAlpha(req.body.firstName.replace(/\s/g, "")))
+        || !(req.body.lastName && validator.isAlpha(req.body.lastName.replace(/\s/g, "")))
       ) {
         req.flash('error', 'Name may only contain letters.')
         res.redirect('/api/user/error')
@@ -255,6 +254,12 @@ module.exports = class UserController {
       }
       if (!validator.isByteLength(req.body.password, { min: 5, max: 15 })) {
         req.flash('error', "Password should be between 5 and 15 characters.")
+        res.redirect('/api/user/error')
+        return
+      }
+      const addressComponents = await GMaps.getFormattedAddress(req.body)
+      if (typeof addressComponents == 'string') {
+        req.flash('error', 'There was an issue validating your address.')
         res.redirect('/api/user/error')
         return
       }

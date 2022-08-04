@@ -42,6 +42,7 @@ module.exports = (app, passport) => {
       res.redirect('/api/user/error')
       return
     }
+    await delay(1000)
     res.send({
       success: addressComponents
     })
@@ -190,4 +191,8 @@ module.exports = (app, passport) => {
     }
   );
 */
+}
+
+const delay = (time) => {
+  return new Promise(resolve => setTimeout(resolve, time));
 }
