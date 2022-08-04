@@ -302,14 +302,14 @@ export default function PrimarySearchAppBar(props) {
         </IconButton>
         <p>Cart</p>
       </MenuItem>
-      <MenuItem>
+      {/*<MenuItem>
         <IconButton aria-label="show 11 new notifications" color="inherit" size="large">
           <Badge badgeContent={11} color="secondary">
             <NotificationsIcon />
           </Badge>
         </IconButton>
         <p>Notifications</p>
-      </MenuItem>
+      </MenuItem>*/}
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           aria-label="account of current user"
@@ -375,11 +375,11 @@ export default function PrimarySearchAppBar(props) {
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit" size="large">
+            {/*<IconButton aria-label="show 17 new notifications" color="inherit" size="large">
               <Badge badgeContent={17} color="secondary">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton>*/}
             <IconButton
               edge="end"
               aria-label="account of current user"

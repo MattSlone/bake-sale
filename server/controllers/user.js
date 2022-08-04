@@ -405,7 +405,8 @@ module.exports = class UserController {
       console.log(req.body.token)
       const { data } = await axios.post('https://www.google.com/recaptcha/api/siteverify', qs.stringify({
         secret: env.recaptchaSecret,
-        response: req.body.token
+        response: req.body.token,
+        remoteip: req.ip
       }))
       console.log(data)
       if(!data.success) {

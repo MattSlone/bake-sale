@@ -8,7 +8,6 @@ import {
   USER_SIGNIN_SUCCESS,
   USER_SIGNIN_FAILURE,
   USER_SIGNOUT_REQUEST,
-  USER_SIGNOUT_SUCCESS,
   USER_SIGNOUT_FAILURE,
   EDIT_USER_REQUEST,
   EDIT_USER_SUCCESS,
@@ -16,6 +15,7 @@ import {
   GET_FORMATTED_ADDRESS_FAILURE,
   GET_FORMATTED_ADDRESS_SUCCESS,
   GET_FORMATTED_ADDRESS_REQUEST,
+  RESET_USER,
   RESET_USER_ERROR,
   IS_LOGGED_IN_FAILURE,
   IS_LOGGED_IN_REQUEST,
@@ -96,6 +96,7 @@ const userReducer = (state = initialState, action) => {
       error: '',
       message: ''
     }
+    case RESET_USER: return initialState
     case EDIT_USER_REQUEST: return {
       ...state,
       loading: true
@@ -126,7 +127,6 @@ const userReducer = (state = initialState, action) => {
       loading: true
     }
     case GET_FORMATTED_ADDRESS_SUCCESS: return {
-      loggedIn: true,
       ...state,
       loading: false,
       street: action.payload.name,

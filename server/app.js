@@ -12,6 +12,10 @@ const { Sequelize, Transaction } = require('sequelize')
 
 require('./lib/passport')(passport)
 
+if (env.nodeEnv === 'production') {
+  app.set('trust proxy', true)
+}
+
 // initalize sequelize with session store
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
@@ -83,11 +87,14 @@ require('./routes/ingredient')(app)
 require('./routes/quote')(app)
 require('./routes/order')(app, webhookApp)
 
-const root = require('path').join('/public')
-app.use(express.static(root));
-app.get("*", (req, res) => {
-    res.sendFile('index.html', { root });
-})
+if (env.nodeEnv === 'production') {
+  const root = require('path').join('/public')
+  app.use(express.static(root));
+  app.get("*", (req, res) => {
+      res.sendFile('index.html', { root });
+  })
+}
+
 
 // Default response for any other request
 app.use(function(req, res) {

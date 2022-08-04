@@ -11,6 +11,7 @@ export function ProvideAuth({
   userSignUp,
   userSignOut,
   isLoggedIn,
+  resetUser,
   resetUserError
 }) {
   const auth = {
@@ -19,6 +20,7 @@ export function ProvideAuth({
     userSignIn,
     userSignUp,
     userSignOut,
+    resetUser,
     resetUserError
   }
   return <authContext.Provider value={auth}>{children}</authContext.Provider>;

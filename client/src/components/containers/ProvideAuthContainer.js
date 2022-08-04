@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import { ProvideAuth } from '../../hooks/use-auth'
-import { userSignIn, userSignUp, userSignOut, resetUserError, isLoggedIn } from '../../redux'
+import { userSignIn, userSignUp, userSignOut, resetUserError, resetUser, isLoggedIn } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -14,7 +14,8 @@ const mapDispatchToProps = dispatch => {
     userSignUp: (formData) => dispatch(userSignUp(formData)),
     userSignOut: () => dispatch(userSignOut()),
     isLoggedIn: () => dispatch(isLoggedIn()),
-    resetUserError: () => dispatch(resetUserError())
+    resetUserError: () => dispatch(resetUserError()),
+    resetUser: () => dispatch(resetUser())
   }
 }
 

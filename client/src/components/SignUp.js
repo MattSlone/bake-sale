@@ -119,7 +119,9 @@ export default function SignUp(props) {
   }
 
   useEffect(() => {
-    auth.resetUserError()
+    if (!auth.userData.loggedIn) {
+      auth.resetUser()
+    }
   }, [])
 
   useEffect(() => {
@@ -130,7 +132,9 @@ export default function SignUp(props) {
       if (auth.userData.message) {
         setMessage(auth.userData.message)
       }
+      console.log(auth.userData.validAddress)
       if (auth.userData.validAddress === true) {
+        console.log('here')
         setStreet(props.userData.street)
         setCity(props.userData.city)
         setState(props.userData.state)
@@ -194,6 +198,7 @@ export default function SignUp(props) {
 
   useEffect(() => {
     if (validAddress) {
+      console.log('here 2')
       auth.userSignUp(formData)
     }
   }, [validAddress])

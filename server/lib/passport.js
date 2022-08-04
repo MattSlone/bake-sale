@@ -26,29 +26,33 @@ module.exports = (passport) => {
   },
   async function(req, username, password, done) {
     try {
-      const [user, created] = await User.findOrCreate({
-        where: { username: username },
-        defaults: {
-          firstName: req.body.firstName,
-          lastName: req.body.lastName,
-          street: req.body.street,
-          street2: req.body.street2,
-          city: req.body.city,
-          state: req.body.state,
-          zipcode: req.body.zipcode,
-          lat: req.body.lat,
-          lng: req.body.lng,
-          seller: req.body.seller,
-          email: username,
-          active: 0,
-          password: await User.generateHash(password),
+      try {
+        const [user, created] = await User.findOrCreate({
+          where: { username: username },
+          defaults: {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            street: req.body.street,
+            street2: req.body.street2,
+            city: req.body.city,
+            state: req.body.state,
+            zipcode: req.body.zipcode,
+            lat: req.body.lat,
+            lng: req.body.lng,
+            seller: req.body.seller,
+            email: username,
+            active: 0,
+            password: await User.generateHash(password),
+          }
+        });
+  
+        if (!created) {
+          return done(null, false, { message: 'Username taken.' });
         }
-      });
-
-      if (!created) {
-        return done(null, false, { message: 'Username taken.' });
+        return done(null, user);
+      } catch (err) {
+        console.log(err)
       }
-      return done(null, user);
     } catch(err) {
       return done(err);
     }

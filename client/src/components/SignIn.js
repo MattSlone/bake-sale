@@ -83,7 +83,9 @@ export default function SignIn({ userSignIn, userData }) {
   }
 
   useEffect(() => {
-    auth.resetUserError()
+    if (!auth.userData.loggedIn) {
+      auth.resetUser()
+    }
   }, [])
 
   useEffect(() => {

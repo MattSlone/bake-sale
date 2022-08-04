@@ -22,7 +22,8 @@ import {
   IS_LOGGED_IN_FAILURE,
   IS_LOGGED_IN_SUCCESS,
   IS_LOGGED_IN_REQUEST,
-  RESET_USER_ERROR
+  RESET_USER_ERROR,
+  RESET_USER
  } from './userTypes'
 
  import { getShop } from '../shop/shopActions'
@@ -112,6 +113,12 @@ export const editUserFailure = (error) => {
 export const resetUserError = () => {
   return {
     type: RESET_USER_ERROR
+  }
+}
+
+export const resetUser = () => {
+  return {
+    type: RESET_USER
   }
 }
 
