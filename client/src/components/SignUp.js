@@ -198,8 +198,17 @@ export default function SignUp(props) {
 
   useEffect(() => {
     if (validAddress) {
-      console.log('here 2')
       auth.userSignUp(formData)
+      setFirstName('')
+      setLastName('')
+      setUsername('')
+      setPassword('')
+      setStreet('')
+      setStreet2('')
+      setCity('')
+      setState('')
+      setZipcode('')
+      setSeller(0)
     }
   }, [validAddress])
 

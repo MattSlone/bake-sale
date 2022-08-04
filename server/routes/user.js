@@ -37,7 +37,6 @@ module.exports = (app, passport) => {
   UserController.verifyReCaptcha,
   async (req, res, next) => {
     const addressComponents = await GMaps.getFormattedAddress(req.body)
-    console.log(addressComponents)
     if (typeof addressComponents == 'string') {
       req.flash('error', 'There was an issue validating your address.')
       res.redirect('/api/user/error')

@@ -195,7 +195,11 @@ export const userSignUp = (formData) => {
         dispatch(userSignUpSuccess({ message: 'You\'re signed up! Check your email for confirmation.' }))
       }
     } catch(error) {
-      dispatch(userSignUpFailure(error.message))
+      if (error.response) {
+        dispatch(userSignUpFailure("There was an issue signing up"))
+        return
+      }
+      dispatch(userSignUpFailure(error))
     }
   }
 }
