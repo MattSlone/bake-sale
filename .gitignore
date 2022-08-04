@@ -18,6 +18,9 @@ node_modules
 # data
 data
 
+#ssl
+dhparam
+
 # misc
 .DS_Store
 .env.local
