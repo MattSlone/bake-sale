@@ -47,6 +47,9 @@ module.exports = class GMaps {
         return res.data.data[0]
       }
     } catch (error) {
+      if (error.response) {
+        return error.response.statusText
+      }
       return error
     }
   }

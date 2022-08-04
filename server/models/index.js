@@ -5,7 +5,6 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const env = require('../config/environment')
 const basename = path.basename(__filename);
-console.log(env)
 let config = require('../config/config')
 if (env.nodeEnv === 'production') {
   config = config.production
