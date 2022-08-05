@@ -302,15 +302,20 @@ export default function CreateShop(props) {
                           Back
                         </Button>
                       : '' }
-                      {(edit && childStep == 0) || childStep == childStepsLength ?
-                        !(activeStep === 2) || props.shop.stripeDetailsSubmitted ?
-                        <Link to={match.path + (activeStep === 1 ? '/stripe' : '')}>
+                      {(
+                        (activeStep == 0)
+                        || (edit && childStep == 0)
+                        || childStep == childStepsLength 
+                      ) && (
+                        !(activeStep === 2)
+                        || props.shop.stripeDetailsSubmitted 
+                      ) && (
+                        <Link to={match.path + (activeStep === 1 && validPickupAndDelivery ? '/stripe' : '')}>
                           <Button variant="contained" color="primary" onClick={handleNext}>
                             {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                           </Button>
                         </Link>
-                        : ''
-                      : ''}   
+                      )}
                     </div>
                 </div>
               )}

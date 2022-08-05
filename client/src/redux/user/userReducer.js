@@ -44,6 +44,7 @@ const userReducer = (state = initialState, action) => {
   switch(action.type) {
     case USER_SIGNUP_REQUEST: return {
       ...state,
+      validAddress: false,
       loading: true
     }
     case USER_SIGNUP_SUCCESS: return {
