@@ -53,9 +53,15 @@ module.exports = class UserController {
   async sendSignUpEmail (req) {
     try {
       const transporter = nodemailer.createTransport({
-        host: 'smtp.zoho.com',
+        host: 'smtpout.secureserver.net',
         port: 465,
-        secure: true, // use SSL
+        secure: true,
+        secureConnection: false,
+        requireTLS: true,
+        tls: {
+          ciphers: 'SSLv3'
+        },
+        debug: true,
         auth: {
           user: env.email,
           pass: env.emailPass
@@ -97,9 +103,15 @@ module.exports = class UserController {
           expiresIn: '15m'
         });
         const transporter = nodemailer.createTransport({
-          host: 'smtp.zoho.com',
+          host: 'smtpout.secureserver.net',
           port: 465,
-          secure: true, // use SSL
+          secure: true,
+          secureConnection: false,
+          requireTLS: true,
+          tls: {
+            ciphers: 'SSLv3'
+          },
+          debug: true,
           auth: {
             user: env.email,
             pass: env.emailPass

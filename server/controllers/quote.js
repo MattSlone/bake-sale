@@ -165,9 +165,15 @@ module.exports = class QuoteController {
     const product = await db.Product.findByPk(quote.ProductId)
     try {
       const transporter = nodemailer.createTransport({
-        host: 'smtp.zoho.com',
+        host: 'smtpout.secureserver.net',
         port: 465,
-        secure: true, // use SSL
+        secure: true,
+        secureConnection: false,
+        requireTLS: true,
+        tls: {
+          ciphers: 'SSLv3'
+        },
+        debug: true,
         auth: {
           user: env.email,
           pass: env.emailPass
