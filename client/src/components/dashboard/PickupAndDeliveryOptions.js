@@ -239,6 +239,9 @@ export default function PickupAndDeliveryOptions(props) {
       rtn.success = true
       return rtn
     } catch(error) {
+      if (error.response) {
+        rtn.error = 'There was an issue validating shop address'
+      }
       rtn.error = error
       return rtn
     }
@@ -264,6 +267,7 @@ export default function PickupAndDeliveryOptions(props) {
           rtn.error = newValidAddress.error
         }
       } else {
+        console.log('heree goood')
         setToken('')
         rtn.success = true
       }
@@ -278,11 +282,6 @@ export default function PickupAndDeliveryOptions(props) {
       setMessage('loading...')
     } else {
       setMessage('')
-      if (goNext == true) {
-        props.setChildStep((prevActiveStep) => prevActiveStep + 1)
-        setActiveStep((prevActiveStep) => prevActiveStep + 1)
-        setGoNext(false)
-      }
     }
   }, [props.shop.loading])
 
@@ -400,9 +399,8 @@ export default function PickupAndDeliveryOptions(props) {
 
   const handleNext = async () => {
     if (await validate()) {
-      setGoNext(true)
-    } else {
-      setGoNext(false)
+      props.setChildStep((prevActiveStep) => prevActiveStep + 1)
+      setActiveStep((prevActiveStep) => prevActiveStep + 1)
     }
   };
 
@@ -786,7 +784,7 @@ export default function PickupAndDeliveryOptions(props) {
           </Step>
         ))}
       </Stepper>
-      {activeStep === Object.keys(steps).length && (
+      {edit && activeStep === Object.keys(steps).length && (
         <Paper square elevation={0} className={classes.resetContainer}>
           <Typography>
             Shop Saved! You can move on to the next step or visit the Dashboard.

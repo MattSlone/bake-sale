@@ -246,7 +246,11 @@ export const getFormattedShopAddress = (formData) => {
         dispatch(getFormattedShopAddressSuccess(res.data.success))
       }
     } catch(error) {
-      dispatch(getFormattedShopAddressFailure(error))
+      if (error.response) {
+        dispatch(getFormattedShopAddressFailure("There was an issue signing up"))
+        return
+      }
+      dispatch(getFormattedShopAddressFailure(JSON.stringify(error)))
     }
   }
 }

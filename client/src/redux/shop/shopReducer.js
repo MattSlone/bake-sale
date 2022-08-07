@@ -203,6 +203,7 @@ import {
         pickupAddress: {
           ...state.pickupAddress,
           street: action.payload.street,
+          street2: action.payload.street2,
           city: action.payload.city,
           state: action.payload.state,
           zipcode: action.payload.zipcode,

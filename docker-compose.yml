@@ -34,6 +34,7 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+      - ./server/uploads:/uploads
     depends_on:
       - db
     environment:
