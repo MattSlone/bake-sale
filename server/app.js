@@ -23,6 +23,15 @@ var SequelizeStore = require("connect-session-sequelize")(session.Store);
 const sequelize = new Sequelize(env.db.name, env.db.username, env.db.password, {
   host: 'db',
   dialect: 'mysql',
+  retry: {
+    match: [
+      Sequelize.ConnectionError,
+      Sequelize.ConnectionTimedOutError,
+      Sequelize.TimeoutError,
+      /Deadlock/i
+    ],
+    max: 3
+}
   //isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
   //logging: (...msg) => console.log(msg)
 });
