@@ -266,17 +266,17 @@ module.exports = class ProductController {
         await field.save()
         let constraints = await this.upsertFieldAssociation(field, db.Constraint, newField.Constraints)
         await field.setConstraints(constraints.map(constraint => constraint.id))
-        await db.Constraint.destroy({
-            where: { FieldId: null }
-        })
         let options = await this.upsertFieldAssociation(field, db.Option, newField.Options)
         await field.setOptions(options.map(option => option.id))
-        await db.Option.destroy({
-            where: { FieldId: null }
-        })
       }
       return field ? field : false
     }))).filter(field => field)
+    await db.Constraint.destroy({
+      where: { FieldId: null }
+    })
+    await db.Option.destroy({
+      where: { FieldId: null }
+    })
     let newFields = fields.filter(field => {
       return !updateCustomFields.map(field => field.name).includes(field.name) && !field.deleted
     }).map(field => {
