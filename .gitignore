@@ -17,6 +17,7 @@ node_modules
 
 # data
 data
+uploads
 
 #ssl
 dhparam

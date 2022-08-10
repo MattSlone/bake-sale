@@ -12,49 +12,50 @@ const { sequelize } = require('../models/index');
 
 module.exports = class ProductController {
     async create (req, res, next) {
-        try {
-            const varieties = req.body.product?.custom ? { quantity: 1 } : req.body.product.varieties
-            const product = await db.Product.create({
-                name: req.body.product.name,
-                category: req.body.product.category,
-                custom: req.body.product.custom,
-                processingTime: req.body.product.processingTime,
-                description: req.body.product.description,
-                automaticRenewal: req.body.product.automaticRenewal,
-                inventory: req.body.product.inventory,
-                weight: req.body.product.weight,
-                personalizationPrompt: req.body.product.personalizationPrompt,
-                Varieties: varieties,
-                Addons: req.body.product.addons,
-                ShopId: req.body.shopId,
-                Form: {
-                    name: req.body.product.formName,
-                    Fields: req.body.product.fields
-                },
-              }, {
-                include: [
-                    db.Variety,
-                    db.Addon,
-                    {
-                        association: db.Product.Form,
-                        include: [ 
-                            {
-                                association: db.Form.Field,
-                                include: [ 
-                                    db.Option,
-                                    db.Constraint
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            });
-            await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
-            return product
-        }
-        catch (err) {
-            console.log(err)
-        }
+      try {
+        const varieties = req.body.product?.custom ? { quantity: 1 } : req.body.product.varieties
+        const product = await db.Product.create({
+          name: req.body.product.name,
+          published: false,
+          category: req.body.product.category,
+          custom: req.body.product.custom,
+          processingTime: req.body.product.processingTime,
+          description: req.body.product.description,
+          automaticRenewal: req.body.product.automaticRenewal,
+          inventory: req.body.product.inventory,
+          weight: req.body.product.weight,
+          personalizationPrompt: req.body.product.personalizationPrompt,
+          Varieties: varieties,
+          Addons: req.body.product.addons,
+          ShopId: req.body.shopId,
+          Form: {
+              name: req.body.product.formName,
+              Fields: req.body.product.fields
+          },
+        }, {
+          include: [
+            db.Variety,
+            db.Addon,
+            {
+              association: db.Product.Form,
+              include: [ 
+                {
+                  association: db.Form.Field,
+                  include: [ 
+                    db.Option,
+                    db.Constraint
+                  ]
+                }
+              ]
+            }
+          ]
+        });
+        await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
+        return product
+      }
+      catch (err) {
+        console.log(err)
+      }
     }
 
     async getLocalShopIds(user) {
@@ -123,11 +124,24 @@ module.exports = class ProductController {
         const user = req.user ? await db.User.findByPk(req.user.id) : {}
         const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
         const where = {
-            ...(req.query.shop && {ShopId: req.query.shop}),
-            ...(req.query.products && {id: req.query.products}),
-            ...((user.id && !req.query.shop && req.query.delivers) && {ShopId: shopIds}),
-            ...(req.query.category && { category: req.query.category }),
-            ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
+          /*** for shop owner: ***/
+          // show their own products
+          ...(req.query.shop && { ShopId: req.query.shop }),
+          /*** for buyers: ***/
+          // only products that have inventory
+          ...(!req.query.shop && {
+            inventory: { [Op.gt]: 0 },
+            published: true
+          }),
+          // if delivery, only shops where user is in the delivery area
+          ...((user.id && !req.query.shop && req.query.delivers) && { ShopId: shopIds }),
+          // matches search string
+          ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
+          // specific category
+          ...(req.query.category && { category: req.query.category }),
+          /*** for both: ***/
+          // if specific product(s)
+          ...(req.query.products && { id: req.query.products })
         }
         let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
         let limit = 6
@@ -165,29 +179,74 @@ module.exports = class ProductController {
       }
       catch(err) {
         console.log('ERROR:', err)
-        return err
+        throw Error(err)
       }
     }
 
-    async count(req, res, next) {
-        try {
-            const user = req.user ? await db.User.findByPk(req.user.id) : {}
-            const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
-            const where = {
-                ...(req.query.shop && {ShopId: req.query.shop}),
-                ...(req.query.products && {id: req.query.products}),
-                ...((user.id && !req.query.shop) && {ShopId: shopIds}),
-                ...(req.query.category && { category: req.query.category }),
-                ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } })
-            }
-            const count = await db.Product.count({ where: where });
-            return count
-        }
-        catch(err) {
-            console.log('ERROR:', err)
-            return err
-        }
+  async count(req, res, next) {
+    try {
+      const user = req.user ? await db.User.findByPk(req.user.id) : {}
+      const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
+      const where = {
+        /*** for shop owner: ***/
+        // show their own products
+        ...(req.query.shop && { ShopId: req.query.shop }),
+        /*** for buyers: ***/
+        // only products that have inventory
+        ...(!req.query.shop && {
+          inventory: { [Op.gt]: 0 },
+          published: true
+        }),
+        // if delivery, only shops where user is in the delivery area
+        ...((user.id && !req.query.shop && req.query.delivers) && { ShopId: shopIds }),
+        // matches search string
+        ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
+        // specific category
+        ...(req.query.category && { category: req.query.category }),
+        /*** for both: ***/
+        // if specific product(s)
+        ...(req.query.products && { id: req.query.products })
+      }
+      const count = await db.Product.count({ where: where });
+      return count
     }
+    catch(err) {
+      console.log('ERROR:', err)
+      return err
+    }
+  }
+
+  async togglePublish(req, res) {
+    try {
+      const activeShopStatus = await db.ShopStatus.findOne({ where: { status: 'active' } })
+      const product = await db.Product.findOne({
+        where: { 
+          id: req.query.productId
+        },
+        include: {
+          model: db.Shop,
+          where: {
+            ShopStatusId: activeShopStatus.id
+          },
+          required: true,
+          include: {
+            model: db.User,
+            where: {
+              id: req.user.id
+            },
+            required: true
+          }
+        }
+      })
+      if (product) {
+        product.published = !product.published
+        await product.save()
+      }
+    } catch (err) {
+      console.log(err)
+      throw Error(err)
+    }
+  }
 
   async updateProductIngredients(userId, product, ingredients) {
       const updateUserIngredients = (await Promise.all(ingredients.map(async newIngredient => {

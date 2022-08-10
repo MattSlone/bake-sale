@@ -226,8 +226,8 @@ export const getProducts = (formData) => {
       const res = await axios.get('/api/products', {
         params: formData
       })
-      if (res.data.error[0]) {
-        dispatch(getProductsFailure(res.data.error[0]))
+      if (res.data.error) {
+        dispatch(getProductsFailure(res.data.error))
       } else {
         dispatch(getProductsSuccess(res.data))
       }

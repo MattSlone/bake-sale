@@ -45,7 +45,6 @@ module.exports = (app) => {
   })
 
   app.get('/api/product/error', async (req, res, next) => {
-    console.log(req.error)
     res.send({
       error: req.flash('error'),
       success: false
@@ -77,12 +76,25 @@ module.exports = (app) => {
     try {
         let response = await ProductController.list(req, res, next)
         res.send({
-            error: req.flash('error'),
-            success: response
+          success: response
         })
     }
     catch (err) {
-      next(err)
+      req.flash('error', 'There was an error getting products')
+      res.redirect('/api/product/error')
+    }
+  })
+
+  app.get('/api/product/publish/toggle',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
+    try {
+      await ProductController.togglePublish(req, res)
+      res.sendStatus(200)
+    } catch (err) {
+      console.log(err)
+      req.flash('error', 'There was an error toggling the publish state')
+      res.redirect('/api/product/error')
     }
   })
 

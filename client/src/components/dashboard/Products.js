@@ -9,6 +9,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
+import axios from 'axios'
 import { useHistory, Link as RouterLink, Redirect } from "react-router-dom";
 
 const PREFIX = 'Products';
@@ -97,6 +98,25 @@ export default function Products(props) {
     history.push('/dashboard/products/add-custom')
   }
 
+  const handleTogglePublish = async (productId) => {
+    try {
+      const res = await axios.get(`/api/product/publish/toggle`, {
+        params: {
+          productId: productId
+        }
+      })
+      if (res.data.error) {
+        console.log(res.data.error)
+        return
+      }
+      props.getProducts({
+        shop: props.shop.id
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   return (
     <StyledContainer spacing={2} className={classes.cardGrid} maxWidth="lg">
       {message ?
@@ -126,11 +146,13 @@ export default function Products(props) {
         {products ? products.map((product) => (
           <Grid item key={product.id} xs={12} sm={6} md={4}>
             <Card className={classes.card}>
-              <CardMedia
-                className={classes.cardMedia}
-                image={`/api/${product.ProductImages[0]?.path}`}
-                title="Image title"
-              />
+              <RouterLink to={`/products/${product.id}`}>
+                <CardMedia
+                  className={classes.cardMedia}
+                  image={`/api/${product.ProductImages[0]?.path}`}
+                  title="Image title"
+                />
+              </RouterLink>
               <CardContent className={classes.cardContent}>
                 <Typography gutterBottom variant="h5" component="h2">
                   {product.name}
@@ -141,16 +163,18 @@ export default function Products(props) {
                 </Typography>
               </CardContent>
               <CardActions>
-                <RouterLink to={`/products/${product.id}`}>
-                  <Button size="small" color="primary">
-                    View
-                  </Button>
-                </RouterLink>
-                <RouterLink to={`/dashboard/products/${product.id}/edit`}>
+                <RouterLink className={classes.routerLinkButton} to={`/dashboard/products/${product.id}/edit`}>
                   <Button size="small" color="primary">
                     Edit
                   </Button>
                 </RouterLink>
+                <Button
+                  size="small"
+                  color="primary"
+                  onClick={() => handleTogglePublish(product.id)}
+                >
+                  {product.published ? 'Unpublish' : 'Publish'}
+                </Button>
               </CardActions>
             </Card>
           </Grid>

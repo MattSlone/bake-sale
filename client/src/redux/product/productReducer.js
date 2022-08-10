@@ -27,6 +27,7 @@ import {
 const initialState = {
   id: 0,
   custom: false,
+  published: false,
   name: '',
   description: '',
   category: '',
@@ -149,7 +150,8 @@ const productReducer = (state = initialState, action) => {
         addons: action.payload.addons,
         fields: action.payload.fields,
         personalizationPrompt: action.payload.personalizationPrompt,
-        productImages: action.payload.productImages
+        productImages: action.payload.productImages,
+        weight: action.payload.weight
       }
     case EDIT_PRODUCT_REQUEST: return {
       ...state,
