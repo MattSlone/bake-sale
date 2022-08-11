@@ -41,24 +41,22 @@ const StyledContainer = styled(Container)((
     paddingBottom: theme.spacing(8),
   },
 
-  [`&.${classes.card}`]: {
+  [`& .${classes.card}`]: {
     height: '100%',
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
 
   [`& .${classes.cardMedia}`]: {
     paddingTop: '56.25%', // 16:9
   },
 
-  [`& .${classes.cardMediaAdd}`]: {
-    paddingTop: '56.25%', // 16:9
-    height: '100%',
-    cursor: 'pointer'
-  },
-
   [`& .${classes.cardContent}`]: {
     flexGrow: 1,
+    padding: theme.spacing(1),
+    "&:last-child": {
+      paddingBottom: 0
+    }
   },
 
   [`& .${classes.routerLinkButton}`]: {
@@ -105,7 +103,7 @@ const StyledContainer = styled(Container)((
     color: 'white',
     margin: '1em',
     backgroundColor: 'rgba(0, 0, 0, 0.54)'
-  }
+  },
 }));
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -130,36 +128,29 @@ export default function Shop(props) {
       <Header title={shop.name} />
       <Paper className={classes.infoBox}>
         <Typography variant="body1">
-          {shop.description} Testing shop description
+          {shop.description}
         </Typography>
       </Paper>
       <Container disableGutters spacing={2} className={classes.cardGrid} maxWidth="lg">
         <Grid container spacing={4}>
-          {products.map((product) => (
-            <Grid item key={product.id} xs={12} sm={6} md={4}>
-              <Card className={classes.card}>
-                <CardMedia
-                  className={classes.cardMedia}
-                  image="https://source.unsplash.com/featured/?baked,goods"
-                  title="Image title"
-                />
-                <CardContent className={classes.cardContent}>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {product.name}
-                  </Typography>
-                  <Typography>
-                    {product.description}
-                    {product.price}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <RouterLink to={product.custom ? `/products/custom/${product.id}` : `/products/${product.id}`}>
-                    <Button size="small" color="primary">
-                      View
-                    </Button>
-                  </RouterLink>
-                </CardActions>
-              </Card>
+          {products.map((card) => (
+            <Grid item key={card.id} xs={12} sm={6} md={4}>
+              <RouterLink className={classes.routerLinkButton} to={`/products/${card.id}`}>
+                <Card className={classes.card}>
+                  <CardMedia
+                    className={classes.cardMedia}
+                    image={`/api${card.ProductImages[0]?.path}`}
+                  />
+                  <CardContent noGutter className={classes.cardContent}>
+                    <Typography noWrap gutterBottom variant="h5" component="h5">
+                      {card.name}
+                    </Typography>
+                    <Typography noWrap gutterBottom variant="p" component="p">
+                      {card.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </RouterLink>
             </Grid>
           ))}
         </Grid>
@@ -173,8 +164,6 @@ export default function Shop(props) {
 function Header({title})
 {
   const [headerHovered, setHeaderHovered] = useState(false)
-
-
   const fabDisplay = headerHovered ? {
     visibility: 'visible',
     opacity: 1
@@ -185,18 +174,17 @@ function Header({title})
         onMouseLeave={() => setHeaderHovered(false)}
       >
         <div className={classes.headerOverlayTop}>
-          <Fab style={fabDisplay} className={classes.shopOptionsIcon} aria-label="settings">
+          {/*<Fab style={fabDisplay} className={classes.shopOptionsIcon} aria-label="settings">
             <MoreVertIcon />
-          </Fab>
+          </Fab>*/}
         </div>
         <CardMedia
           className={classes.headerImage}
           image="https://source.unsplash.com/featured/?baked,goods"
-          title="Image title"
+          title={title}
         />
         <div className={classes.headerOverlay}>
           <Typography variant="h5">{title}</Typography>
-          <Typography variant="body2">Pies &amp; Cakes</Typography>
         </div>
       </Card>
     )

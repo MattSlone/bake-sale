@@ -193,10 +193,10 @@ export default function CustomProduct(props)
       <Grid container spacing={3} className={classes.top}>
         <Grid item xs={12} md={8}> 
           <Carousel
-          indicators={false}
+            indicators={false}
           >
             {
-              product.ProductImages.map( (item, i) => <Item product={product} key={i} item={item} /> )
+              product.ProductImages?.map( (item, i) => <Item product={product} key={i} item={item} /> )
             }
           </Carousel>
         </Grid>
@@ -285,14 +285,13 @@ export default function CustomProduct(props)
 
 function Item(props)
 {
-
     return (
       <Card className={classes.card}>
         <CardMedia
           className={classes.cardMedia}
-          image={`/api${props.product.ProductImages[0]?.path}`}
-          title="Image title"
+          image={`/api${props.item.path}`}
+          title={props.product.name}
         />
       </Card>
-    );
+    )
 }

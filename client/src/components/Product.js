@@ -413,13 +413,12 @@ export default function Product(props)
 
 function Item(props)
 {
-
     return (
       <Card className={classes.card}>
         <CardMedia
           className={classes.cardMedia}
           image={`/api${props.item.path}`}
-          title="Image title"
+          title={props.product.name}
         />
       </Card>
     )

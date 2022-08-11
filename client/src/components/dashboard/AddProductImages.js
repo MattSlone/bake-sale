@@ -186,7 +186,7 @@ export default function AddProductImages(props) {
                       <CardMedia
                         className={classes.cardMedia}
                         image={imageFiles.files[card-1]?.imagePreviewUrl ? imageFiles.files[card-1].imagePreviewUrl : "/assets/images/add-image.png"}
-                        title="Image title"
+                        title="preview"
                       />
                     <Input type='file' style={{display: 'none'}} inputRef={el => hiddenFileInput.current[card] = el} onChange={(e) => handleChange(e, card)}/>
                   </CardActionArea>

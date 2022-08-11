@@ -130,7 +130,7 @@ export default function Products(props) {
             <CardMedia
               className={classes.cardMediaAdd}
               image="/assets/images/add-icon.png"
-              title="Image title"
+              title="Add product"
             />
           </Card>
         </Grid>
@@ -139,7 +139,7 @@ export default function Products(props) {
             <CardMedia
               className={classes.cardMediaAdd}
               image="/assets/images/add-custom.png"
-              title="Image title"
+              title="Add custom product"
             />
           </Card>
         </Grid>
@@ -149,8 +149,8 @@ export default function Products(props) {
               <RouterLink to={`/products/${product.id}`}>
                 <CardMedia
                   className={classes.cardMedia}
-                  image={`/api/${product.ProductImages[0]?.path}`}
-                  title="Image title"
+                  image={`/api${product.ProductImages[0]?.path}`}
+                  title={product.name}
                 />
               </RouterLink>
               <CardContent className={classes.cardContent}>

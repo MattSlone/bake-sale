@@ -187,7 +187,7 @@ export default function Order({ order }) {
         height="194"
         component="img"
         image="https://source.unsplash.com/featured/?baked,goods"
-        title="Image title"
+        title={order.Product.name}
       />
       <CardContent className={classes.cardContent}>
         <Accordion className={classes.accordion}>
