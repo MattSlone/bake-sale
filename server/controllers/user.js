@@ -205,7 +205,7 @@ module.exports = class UserController {
           return
         }
       }
-      if (!validator.isEmail(req.body.username)) {
+      if (!validator.isEmail(req.body.username.replace(/\s/g, ""))) {
         req.flash('error', "Invalid email address.")
         res.redirect('/api/signin')
         return
@@ -251,7 +251,7 @@ module.exports = class UserController {
           return
         }
       }
-      if (!validator.isEmail(req.body.username)) {
+      if (!validator.isEmail(req.body.username.replace(/\s/g, ""))) {
         req.flash('error', 'Invalid email address')
         res.redirect('/api/user/error')
         return
@@ -336,7 +336,7 @@ module.exports = class UserController {
           return
         }
       }
-      if (!validator.isEmail(req.body.username)) {
+      if (!validator.isEmail(req.body.username.replace(/\s/g, ""))) {
         req.flash('error', 'Invalid email address')
         res.redirect('/api/user/edit')
         return
@@ -371,7 +371,7 @@ module.exports = class UserController {
           return
         }
       }
-      if (!validator.isEmail(req.body.email)) {
+      if (!validator.isEmail(req.body.email.replace(/\s/g, ""))) {
         req.flash('error', "Invalid email address.")
         res.redirect('/api/forgotpassword')
         return

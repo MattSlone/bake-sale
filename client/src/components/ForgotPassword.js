@@ -71,7 +71,7 @@ export default function ForgotPassword() {
         return false
       }
     }
-    if (!isEmail(email)) {
+    if (!isEmail(email.replace(/\s/g, ""))) {
       setMessage('Invalid Email Address.')
       return false
     }

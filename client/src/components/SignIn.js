@@ -105,7 +105,7 @@ export default function SignIn({ userSignIn, userData }) {
         return
       }
     }
-    if (!isEmail(username)) {
+    if (!isEmail(username.replace(/\s/g, ""))) {
       setMessage("Invalid email address.")
       return
     }

@@ -180,7 +180,7 @@ export default function SignUp(props) {
         return rtn
       }
     }
-    if (!isEmail(username)) {
+    if (!isEmail(username.replace(/\s/g, ""))) {
       rtn.error = 'Invalid email address'
       return rtn
     }

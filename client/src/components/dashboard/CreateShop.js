@@ -120,8 +120,8 @@ export default function CreateShop(props) {
         return false
       }
     }
-    if (!isByteLength(shopName, { max: 15 })) {
-      setMessage("Shop names may have a max of 15 characters.")
+    if (!isByteLength(shopName, { max: 30 })) {
+      setMessage("Shop names may have a max of 30 characters.")
       return false
     }
     props.setShop({

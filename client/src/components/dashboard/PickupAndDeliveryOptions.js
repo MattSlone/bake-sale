@@ -211,7 +211,10 @@ export default function PickupAndDeliveryOptions(props) {
       rtn.error = `Invalid phone number`
       return rtn
     }
-    if ((contactType == 'both' || contactType == 'email') && !isEmail(email)) {
+    if (
+      (contactType == 'both' || contactType == 'email')
+      && !isEmail(email.replace(/\s/g, ""))
+    ) {
       rtn.error = `Invalid Email.`
       return rtn
     }
@@ -714,7 +717,7 @@ export default function PickupAndDeliveryOptions(props) {
                           <Grid item>
                             <Typography>
                               You can choose the delivery radius using the input under the map to the right.
-                              You can zoom in on the map to see where the radius ends. The map sves automatically
+                              You can zoom in on the map to see where the radius ends. The map saves automatically
                               so once you're done you can go to the next step.
                             </Typography>
                           </Grid>

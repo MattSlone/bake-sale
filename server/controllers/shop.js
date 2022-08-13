@@ -17,7 +17,10 @@ module.exports = class ShopController {
           UserId: req.user.id,
           PickupAddress: req.body.pickupAddress,
           PickupSchedules: req.body.pickupSchedule,
-          ShopContact: req.body.contact,
+          ShopContact: {
+            ...req.body.contact,
+            email: req.body.contact.email.replace(/\s/g, "")
+          },
           ShopStatusId: inactiveStatus.id
       }, {
         include: [
@@ -82,6 +85,11 @@ module.exports = class ShopController {
           return
         }
       }
+      if (!validator.isByteLength(req.body.name, { max: 30 })) {
+        req.flash('error', 'Shop names may have a max of 30 characters.')
+        res.redirect('/api/shop/create')
+        return
+      }
       if (req.body.allowPickups) {
         if (req.body.contact.type == 'none') {
           req.flash('error', 'A contact method must be provided if you allow pickups.')
@@ -106,7 +114,7 @@ module.exports = class ShopController {
       }
       
       if ((req.body.contact.type == 'both' || req.body.contact.type == 'email')
-        && !validator.isEmail(req.body.contact.email)
+        && !validator.isEmail(req.body.contact.email.replace(/\s/g, ""))
       ) {
         req.flash('error', 'Invalid Email.')
         res.redirect('/api/shop/create')
@@ -191,7 +199,10 @@ module.exports = class ShopController {
           where: { ShopId: null }
       })
 
-      let shopContacts = await this.upsertAssociation(shop, db.ShopContact, [req.body.contact])
+      let shopContacts = await this.upsertAssociation(shop, db.ShopContact, [{
+        ...req.body.contact,
+        email: req.body.contact.email.replace(/\s/g, "")
+      }])
       await shop.setShopContact(shopContacts.map(contact => contact.id))
       await db.ShopContact.destroy({
           where: { ShopId: null }

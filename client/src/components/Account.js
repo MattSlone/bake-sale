@@ -109,7 +109,7 @@ export default function Account(props) {
         return
       }
     }
-    if (!isEmail(username)) {
+    if (!isEmail(username.replace(/\s/g, ""))) {
       setMessage('Invalid email address')
       return
     }
