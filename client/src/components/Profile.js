@@ -112,7 +112,6 @@ export default function Profile(props) {
     if (auth.userData.loading) {
       setMessage('validating address...')
     } else {
-      setMessage('')
       if (auth.userData.validAddress === true) {
         setStreet(auth.userData.street)
         setStreet2(auth.userData.street2)

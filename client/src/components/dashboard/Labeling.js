@@ -81,7 +81,7 @@ export default function Labeling(props) {
       </Grid>
       <Grid item xs={12}>
         <PDFViewer className={classes.pdf}>
-          <LabelFL />
+          <LabelFL product={props.product} shop={props.shop} user={props.user}/>
         </PDFViewer>
       </Grid>
     </StyledGrid>
