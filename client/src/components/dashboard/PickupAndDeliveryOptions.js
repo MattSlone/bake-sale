@@ -779,7 +779,7 @@ export default function PickupAndDeliveryOptions(props) {
                     onClick={handleNext}
                     className={classes.button}
                   >
-                    {activeStep === Object.keys(steps).length - 1 && edit ? 'Save' : 'Next'}
+                    {activeStep !== Object.keys(steps).length - 1 ? (edit ? 'Save' : 'Next') : 'Finish'}
                   </Button>
                 </div>
               </div>

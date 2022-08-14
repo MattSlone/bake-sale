@@ -237,7 +237,7 @@ export default function AddCustomProduct (props) {
                           onClick={handleNext}
                           className={classes.button}
                         >
-                          {edit ? 'Save' : 'Finish'}
+                          Finish
                         </Button>
                       )
                     } else {
@@ -247,7 +247,7 @@ export default function AddCustomProduct (props) {
                         onClick={handleNext}
                         className={classes.button}
                       >
-                        Next
+                        {edit ? 'Save' : 'Next'}
                       </Button>
                     }
                   })()}

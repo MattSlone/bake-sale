@@ -312,7 +312,7 @@ export default function CreateShop(props) {
                       ) && (
                         <Link to={match.path + (activeStep === 1 && validPickupAndDelivery ? '/stripe' : '')}>
                           <Button variant="contained" color="primary" onClick={handleNext}>
-                            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                            {activeStep === steps.length - 1 ? 'Finish' : (edit ? 'Save' : 'Next')}
                           </Button>
                         </Link>
                       )}
