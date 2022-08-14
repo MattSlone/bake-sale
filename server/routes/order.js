@@ -1,40 +1,37 @@
 'use strict';
 
+const UserController = require('../controllers/user');
+
 const MakeOrderController = require('../controllers/order'),
   OrderController = new MakeOrderController()
 
 module.exports = (app, webhookApp) => {
-  app.get('/api/orders', async (req, res, next) => {
+  app.get('/api/orders',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
     try {
-      console.log('inside routeeee!')
-      if (req.user) {
-        console.log('user is logged in!!!')
-        let response = await OrderController.list(req, res, next)
-        res.send({
-          error: req.flash('error'),
-          success: response
-        })
-      } else {
-        res.send({
-          error: req.flash('Not Logged In'),
-          success: false
-        })
-      }
+      let response = await OrderController.list(req, res, next)
+      res.send({
+        success: response
+      })
     }
     catch (err) {
-      next(err)
+      console.log(err)
+      req.flash('error', 'There was an erro getting orders')
+      res.redirect('/api/order/error')
     }
   })
 
   app.post('/api/order/intent',
+  UserController.isLoggedIn,
   MakeOrderController.validateCart,
   async (req, res, next) => {
     try {
-        let response = await OrderController.createPaymentIntent(req, res, next)
-        res.send({
-            error: false,
-            success: response
-        })
+      let response = await OrderController.createPaymentIntent(req, res, next)
+      res.send({
+          error: false,
+          success: response
+      })
     }
     catch (err) {
       req.flash('error', err)

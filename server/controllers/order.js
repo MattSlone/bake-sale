@@ -16,34 +16,34 @@ const db = require('../models/index'),
   ProductController = require('./product')
 require('datejs')
 
+const STRIPE_FEE_MULTIPLE = 0.029
+const STRIPED_FIXED_FEE = 0.3
+const OUR_FEE_MULTIPLE = 0.05
+
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
     try {
-      console.log('we got this FAR')
       const shopAmounts = await this.mapCartToShopAmounts(req, req.body.items)
-      console.log('not inside mapCartToShopAmounts')
       const totalAmount = shopAmounts.map(shopAmount => shopAmount.amount)
         .reduce((prev, curr) => prev + curr)
       
       const paymentIntent = await StripeAPI.createPaymentIntent(totalAmount*100)
 
       for (const shop of shopAmounts) {
-        const stripeFee = shop.amount*0.029 + 0.3
-        const ourFee =shop.amount*0.05
-
+        const stripeFee = this.calculateStripeFee(shop.amount)
+        const ourFee = this.calculateOurFee(shop.amount)
+        const payout = Number.parseFloat(shop.amount - stripeFee - ourFee).toFixed(2)
         const transfer = await db.Transfer.create({
-          amount: Number.parseFloat(shop.amount - stripeFee - ourFee).toFixed(2),
+          orderTotal: shop.amount,
+          ourFee: ourFee,
+          stripeFee: stripeFee,
+          payout: payout,
           stripeTransferId: 0,
           stripePaymentIntentId: paymentIntent.id,
           ShopId: shop.id
         })
 
         for (const item of shop.items) {
-          // addon: {"addon name": true if added / false if not}
-          const addonIds = Object.entries(item.addons).map(addon => addon[1] ? addon[0] : null)
-            .filter(addon => addon !== null)
-          
-          console.log('PRODUCT: ', item.product)
           const variation = await db.Variety.findOne({
             where: {
               ProductId: item.product.id,
@@ -51,19 +51,33 @@ module.exports = class OrderController {
             }
           })
           const pendingStatus = await db.OrderStatus.findOne({ where: { status: 'pending' } })
-          console.log(item)
+          const productPrice = await (new ProductController).calculateProductPrice(req, item, variation)
+          const fulfillmentPrice = await (new ProductController).calculateFulfillmentPrice(req, item, variation)
+          const secondaryFulfillmentPrice = await (new ProductController).calculateSecondaryFulfillmentPrice(req, item, variation)
+          const orderTotal = (
+            (productPrice * item.quantity)
+            + fulfillmentPrice
+            + secondaryFulfillmentPrice*(item.quantity-1)
+          )
           const order = await db.Order.create({
-            amount: await this.calculateProductPrice(req, item),
+            productPrice: productPrice,
+            fulfillmentPrice: fulfillmentPrice,
+            secondaryFulfillmentPrice: secondaryFulfillmentPrice,
             quantity: item.quantity,
+            total: orderTotal,
             processingTime: item.product.processingTime,
+            fulfillment: item.fulfillment,
+            personalization: item.personalization,
             TransferId: transfer.id,
             ProductId: item.product.id,
             VarietyId: variation.id,
-            fulfillment: item.fulfillment,
-            personalization: item.personalization,
             OrderStatusId: pendingStatus.id,
             UserId: req.user.id
           })
+          // addon: {"addon name": true if added / false if not}
+          const addonIds = Object.entries(item.addons)
+            .map(addon => addon[1] ? addon[0] : null)
+            .filter(addon => addon !== null)
           await order.setAddons(addonIds)
         }
       }
@@ -75,14 +89,33 @@ module.exports = class OrderController {
     }
   }
 
+  calculateOurFee(amount) {
+    return amount * OUR_FEE_MULTIPLE
+  }
+
+  calculateStripeFee(amount) {
+    return amount * STRIPE_FEE_MULTIPLE + STRIPED_FIXED_FEE
+  }
+
+  async calculateOrderTotal(req, item, variation) {
+    const productPrice = await (new ProductController).calculateProductPrice(req, item, variation)
+    const fulfillmentPrice = await (new ProductController).calculateFulfillmentPrice(req, item, variation)
+    const secondaryFulfillmentPrice = await (new ProductController).calculateSecondaryFulfillmentPrice(req, item, variation)
+    const orderTotal = (
+      (productPrice * item.quantity)
+      + fulfillmentPrice
+      + secondaryFulfillmentPrice*(item.quantity-1)
+    )
+    return orderTotal
+  }
+
   async mapCartToShopAmounts(req, items) {
     try {
-      console.log('inside mapCartToShopAmounts')
       const shops = items.map(item => item.product.ShopId)
         .filter((shop, index, shops) => shops.indexOf(shop) === index) // unique shops
 
-      const shopItems = await Promise.all(shops.map(async id => {
-        let itemsTest = await Promise.all(items.map(async item => {
+      const shopsItems = await Promise.all(shops.map(async id => {
+        let shopItems = await Promise.all(items.map(async item => {
           return {
             ...item,
             product: (await db.Product.findByPk(item.product.id))
@@ -90,18 +123,25 @@ module.exports = class OrderController {
         }))
         return {
           id: id,
-          items: itemsTest.filter(item => item.product.ShopId === id)
+          items: shopItems.filter(item => item.product.ShopId === id)
         }
       }))
 
-      const shopAmounts = Promise.all(shopItems.map(async shop => {
+      const shopAmounts = Promise.all(shopsItems.map(async shop => {
         try {
           const shopInstance = await db.Shop.findByPk(shop.id, { attributes: ['stripeAccountId'], raw: true })
           const amounts = await Promise.all(shop.items.map(async item => {
-            const productPrice = await this.calculateProductPrice(req, item)
-            return productPrice * item.quantity
+            let selectedVariation = await db.Variety.findOne({
+              where: {
+                ProductId: item.product.id,
+                quantity: item.variation
+              }
+            })
+            const shopItemOrderTotal = await this.calculateOrderTotal(req, item, selectedVariation)
+            console.log('shopItemOrderTotal: ', shopItemOrderTotal)
+            return shopItemOrderTotal
           }))
-          const amount = amounts.reduce((prev, curr) => prev + curr)
+          const amount = amounts.reduce((prev, curr) => prev + curr, 0)
           return {
             id: shop.id,
             items: shop.items,
@@ -118,73 +158,7 @@ module.exports = class OrderController {
     }
   }
 
-  async calculateProductPrice(req, item) {
-    try {
-      console.log('clientSidePrice: ', item)
-      let total = 0
-      let selectedVariation = await db.Variety.findOne({
-        where: {
-          ProductId: item.product.id,
-          quantity: item.variation
-        }
-      })
-      if (item.product.custom) {
-        const quote = await db.Quote.findOne({ where: { UserId: req.user.id, ProductId: item.product.id } })
-        total = Number(quote.price)
-      } else {
-        total = Number(selectedVariation.price)
-      }
-
-      let addonsTotal = 0.0
-      const addons = Object.entries(item.addons).map(addon => {
-        return {
-          id: addon[0],
-          checked: addon[1]
-        }
-      })
-      for (const addon of addons) {
-        if(addon.checked) {
-          let addonInstance = await db.Addon.findByPk(addon.id,
-            { attributes: ['price', 'secondaryPrice', 'ProductId'] }
-          )
-          if (addonInstance.ProductId != item.product.id) {
-            throw Error('ERROR: addon doesn\'t exist for this product. Handle accordingly')
-          }
-          addonsTotal += Number(addonInstance.price)
-          addonsTotal += Number(addonInstance.secondaryPrice) * Number(item.variation-1)
-        }
-      }
-
-      total += addonsTotal
-
-      let fulfillmentPrice = 0.0
-      if (item.fulfillment == 'delivery') {
-        if (selectedVariation.deliveryFeeType == 'mile') {
-          const shop = await db.Shop.findByPk(item.product.ShopId, {
-            include: {
-              model: db.PickupAddress,
-              attributes: ['lat', 'lng']
-            }
-          })
-          const distance = GMaps.haversine_distance(
-            { lat: req.user.lat, lng: req.user.lng },
-            { lat: shop.PickupAddress.lat, lng: shop.PickupAddress.lng }
-          )
-          fulfillmentPrice = Number(selectedVariation.delivery) * (distance * 0.000621371)
-        } else {
-          fulfillmentPrice = Number(selectedVariation.delivery)
-        }
-      } else if(item.fulfillment == 'shipping') {
-        fulfillmentPrice = Number(selectedVariation.shipping)
-      }
-      total += fulfillmentPrice
-      console.log(total)
-      console.log('serverSidePrice: ', Number(total).toFixed(2))
-      return Number(total).toFixed(2)
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  
 
   async handleStripePaymentIntentSucceeded(data) {
     const transfers = await db.Transfer.findAll({
@@ -198,7 +172,7 @@ module.exports = class OrderController {
     transfers.forEach(async transfer => {
       try {
         const transferId = await StripeAPI.createTransfer(
-          transfer.amount*100, // Needs to be in cents
+          transfer.payout*100, // Needs to be in cents
           transfer.Shop.stripeAccountId,
           data.charges.data[0].id
         )
@@ -268,6 +242,11 @@ module.exports = class OrderController {
                       db.PickupSchedule,
                       db.ShopContact
                     ]
+                  },
+                  {
+                    model: db.ProductImage,
+                    attributes: ['path'],
+                    limit: 1
                   }
                 ],
                 where: {
@@ -284,13 +263,14 @@ module.exports = class OrderController {
                   'street2',
                   'city',
                   'state',
-                  'zipcode'
+                  'zipcode',
+                  'username'
                 ]
               },
               ...(shop ? [
                 {
                   model: db.Transfer,
-                  attributes: ['amount']
+                  attributes: ['payout', 'ourFee', 'stripeFee']
                 }
               ] : [])
             ]
@@ -316,7 +296,6 @@ module.exports = class OrderController {
       }, {
           include: hasMany ? [db.Order] : []
       });
-
       return instance
     }))
 
@@ -327,7 +306,10 @@ module.exports = class OrderController {
     try {
       const pending = await db.OrderStatus.findOne({ where: { status: 'pending' } })
       const staleOrders = await db.Order.findAll({
-        where: { OrderStatusId: pending.id, UserId: userId },
+        where: {
+          OrderStatusId: pending.id,
+          UserId: userId
+        },
         include: db.Transfer
       })
       for (let order of staleOrders) {

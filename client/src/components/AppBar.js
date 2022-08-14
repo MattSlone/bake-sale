@@ -27,6 +27,7 @@ import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 
 const PREFIX = 'AppBar';
 
@@ -48,7 +49,8 @@ const classes = {
   routerLinkButton: `${PREFIX}-routerLinkButton`,
   white: `${PREFIX}-white`,
   popoverRoot: `${PREFIX}-popoverRoot`,
-  logo: `${PREFIX}-logo`
+  logo: `${PREFIX}-logo`,
+  tooltip: `${PREFIX}-tooltip`
 };
 
 const Root = styled('div')((
@@ -67,6 +69,10 @@ const Root = styled('div')((
 
   [`& .${classes.paper}`]: {
     padding: theme.spacing(1),
+  },
+
+  [`& .${classes.tooltip}`]: {
+    fontSize: theme.typography.pxToRem(48),
   },
 
   [`& .${classes.paddingLeft}`]: {
@@ -439,14 +445,22 @@ export default function PrimarySearchAppBar(props) {
                   >
                     {product.product?.name}
                   </ListItemText>}
-                  <ListItemText 
-                  secondary={product.quantity > 1 
-                    ? `$${Number.parseFloat(product.clientSidePrice).toFixed(2)} ea` 
-                    : ""}
-                  sx={{paddingLeft: 1}}
+                  <Tooltip 
+                    title={<Typography>Quantity discounts applied</Typography>}
+                    placement='top' 
                   >
-                    ${Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}
-                  </ListItemText>
+                    <ListItemText
+                    secondary={product.quantity > 1 
+                      ? `$${Number.parseFloat(product.productPrice + product.fulfillmentPrice).toFixed(2)} ea*` 
+                      : ""}
+                    sx={{paddingLeft: 1}}
+                    >
+                      ${Number.parseFloat(
+                        (product.productPrice * product.quantity) + product.fulfillmentPrice
+                        + (product.secondaryFulfillmentPrice * (product.quantity-1))
+                      ).toFixed(2)}
+                    </ListItemText>
+                  </Tooltip>
                   <ListItemSecondaryAction>
                     <IconButton
                       edge="end"

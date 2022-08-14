@@ -14,7 +14,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Transfer.init({
-    amount: DataTypes.FLOAT,
+    orderTotal: DataTypes.FLOAT,
+    ourFee: DataTypes.FLOAT,
+    stripeFee: DataTypes.FLOAT,
+    payout: DataTypes.FLOAT,
     stripePaymentIntentId: DataTypes.STRING,
     stripeTransferId: DataTypes.STRING
   }, {

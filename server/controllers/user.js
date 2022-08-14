@@ -42,7 +42,10 @@ module.exports = class UserController {
       if (!req.query?.UserId) {
         return req.user
       }
-      let user = await db.User.findOne({ where: { id: req.query.UserId } })
+      let user = await db.User.findOne({
+        where: { id: req.query.UserId },
+        exclude: ['password', 'createdAt', 'updatedAt']
+      })
       return user
     } catch (err) {
       req.flash('error', err)

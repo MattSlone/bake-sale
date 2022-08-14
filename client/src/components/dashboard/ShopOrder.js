@@ -84,23 +84,54 @@ export default function ShopOrder(props)
       <List className={classes.list}>
           <ListItem className={classes.listItem}>
             <ListItemText
+              className={classes.listItemText}
               primary={`${order.User.firstName} ${order.User.lastName}`}
               secondary="Customer Name"
+            />
+            <ListItemText
+              className={classes.listItemText}
+              primary={`${order.User.username}`}
+              secondary="Customer Email"
             />
           </ListItem>
           <Divider />
           <ListItem className={classes.listItem}>
             <ListItemText
               className={classes.listItemText}
-              primary={`$${Number(order.amount).toFixed(2)}`}
+              primary={`$${Number(order.total).toFixed(2)}`}
               secondary="Order Amount"
             />
             <ListItemText
               className={classes.listItemText}
-              primary={`$${Number(order.Transfer.amount).toFixed(2)}`}
+              primary={`$${Number(order.Transfer.payout).toFixed(2)}`}
               secondary="Payout Amount"
             />
           </ListItem>
+          <ListItem className={classes.listItem}>
+            <ListItemText
+              className={classes.listItemText}
+              primary={`$${Number(order.productPrice * order.quantity).toFixed(2)}`}
+              secondary="Item Price"
+            />
+            <ListItemText
+              className={classes.listItemText}
+              primary={`$${Number(order.fulfillmentPrice + order.secondaryFulfillmentPrice*(order.quantity-1)).toFixed(2)}`}
+              secondary="Fulfillment Price"
+            />
+          </ListItem>
+          <ListItem className={classes.listItem}>
+            <ListItemText
+              className={classes.listItemText}
+              primary={`$${Number(order.Transfer.ourFee).toFixed(2)}`}
+              secondary="Bake.Sale Fee"
+            />
+            <ListItemText
+              className={classes.listItemText}
+              primary={`$${Number(order.Transfer.stripeFee).toFixed(2)}`}
+              secondary="Stripe Fee"
+            />
+          </ListItem>
+          
           <Divider />
           <ListItem className={classes.listItem}>
             <ListItemText
@@ -141,6 +172,12 @@ export default function ShopOrder(props)
           <Divider />
           {!order.Product.custom &&
           <>
+            <ListItem className={classes.listItem}>
+              <ListItemText
+                primary={`${order.quantity} package${order.quantity > 1 ? "'s" : ''} of ${order.Variety.quantity}`}
+                secondary="Quantity"
+              />
+            </ListItem>
             <ListItem className={classes.listItem}>
               <ListItemText
                 primary={order.Addons.length > 0 ? order.Addons.map((addon, index) => (

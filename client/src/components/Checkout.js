@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider'
 import { useLocation } from 'react-router-dom';
 const stripePromise = loadStripe("pk_test_51KMDSaL7rHJy0SQFdZI0Q9HFv1wbLuCHm6AuVequIPtqFCa738z7EjGXncDblPZowGe8ALzhjbwh9W25NtejoyxW00YxzwtmYo");
 import './Checkout.css'
@@ -82,15 +83,20 @@ export default function  Checkout(props) {
             <ListItem key={product.product.name} sx={{ py: 1, px: 0 }}>
               <ListItemText>x{product.quantity}</ListItemText>
               <ListItemText primary={product.product.name} secondary={product.quote ? '' : `package of ${product.variation}`} />
-              <Typography variant="body2">{Number.parseFloat(product.clientSidePrice * product.quantity).toFixed(2)}</Typography>
+              <Typography variant="body2">{Number.parseFloat(
+                (product.productPrice * product.quantity) + product.fulfillmentPrice
+                + (product.secondaryFulfillmentPrice * (product.quantity-1))
+              ).toFixed(2)}</Typography>
             </ListItem>
           ))}
 
           <ListItem sx={{ py: 1, px: 0 }}>
             <ListItemText primary="Total" />
             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-              ${Number.parseFloat(props.cart.products.map(product => product.clientSidePrice * product.quantity)
-                .reduce((prev, curr) => prev + curr, 0)).toFixed(2)}
+              ${Number.parseFloat(props.cart.products.map(product => 
+                (product.productPrice * product.quantity) + product.fulfillmentPrice
+                + (product.secondaryFulfillmentPrice * (product.quantity-1))
+              ).reduce((prev, curr) => prev + curr, 0)).toFixed(2)}
             </Typography>
           </ListItem>
         </List>

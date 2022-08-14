@@ -52,9 +52,9 @@ export default function PricingAndInventory(props) {
   const [quantity, setQuantity] = useState('')
   const [deliveryFeeType, setDeliveryFeeType] = useState('')
   const [shipping, setShipping] = useState(0)
-  const [secondaryShipping, setSecondaryShipping] = useState(0)
+  const [secondaryShipping, setSecondaryShipping] = useState(null)
   const [delivery, setDelivery] = useState(0)
-  const [secondaryDelivery, setSecondaryDelivery] = useState(0)
+  const [secondaryDelivery, setSecondaryDelivery] = useState(null)
   const [message, setMessage] = useState('')
 
   const validateVariety = () => {
@@ -130,6 +130,19 @@ export default function PricingAndInventory(props) {
     setVarieties(newVarieties)
   }
 
+  const handleSetShipping = (e) => {
+    setShipping(Number(e.target.value))
+    if (secondaryShipping === null) {
+      setSecondaryShipping(Number(e.target.value))
+    }
+  }
+
+  const handleSetDelivery = (e) => {
+    setDelivery(Number(e.target.value))
+    if (secondaryDelivery === null) {
+      setSecondaryDelivery(Number(e.target.value))
+    }
+  }
 
   return props.custom ? <PricingAndInventoryCustom varieties={varieties} setInventory={setInventory} setVarieties={setVarieties}/> : (
     <StyledGrid container spacing={2} direction="column">
@@ -226,14 +239,14 @@ export default function PricingAndInventory(props) {
           <Grid item xs={12} sm={6} md={3} lg={2}>
             <Tooltip 
               title={<Typography>If you offer shipping, you can add the cost for the package here. Otherwise you can leave it blank.</Typography>}
-              position='top'
+              placement='top'
             >
               <TextField
                 className={classes.fullWidth}
                 id="shipping"
                 label="Shipping Cost"
                 placeholder="$0.00"
-                onChange={(e) => {setShipping(Number(e.target.value))}}
+                onChange={handleSetShipping}
                 type="number"
                 InputLabelProps={{
                   shrink: true
@@ -294,7 +307,7 @@ export default function PricingAndInventory(props) {
                 label="Delivery Cost"
                 disabled={!deliveryFeeType ? true : false}
                 placeholder="$0.00"
-                onChange={(e) => {setDelivery(Number(e.target.value))}}
+                onChange={handleSetDelivery}
                 type="number"
                 InputLabelProps={{
                   shrink: true,

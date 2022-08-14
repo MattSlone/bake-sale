@@ -100,6 +100,7 @@ export default function CustomProduct(props)
   const [message, setMessage] = useState('')
   const [fulfillment, setFulfillment] = useState('')
   const [deliveryCost, setDeliveryCost] = useState(0)
+  const [miles, setMiles] = useState(0)
 
   const validate = () => {
     let rtn = { error: '', success: false }
@@ -178,10 +179,12 @@ export default function CustomProduct(props)
           quantity: 1
         }
       })
-      if(res.data.error[0]) {
-        console.log(res.data.error[0])
+      if(res.data.error) {
+        console.log(res.data.error)
       } else {
-        setDeliveryCost(res.data.success)
+        console.log(res.data.success.miles)
+        setDeliveryCost(res.data.success.cost)
+        setMiles(res.data.success.miles)
       }
     } else {
       setDeliveryCost(product.Varieties.find(v => v.quantity == 1).delivery)
@@ -243,15 +246,17 @@ export default function CustomProduct(props)
                   <MenuItem value=''>Select an option</MenuItem>
                   {props.shop.pickupAddress ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
                   {
-                    (product.Varieties.find(v => v.quantity == 1).delivery > 0) ? 
-                    <MenuItem value='delivery'>{
-                      `Delivery, $${Number.parseFloat(deliveryCost).toFixed(2)}`}</MenuItem>
-                    : ""
+                    (product.Varieties.find(v => v.quantity == 1).delivery > 0) &&
+                    <MenuItem value='delivery'>
+                      {`Delivery, $${Number.parseFloat(deliveryCost).toFixed(2)}\
+                        ${miles > 0 ? `(${Number.parseFloat(miles).toFixed(1)} mi)`: ''}`}
+                    </MenuItem>
                   }
                   {
-                    (product.Varieties.find(v => v.quantity == 1).shipping) ? 
-                    <MenuItem value='shipping'>{`Shipped, $${Number.parseFloat(product.Varieties.find(v => v.quantity == 1).shipping).toFixed(2)}`}</MenuItem>
-                    : ""
+                    (product.Varieties.find(v => v.quantity == 1).shipping) && 
+                    <MenuItem value='shipping'>
+                      {`Shipped, $${Number.parseFloat(product.Varieties.find(v => v.quantity == 1).shipping).toFixed(2)}`}
+                    </MenuItem>
                   }
                 </Select>
               </FormControl>

@@ -119,12 +119,26 @@ module.exports = (app) => {
         req.query.quantity
       )
       res.send({
-          error: req.flash('error'),
           success: response
       })
     }
     catch (err) {
-      next(err)
+      req.flash('error', 'There was a problem getting delivery cost')
+      res.redirect('/api/product/error')
+    }
+  })
+
+  app.post('/api/product/price', async (req, res, next) => {
+    try {
+      let response = await ProductController.getProductPrice(req)
+      res.send({
+        success: response
+      })
+    }
+    catch (err) {
+      console.log(err)
+      req.flash('error', 'There was a problem getting product price')
+      res.redirect('/api/product/error')
     }
   })
 

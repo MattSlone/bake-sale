@@ -26,7 +26,9 @@ const cartReducer = (state = initialState, action) => {
         quantity: action.payload.quantity,
         fulfillment: action.payload.fulfillment,
         addons: action.payload.addons,
-        clientSidePrice: action.payload.clientSidePrice,
+        productPrice: action.payload.productPrice,
+        fulfillmentPrice: action.payload.fulfillmentPrice,
+        secondaryFulfillmentPrice: action.payload.secondaryFulfillmentPrice,
         quote: action.payload.quote ? true : false
       }]
     }

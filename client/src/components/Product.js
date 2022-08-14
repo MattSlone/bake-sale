@@ -137,8 +137,12 @@ export default function Product(props)
   const [personalization, setPersonalization] = useState('')
   const [fulfillment, setFulfillment] = useState('')
   const [price, setPrice] = useState(0)
+  const [fulfillmentPrice, setFulfillmentPrice] = useState(0)
+  const [secondaryFulfillmentPrice, setSecondaryFulfillmentPrice] = useState(0)
   const [addonsChecked, setAddonsChecked] = useState([]);
-  const [deliveryCost, setDeliveryCost] = useState('')
+  const [deliveryCost, setDeliveryCost] = useState(0)
+  const [miles, setMiles] = useState(0)
+
   const [message, setMessage] = useState('')
 
   useEffect(() => {
@@ -191,31 +195,24 @@ export default function Product(props)
     }
   }, [product, variation, fulfillment, addonsChecked])
 
-  const handleSetPrice = () => {
-    let selectedVariation = product.Varieties.find(v => v.quantity == variation)
-    let total = Number(selectedVariation.price)
-
-    let addonsTotal = 0.0
-
-    product.Addons.forEach((addon) => {
-      if(addonsChecked[addon.id]) {
-        addonsTotal += Number(addon.price)
-        addonsTotal += Number(addon.secondaryPrice) * (variation-1)
-      }
-    })
-
-    total += addonsTotal
-
-    let fulfillmentPrice = 0.0
-    if (fulfillment == 'delivery') {
-      fulfillmentPrice = deliveryCost
-    } else if(fulfillment == 'shipping') {
-      fulfillmentPrice = Number(selectedVariation.shipping)
+  const handleSetPrice = async () => {
+    const item = {
+      product: product,
+      personalization: personalization,
+      variation: variation,
+      fulfillment: fulfillment,
+      addons: addonsChecked,
+      quantity: 1
     }
-
-    total += fulfillmentPrice
-
-    setPrice(Number(total).toFixed(2))
+    const res = await axios.post('/api/product/price', item)
+    if(res.data.error) {
+      console.log(res.data.error)
+    } else {
+      const prices = res.data.success
+      setPrice(Number(prices.productPrice + prices.fulfillmentPrice).toFixed(2))
+      setFulfillmentPrice(prices.fulfillmentPrice)
+      setSecondaryFulfillmentPrice(prices.secondaryFulfillmentPrice)
+    }
   }
 
   const handleAddToCart = () => {
@@ -228,7 +225,9 @@ export default function Product(props)
         variation: variation,
         fulfillment: fulfillment,
         addons: addonsChecked,
-        clientSidePrice: price,
+        productPrice: price - fulfillmentPrice,
+        fulfillmentPrice: fulfillmentPrice,
+        secondaryFulfillmentPrice: secondaryFulfillmentPrice,
         quantity: 1
       })
     } else {
@@ -251,21 +250,21 @@ export default function Product(props)
 
   const getDeliveryByTheMileCost = (async () => {
     if (product.Varieties.find(v => v.quantity == variation).deliveryFeeType == 'mile') {
-      console.log(product.id)
       const res = await axios.get('/api/product/deliverycost', {
         params: {
           productId: product.id,
-          quantity: variation
+          quantity: 1
         }
       })
-      if(res.data.error[0]) {
-        console.log(res.data.error[0])
+      if(res.data.error) {
+        console.log(res.data.error)
       } else {
-        console.log(res.data.success)
-        setDeliveryCost(Number(res.data.success))
+        console.log(res.data.success.miles)
+        setDeliveryCost(res.data.success.cost)
+        setMiles(res.data.success.miles)
       }
     } else {
-      setDeliveryCost(Number(product.Varieties.find(v => v.quantity == variation).delivery))
+      setDeliveryCost(product.Varieties.find(v => v.quantity == variation).delivery)
     }
   })
 
@@ -310,7 +309,7 @@ export default function Product(props)
                         onChange={handleAddonCheckChange}
                       />
                     }
-                    label={`${addon.name} ($${Number(addon.price).toFixed(2)}${Number(addon.secondaryPrice) > 0 ? ` + $${Number(addon.secondaryPrice).toFixed(2)}`: ""})`}
+                    label={`${addon.name} ($${Number(addon.price).toFixed(2)}${Number(addon.secondaryPrice) > 0 ? ` + $${Number(addon.secondaryPrice).toFixed(2)} each additional item`: ""})`}
                   />
                 ))}
               </Typography>
@@ -374,13 +373,21 @@ export default function Product(props)
                       <MenuItem value=''>Select an option</MenuItem>
                       {props.shop.pickupAddress ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
                       {
-                        (product.Varieties.find(v => v.quantity == variation).delivery > 0) ? 
-                        <MenuItem value='delivery'>{`Delivery, $${Number.parseFloat(deliveryCost).toFixed(2)}`}</MenuItem>
-                        : ""
+                        (product.Varieties.find(v => v.quantity == variation).delivery > 0) && 
+                        <MenuItem value='delivery'>
+                          {`Delivery, $${Number.parseFloat(deliveryCost).toFixed(2)}\
+                            ${miles > 0 ? `(${Number.parseFloat(miles).toFixed(1)} mi)`: ''}\
+                              + $${Number.parseFloat(product.Varieties.find(v => v.quantity == variation).secondaryDelivery).toFixed(2)}\
+                               each additional item`}
+                        </MenuItem>
                       }
                       {
                         (product.Varieties.find(v => v.quantity == variation).shipping) ? 
-                        <MenuItem value='shipping'>{`Shipped, $${Number.parseFloat(product.Varieties.find(v => v.quantity == variation).shipping).toFixed(2)}`}</MenuItem>
+                        <MenuItem value='shipping'>
+                          {`Shipped, $${Number.parseFloat(product.Varieties.find(v => v.quantity == variation).shipping).toFixed(2)}\
+                           + $${Number.parseFloat(product.Varieties.find(v => v.quantity == variation).secondaryShipping).toFixed(2)}\
+                         each additional item`}
+                        </MenuItem>
                         : ""
                       }
                     </Select>

@@ -176,7 +176,7 @@ export default function Order({ order }) {
       <CardHeader
         action={
           <Typography variant="h5">
-            ${Number.parseFloat(order.amount).toFixed(2)}
+            ${Number.parseFloat(order.total).toFixed(2)}
           </Typography>
         }
         title={order.Product.name}
@@ -186,7 +186,7 @@ export default function Order({ order }) {
         className={classes.cardMedia}
         height="194"
         component="img"
-        image="https://source.unsplash.com/featured/?baked,goods"
+        image={`/api${order.Product.ProductImages[0]?.path}`}
         title={order.Product.name}
       />
       <CardContent className={classes.cardContent}>
@@ -201,6 +201,19 @@ export default function Order({ order }) {
           </AccordionSummary>
           <AccordionDetails>
             <List disablePadding dense={true}>
+            <ListItem disableGutters>
+              <ListItemText>
+                <Box component="span" fontWeight="bold">Item Price: </Box>
+                {`$${Number(order.productPrice * order.quantity).toFixed(2)}`}
+              </ListItemText>
+            </ListItem>
+            <ListItem disableGutters>
+              <ListItemText>
+                <Box component="span" fontWeight="bold">Fulfillment Price: </Box>
+                {`$${Number(order.fulfillmentPrice + order.secondaryFulfillmentPrice*(order.quantity-1)).toFixed(2)}`}
+              </ListItemText>
+            </ListItem>
+            <Divider />
               {order.fulfillment !== 'pickup' && (
               <ListItem disableGutters>
                 <ListItemText>

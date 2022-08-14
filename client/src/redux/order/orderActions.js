@@ -76,8 +76,8 @@ export const getOrders = (formData = null) => {
         params: formData
       })
       console.log(res.data)
-      if(res.data.error[0]) {
-        dispatch(getOrdersFailure(res.data.error[0]))
+      if(res.data.error) {
+        dispatch(getOrdersFailure(res.data.error))
       }
       else {
         dispatch(getOrdersSuccess(res.data.success))
