@@ -113,7 +113,7 @@ export default function Account(props) {
       setMessage('Invalid email address')
       return
     }
-    if (!isByteLength(password, { min: 5, max: 15 })) {
+    if (newPassword && !isByteLength(newPassword, { min: 5, max: 15 })) {
       setMessage("Password should be between 5 and 15 characters.")
       return
     }

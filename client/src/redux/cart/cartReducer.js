@@ -62,6 +62,7 @@ const cartReducer = (state = initialState, action) => {
     case CHECKOUT_FAILURE: return {
       ...state,
       loading: false,
+      clientSecret: '',
       error: action.payload
     }
     case RESET_CART: return initialState

@@ -80,38 +80,13 @@ export default function SignUp(props) {
   let recaptcha
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [street, setStreet] = useState('')
-  const [street2, setStreet2] = useState('')
-  const [city, setCity] = useState('')
-  const [state, setState] = useState('')
-  const [lat, setLat] = useState(0)
-  const [lng, setLng] = useState(0)
-  const [zipcode, setZipcode] = useState('')
-  const [seller, setSeller] = useState(0)
   const [message, setMessage] = useState('')
   const [token, setToken] = useState('')
-  const [validAddress, setValidAddress] = useState(false)
 
   let formData = {
-    firstName: firstName,
-    lastName: lastName,
-    street: street,
-    street2: street2,
-    city: city,
-    state: state,
-    lat: lat,
-    lng: lng,
-    zipcode: zipcode,
     username: username,
     password: password,
-    seller: seller,
     token: token
-  }
-
-  const getFormattedAddress = () => {
-    props.getFormattedAddress(formData)
   }
 
   function onChange(value) {
@@ -128,24 +103,15 @@ export default function SignUp(props) {
     if (auth.userData.loading) {
       setMessage('loading...')
     } else {
-      setMessage('')
-      if (auth.userData.message) {
-        setMessage(auth.userData.message)
-      }
-      console.log(auth.userData.validAddress)
-      if (auth.userData.validAddress === true) {
-        console.log('here')
-        setStreet(props.userData.street)
-        setCity(props.userData.city)
-        setState(props.userData.state)
-        setZipcode(props.userData.zipcode)
-        setLat(props.userData.lat)
-        setLng(props.userData.lng)
-        setValidAddress(true)
+      if (auth.userData.error) {
+        setMessage(auth.userData.error)
       } else {
-        setValidAddress(false)
-        if (auth.userData.error) {
-          setMessage(auth.userData.error)
+        setUsername('')
+        setPassword('')
+        if (auth.userData.message) {
+        setMessage(auth.userData.message)
+        } else {
+          setMessage('')
         }
       }
     }
@@ -156,7 +122,7 @@ export default function SignUp(props) {
     if (valid.success) {
       setMessage('')
       recaptcha.reset()
-      getFormattedAddress()
+      auth.userSignUp(formData)
     } else {
       setMessage(valid.error)
     }
@@ -165,12 +131,6 @@ export default function SignUp(props) {
   const validate = () => {
     let rtn = { error: '', success: false }
     for (const field of [
-      { name: 'First name', value: firstName },
-      { name: 'Last name', value: lastName },
-      { name: 'Street', value: street },
-      { name: 'City', value: city },
-      { name: 'State', value: state },
-      { name: 'Zipcode', value: zipcode },
       { name: 'Email', value: username },
       { name: 'Password', value: password },
       { name: 'ReCaptcha', value: token }
@@ -184,10 +144,6 @@ export default function SignUp(props) {
       rtn.error = 'Invalid email address'
       return rtn
     }
-    if (!(firstName && isAlpha(firstName.replace(/\s/g, ""))) || !(lastName && isAlpha(lastName.replace(/\s/g, "")))) {
-      rtn.error = 'Name may only contain letters.'
-      return rtn
-    }
     if (!isByteLength(password, { min: 5, max: 15 })) {
       rtn.error = "Password should be between 5 and 15 characters."
       return rtn
@@ -195,22 +151,6 @@ export default function SignUp(props) {
     rtn.success = true
     return rtn
   }
-
-  useEffect(() => {
-    if (validAddress) {
-      auth.userSignUp(formData)
-      setFirstName('')
-      setLastName('')
-      setUsername('')
-      setPassword('')
-      setStreet('')
-      setStreet2('')
-      setCity('')
-      setState('')
-      setZipcode('')
-      setSeller(0)
-    }
-  }, [validAddress])
 
   if(auth.userData.loggedIn == true) {
     return (
@@ -230,33 +170,6 @@ export default function SignUp(props) {
         </Typography>
         <form className={classes.form} noValidate>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="fname"
-                name="firstName"
-                variant="outlined"
-                required
-                fullWidth
-                id="firstName"
-                label="First Name"
-                value={firstName}
-                onChange={e => setFirstName(e.target.value)}
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lname"
-                value={lastName}
-                onChange={e => setLastName(e.target.value)}
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 variant="outlined"
@@ -282,76 +195,6 @@ export default function SignUp(props) {
                 autoComplete="current-password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="street"
-                label="Street"
-                name="street"
-                autoComplete="street"
-                value={street}
-                onChange={e => setStreet(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                fullWidth
-                id="street2"
-                label="Apartment, suite, etc."
-                name="street2"
-                autoComplete="street2"
-                value={street2}
-                onChange={e => setStreet2(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="city"
-                label="City"
-                name="city"
-                autoComplete="city"
-                value={city}
-                onChange={e => setCity(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="state"
-                label="State"
-                name="state"
-                autoComplete="state"
-                value={state}
-                onChange={e => setState(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="zipcode"
-                label="Zipcode"
-                name="zipcode"
-                autoComplete="zipcode"
-                value={zipcode}
-                onChange={e => setZipcode(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value={1} onChange={e => setSeller(e.target.value)} color="primary" />}
-                label="Seller account"
               />
             </Grid>
             <Grid item xs={12}>

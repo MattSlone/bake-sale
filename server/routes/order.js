@@ -29,7 +29,6 @@ module.exports = (app, webhookApp) => {
     try {
       let response = await OrderController.createPaymentIntent(req, res, next)
       res.send({
-          error: false,
           success: response
       })
     }

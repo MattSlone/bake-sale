@@ -50,7 +50,8 @@ const userReducer = (state = initialState, action) => {
     case USER_SIGNUP_SUCCESS: return {
       ...state,
       loading: false,
-      message: action.payload.message
+      message: action.payload.message,
+      error: ''
     }
     case USER_SIGNUP_FAILURE: return {
       user: false,
@@ -116,7 +117,8 @@ const userReducer = (state = initialState, action) => {
       state: action.payload.state,
       zipcode: action.payload.zipcode,
       seller: action.payload.seller,
-      error: ''
+      error: '',
+      message: 'Your changes have been saved.'
     }
     case EDIT_USER_FAILURE: return {
       ...state,
@@ -125,7 +127,8 @@ const userReducer = (state = initialState, action) => {
     }
     case GET_FORMATTED_ADDRESS_REQUEST: return {
       ...state,
-      loading: true
+      loading: true,
+      message: 'validating address...'
     }
     case GET_FORMATTED_ADDRESS_SUCCESS: return {
       ...state,

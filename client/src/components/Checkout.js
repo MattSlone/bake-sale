@@ -47,7 +47,6 @@ export default function  Checkout(props) {
   }, [props.cart.products]);
 
   useEffect(() => {
-    console.log('heree 1')
     if (paymentComplete) {
       props.resetCart()
     }
@@ -56,8 +55,10 @@ export default function  Checkout(props) {
   useEffect(() => {
     if (props.cart.loading == false) {
       if (props.cart.error) {
+        setClientSecret('')
         setMessage(props.cart.error)
       } else {
+        setMessage('')
         setClientSecret(props.cart.clientSecret)
       }
     }

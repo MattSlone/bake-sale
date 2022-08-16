@@ -355,6 +355,15 @@ module.exports = class OrderController {
 
   static async validateCart(req, res, next) {
     try {
+      if (
+        !(req.user.firstName && req.user.lastName
+          && req.user.street && req.user.city && req.user.state && req.user.zipcode
+        )
+      ) {
+        req.flash('error', `You must complete your profile before checking out.`)
+        res.redirect('/api/order/error')
+        return
+      }
       const products = await Promise.all(req.body.items.map(async item => {
         return await db.Product.findOne({
           attributes: ['id', 'inventory', 'name'],
@@ -396,7 +405,6 @@ module.exports = class OrderController {
           }
         })
         for (let fulfillment of orderFulfillments) {
-          console.log('FULFILLMENT: ', fulfillment.fulfillment)
           if (fulfillment.fulfillment == 'pickup' && !product.Shop.allowPickups) {
             req.flash('error', `${product.Shop.name} does not allow pickups. \
               Please change your choice of fulfillment for ${product.name}`

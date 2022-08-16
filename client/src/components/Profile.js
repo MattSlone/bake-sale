@@ -110,22 +110,27 @@ export default function Profile(props) {
 
   useEffect(() => {
     if (auth.userData.loading) {
-      setMessage('validating address...')
+      setMessage(auth.userData.message)
     } else {
-      if (auth.userData.validAddress === true) {
-        setStreet(auth.userData.street)
-        setStreet2(auth.userData.street2)
-        setCity(auth.userData.city)
-        setState(auth.userData.state)
-        setZipcode(auth.userData.zipcode)
-        setLat(auth.userData.lat)
-        setLng(auth.userData.lng)
-        setValidAddress(true)
-      } else {
-        setValidAddress(false)
-        if (auth.userData.error) {
-          setMessage(auth.userData.error)
+      if (street) {
+        if (auth.userData.validAddress === true) {
+          setStreet(auth.userData.street)
+          setStreet2(auth.userData.street2)
+          setCity(auth.userData.city)
+          setState(auth.userData.state)
+          setZipcode(auth.userData.zipcode)
+          setLat(auth.userData.lat)
+          setLng(auth.userData.lng)
+          setValidAddress(true)
+        } else {
+          setValidAddress(false)
         }
+      }
+      if (auth.userData.message) {
+        setMessage(auth.userData.message)
+      }
+      if (auth.userData.error) {
+        setMessage(auth.userData.error)
       }
     }
   }, [auth.userData.loading])
@@ -134,7 +139,11 @@ export default function Profile(props) {
     const valid = validate()
     if (valid.success) {
       recaptcha.reset()
-      getFormattedAddress()
+      if (street) {
+        getFormattedAddress()
+      } else {
+        props.editUser(formData)
+      }
     } else {
       setMessage(valid.error)
     }
@@ -143,20 +152,21 @@ export default function Profile(props) {
   const validate = () => {
     const rtn = { error: '', success: false }
     for (const field of [
-      { name: 'First name', value: firstName },
-      { name: 'Last name', value: lastName },
-      { name: 'Street', value: street },
-      { name: 'City', value: city },
-      { name: 'State', value: state },
-      { name: 'Zipcode', value: zipcode },
-      { name: 'ReCaptcha', value: token },
+      ...street && [
+        { name: 'Street', value: street },
+        { name: 'City', value: city },
+        { name: 'State', value: state },
+        { name: 'Zipcode', value: zipcode },
+        { name: 'ReCaptcha', value: token }
+      ],
+      { name: 'ReCaptcha', value: token }
     ]) {
       if (!field.value) {
         rtn.error = `${field.name} is required.`
         return rtn
       }
     }
-    if (!(firstName && isAlpha(firstName)) || !(lastName && isAlpha(lastName))) {
+    if ((firstName && !isAlpha(firstName.replace(/\s/g, ""))) || (lastName && !isAlpha(lastName.replace(/\s/g, "")))) {
       rtn.error = 'Name may only contain letters.'
       return rtn
     }
@@ -167,7 +177,6 @@ export default function Profile(props) {
   useEffect(() => {
     if (validAddress) {
       props.editUser(formData)
-      setMessage('Your changes have been saved')
     }
   }, [validAddress])
 

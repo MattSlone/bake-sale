@@ -297,6 +297,10 @@ module.exports = class ProductController {
                           ]
                       }
                   ]
+              },
+              {
+                model: db.Shop,
+                attributes: ['id', 'name']
               }
           ]
       });

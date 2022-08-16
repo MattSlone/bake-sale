@@ -151,7 +151,8 @@ const productReducer = (state = initialState, action) => {
         fields: action.payload.fields,
         personalizationPrompt: action.payload.personalizationPrompt,
         productImages: action.payload.productImages,
-        weight: action.payload.weight
+        weight: action.payload.weight,
+        published: action.payload.published
       }
     case EDIT_PRODUCT_REQUEST: return {
       ...state,
