@@ -128,11 +128,11 @@ export default function PickupAndDeliveryOptions(props) {
   const [validDeliveryArea, setValidDeliveryArea] = useState(edit ? {valid: true} : {valid: false})
   
   const convertMetersToMiles = (meters) => {
-    return meters * MILES_MULTIPLE
+    return Number(Number(meters * MILES_MULTIPLE).toFixed(2))
   }
 
   const convertMilesToMeters = (miles) => {
-    return miles / MILES_MULTIPLE
+    return Number(Number(miles / MILES_MULTIPLE).toFixed(2))
   }
 
   useEffect(() => {
@@ -764,7 +764,7 @@ export default function PickupAndDeliveryOptions(props) {
                               style={{width: '100%', marginTop: '0.5em'}}
                               inputProps={{min: 0, step: 0.01, style: { textAlign: 'center' }}} 
                               type="number"
-                              value={Number(convertMetersToMiles(radius))}
+                              value={convertMetersToMiles(radius)}
                               onChange={handleRadiusChange}
                             />
                           </Grid>
