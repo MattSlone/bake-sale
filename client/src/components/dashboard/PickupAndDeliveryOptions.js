@@ -504,7 +504,7 @@ export default function PickupAndDeliveryOptions(props) {
   }
 
   const handleRadiusChange = (e) => {
-    setRadius(Number(convertMilesToMeters(e.target.value)))
+    setRadius(convertMilesToMeters(e.target.value))
   }
 
   return (
@@ -760,11 +760,11 @@ export default function PickupAndDeliveryOptions(props) {
                             </GoogleMap>
                             <TextField
                               variant='outlined'
-                              label="radius"
+                              label="radius (miles)"
                               style={{width: '100%', marginTop: '0.5em'}}
-                              inputProps={{min: 0, step: 0.1, style: { textAlign: 'center' }}} 
+                              inputProps={{min: 0, step: 0.01, style: { textAlign: 'center' }}} 
                               type="number"
-                              value={Number(convertMetersToMiles(radius)).toFixed(2)}
+                              value={Number(convertMetersToMiles(radius))}
                               onChange={handleRadiusChange}
                             />
                           </Grid>
