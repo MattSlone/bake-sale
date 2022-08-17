@@ -71,6 +71,9 @@ module.exports = class GMaps {
         const addressComponents = this.convertFormattedAddressToObject(
           res.data.results[0]
         )
+        if (typeof addressComponents == 'string') {
+          return addressComponents
+        }
         return {
           ...addressComponents,
           street: `${addressComponents.street_number} ${addressComponents.route}`,

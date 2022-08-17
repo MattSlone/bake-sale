@@ -239,6 +239,7 @@ export const getFormattedShopAddress = (formData) => {
     try {
       dispatch(getFormattedShopAddressRequest())
       const res = await axios.post('/api/user/address/components', formData)
+      console.log(res.data)
       if(res.data.error) {
         dispatch(getFormattedShopAddressFailure(res.data.error))
       }
@@ -247,7 +248,7 @@ export const getFormattedShopAddress = (formData) => {
       }
     } catch(error) {
       if (error.response) {
-        dispatch(getFormattedShopAddressFailure("There was an issue signing up"))
+        dispatch(getFormattedShopAddressFailure("There was an issue validating address."))
         return
       }
       dispatch(getFormattedShopAddressFailure(JSON.stringify(error)))

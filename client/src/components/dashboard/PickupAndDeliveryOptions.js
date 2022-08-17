@@ -93,6 +93,7 @@ function getSteps() {
 
 export default function PickupAndDeliveryOptions(props) {
   let recaptcha
+  const MILES_MULTIPLE = 0.000621371
   const [activeStep, setActiveStep] = React.useState(0);
   const isMount = useIsMount()
   const steps = getSteps();
@@ -125,7 +126,14 @@ export default function PickupAndDeliveryOptions(props) {
   const [validPickupSchedule, setValidPickupSchedule] = useState(edit ? {valid: true} : {valid: false})
   const [validShopContact, setValidShopContact] = useState(edit ? {valid: true} : {valid: false})
   const [validDeliveryArea, setValidDeliveryArea] = useState(edit ? {valid: true} : {valid: false})
-  const [goNext, setGoNext] = useState(false)
+  
+  const convertMetersToMiles = (meters) => {
+    return meters * MILES_MULTIPLE
+  }
+
+  const convertMilesToMeters = (miles) => {
+    return miles / MILES_MULTIPLE
+  }
 
   useEffect(() => {
     if ([
@@ -231,7 +239,7 @@ export default function PickupAndDeliveryOptions(props) {
       props.getFormattedShopAddressRequest()
       const res = await axios.post('/api/user/address/components', formData)
       if(res.data.error) {
-        rtn.error = res.data.error[0]
+        rtn.error = res.data.error
         props.getFormattedShopAddressFailure(rtn.error)
         return rtn
       }
@@ -239,11 +247,15 @@ export default function PickupAndDeliveryOptions(props) {
         ...res.data.success,
         street2: street2
       })
+      setStreet(res.data.success.street)
+      setCity(res.data.success.city)
+      setState(res.data.success.state)
+      setZipcode(res.data.success.zipcode)
       rtn.success = true
       return rtn
     } catch(error) {
       if (error.response) {
-        rtn.error = 'There was an issue validating shop address'
+        rtn.error = 'There was an issue validating shop address.'
       }
       rtn.error = error
       return rtn
@@ -270,7 +282,6 @@ export default function PickupAndDeliveryOptions(props) {
           rtn.error = newValidAddress.error
         }
       } else {
-        console.log('heree goood')
         setToken('')
         rtn.success = true
       }
@@ -297,9 +308,9 @@ export default function PickupAndDeliveryOptions(props) {
         case 0:
           valid = await validateAddress()
           if (valid.success) {
-            setValidAddress({valid: true})
+            setValidAddress({ valid: true })
           } else {
-            setValidAddress({valid: false})
+            setValidAddress({ valid: false })
           }
           break
         case 1:
@@ -490,6 +501,10 @@ export default function PickupAndDeliveryOptions(props) {
   const handleGoToStep = async (i) => {
     setActiveStep(i)
     props.setChildStep(i)
+  }
+
+  const handleRadiusChange = (e) => {
+    setRadius(Number(convertMilesToMeters(e.target.value)))
   }
 
   return (
@@ -747,10 +762,10 @@ export default function PickupAndDeliveryOptions(props) {
                               variant='outlined'
                               label="radius"
                               style={{width: '100%', marginTop: '0.5em'}}
-                              inputProps={{min: 0, style: { textAlign: 'center' }}} 
+                              inputProps={{min: 0, step: 0.1, style: { textAlign: 'center' }}} 
                               type="number"
-                              value={Number(radius)}
-                              onChange={(e) => {setRadius(Number(e.target.value))}}
+                              value={Number(convertMetersToMiles(radius)).toFixed(2)}
+                              onChange={handleRadiusChange}
                             />
                           </Grid>
                         </Grid>

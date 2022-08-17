@@ -558,7 +558,6 @@ async count(req, res, next) {
           include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage, db.Form]
         }
       )
-      console.log('VARIETIES: ', req.body.product.varieties)
       let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
       await product.setVarieties(varieties.map(variety => variety.id))
       await db.Variety.destroy({
