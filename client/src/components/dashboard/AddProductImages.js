@@ -111,18 +111,25 @@ export default function AddProductImages(props) {
   useEffect(() => {
     const getImages = async () => {
       if (!isMount && edit && props.product.productImages.length > 0) {
-        const newImageFiles = await Promise.all(props.product.productImages.map(async (image, index) => {
-          const res = await axios.get(`/api${image.path}`,{
-            responseType: 'blob'
-          })
-          return {
-            file: new File([res.data], `image${props.product.id}_${index}`, {
-              type: 'image/png',
-              size: 2
-            }),
-            imagePreviewUrl: `/api${image.path}`
+        let newImageFiles = await Promise.all(props.product.productImages.map(async (image, index) => {
+          try {
+            const res = await axios.get(`/api${image.path}`, {
+              responseType: 'blob'
+            })
+            return {
+              file: new File([res.data], `image${props.product.id}_${index}`, {
+                type: 'image/png',
+                size: 2
+              }),
+              imagePreviewUrl: `/api${image.path}`
+            }
+          } catch (err) {
+            console.log(err)
+            return null
           }
         }))
+        newImageFiles = newImageFiles.filter(file => file !== null)
+        console.log(newImageFiles)
         dispatchImageFiles({ payload: { files: newImageFiles } })
       } else if ((edit && isMount && props.product.id == id) || (!edit && !props.product.id)) {
         dispatchImageFiles({ payload: { files: props.product.imageFiles } })

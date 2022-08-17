@@ -91,7 +91,7 @@ module.exports = (app, passport) => {
 
   app.post('/api/signup',
   UserController.validateSignUp,
-  passport.authenticate('local-signup', { failureRedirect: '/api/user/error',failureFlash: true }),
+  passport.authenticate('local-signup', { failureRedirect: '/api/user/error', failureFlash: true }),
   async (req, res) => {
     try {
       await (new UserController).sendSignUpEmail(req)

@@ -119,9 +119,13 @@ export default function Shop(props) {
     props.getProducts({
       shop: id
     })
-
-    setProducts(props.product.products)
   }, [])
+
+  useEffect(() => {
+    if (!props.product.loading) {
+      setProducts(props.product.products)
+    }
+  }, [props.product.loading])
 
   return (
     <StyledContainer>

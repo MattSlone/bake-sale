@@ -47,7 +47,7 @@ module.exports = (passport) => {
         });
   
         if (!created) {
-          return done(null, false, { message: 'Username taken.' });
+          return done(null, false, { message: 'Account already exists.' });
         }
         return done(null, user);
       } catch (err) {

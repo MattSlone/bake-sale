@@ -284,9 +284,9 @@ export default function Product(props)
         <Grid item xs={12} md={4}>
           <Grid container direction="column" className={classes.productAttributes}>
             <Grid item>
-              <Link to={`/shop/${props.shop.id}`}>
+              <Link to={`/shop/${product.Shop.id}`}>
                 <Typography gutterBottom variant="h6" component="h4">
-                  {props.shop.name}
+                  {product.Shop.name}
                 </Typography>
               </Link>
             </Grid>
@@ -322,16 +322,16 @@ export default function Product(props)
               </Typography>
             </Grid>
             <Grid item>
-            <TextField
-              className={classes.personalizationBox}
-              value={personalization}
-              id="outlined-multiline-static"
-              label="Personalize your order"
-              multiline
-              rows={4}
-              variant="outlined"
-              onChange={handlePersonalizationChange}
-            />
+              <TextField
+                className={classes.personalizationBox}
+                value={personalization}
+                id="outlined-multiline-static"
+                label="Personalize your order"
+                multiline
+                rows={4}
+                variant="outlined"
+                onChange={handlePersonalizationChange}
+              />
             </Grid>
             </>
             : ''}
@@ -343,7 +343,9 @@ export default function Product(props)
             <Grid item>
               <Grid container alignItems="stretch" direction="column">
                 <Grid item xs={12}>
-                  <FormControl variant="outlined" className={classes.formControl}>
+                  <FormControl
+                    variant="outlined"
+                    className={classes.formControl}>
                     <InputLabel id="variation-label">Variation</InputLabel>
                     <Select
                       labelId="variation-label"
@@ -360,8 +362,10 @@ export default function Product(props)
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12}>
-                  <FormControl variant="outlined" className={classes.formControl}>
+                <Grid item>
+                  <FormControl
+                    variant="outlined"
+                    className={classes.formControl}>
                     <InputLabel id="variation-label">Fulfillment Type</InputLabel>
                     <Select
                       labelId="variation-label"
@@ -393,12 +397,12 @@ export default function Product(props)
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item>
                   <Typography style={{ color: 'red' }}>
                     {message}
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item>
                   <Button
                   className={classes.addToCartButton}
                   variant="contained"
