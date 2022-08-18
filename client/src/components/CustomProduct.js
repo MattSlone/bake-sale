@@ -13,7 +13,7 @@ import { TextField, Typography } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios'
 
@@ -206,11 +206,11 @@ export default function CustomProduct(props)
         <Grid item xs={12} md={4}>
           <Grid item container className={classes.sidebar} justifyContent="flex-start" direction="column">
             <Grid item>
-              <Typography gutterBottom variant="h6" component="h4">
-                <RouterLink className={classes.link} to={`/shop/${props.shop.id}`}>
-                  {props.shop.name}
-                </RouterLink>
-              </Typography>
+              <Link to={`/shop/${product.Shop.id}`}>
+                <Typography gutterBottom variant="h6" component="h4">
+                  {product.Shop.name}
+                </Typography>
+              </Link>
             </Grid>
             <Grid item className={classes.titles}>
               <Typography gutterBottom variant="h5" component="h2">

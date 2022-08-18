@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { PDFViewer } from '@react-pdf/renderer';
+import { BlobProvider } from '@react-pdf/renderer';
 import LabelFL from '../labels/FL'
+import { Document, Page } from 'react-pdf/dist/umd/entry.webpack';
 import { TextField, Typography } from '@mui/material';
 
 const PREFIX = 'Labeling';
@@ -21,11 +22,6 @@ const StyledGrid = styled(Grid)((
       flexGrow: 1,
       padding: theme.spacing(2)
   },
-
-  [`& .${classes.pdf}`]: {
-    width: '100%',
-    height: 400
-  }
 }));
 
 export default function Labeling(props) {
@@ -79,10 +75,23 @@ export default function Labeling(props) {
           type="number"
         />
       </Grid>
-      <Grid item xs={12}>
-        <PDFViewer className={classes.pdf}>
-          <LabelFL product={props.product} shop={props.shop} user={props.user}/>
-        </PDFViewer>
+      <Grid item xs={12} className={classes.pdf}>
+        <BlobProvider
+          document={<LabelFL product={props.product} shop={props.shop} user={props.user}/>}
+        >
+          {({ blob, url, loading }) => {
+            return loading ? 'loading...' : (
+              <Document file={url}
+                renderMode="canvas"
+              >
+                <Page
+                  pageNumber={1}
+                  width={document.getElementsByClassName('Labeling-pdf')[0]?.clientWidth*0.75}
+                />
+              </Document>
+            );
+          }}
+        </BlobProvider>
       </Grid>
     </StyledGrid>
   );

@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
-import Link from '@mui/material/Link';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
 import Title from './Title';
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -40,26 +36,31 @@ export default function Quotes(props) {
   return (
     <Root>
       <Title>Requests</Title>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Product</TableCell>
-            <TableCell>Customer</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {quotes ? quotes.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.createdAt}</TableCell>
-              <TableCell>{row.Product.name}</TableCell>
-              <TableCell>Matt</TableCell>
-              <TableCell><RouterLink to={`/dashboard/requests/${row.id}`}>View Request</RouterLink></TableCell>
-            </TableRow>
-          )) : ''}
-        </TableBody>
-      </Table>
+      <Grid container direction='column'>
+        <Grid item xs={12}>
+          <Grid spacing={1} container>
+            {['Date', 'Product', 'Customer', ''].map(name => 
+              <Grid item xs={3}>
+                <span style={{fontWeight: 'bold'}}>{name}</span>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+        <Divider />
+        {quotes.length > 0 ? quotes.map((row) => (
+          <>
+          <Grid item xs={12}>
+            <Grid spacing={1} container direction='row'>
+              <Grid className={classes.row} item xs={3}>{row.createdAt}</Grid>
+              <Grid className={classes.row} item xs={3}>{row.Product.name}</Grid>
+              <Grid className={classes.row} item xs={3}>{`${row.User.firstName} ${row.User.lastName}`}</Grid>
+              <Grid className={classes.row} item xs={3}><RouterLink to={`/dashboard/requests/${row.id}`}>View Order</RouterLink></Grid>
+            </Grid>
+          </Grid>
+          <Divider />
+          </>
+        )) : ''}
+      </Grid>
     </Root>
   );
 }

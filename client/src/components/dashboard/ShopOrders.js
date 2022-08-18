@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
-import Link from '@mui/material/Link';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import Grid from '@mui/material/Grid'
 import Title from './Title';
+import Divider from '@mui/material/Divider'
 import { Link as RouterLink } from 'react-router-dom'
 
 const PREFIX = 'Orders';
 
 const classes = {
-  seeMore: `${PREFIX}-seeMore`
+  root: `${PREFIX}-root`,
+  seeMore: `${PREFIX}-seeMore`,
+  row: `${PREFIX}-row`
 };
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
@@ -21,7 +19,10 @@ const Root = styled('div')((
     theme
   }
 ) => ({
-  padding: theme.spacing(2)
+  padding: theme.spacing(2),
+  [`& .${classes.row}`]: {
+    overflowX: 'auto',
+  }
 }));
 
 export default function ShopOrders(props) {
@@ -39,29 +40,33 @@ export default function ShopOrders(props) {
   }, [props.order.loading])
 
   return (
-    <Root>
+    <Root className={classes.root}>
       <Title>Orders</Title>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Product</TableCell>
-            <TableCell>Customer</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {orders.length > 0 ? orders.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.createdAt}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{`${row.User.firstName} ${row.User.lastName}`}</TableCell>
-              <TableCell><RouterLink to={`/dashboard/orders/${row.id}`}>View Order</RouterLink></TableCell>
-              
-            </TableRow>
-          )) : ''}
-        </TableBody>
-      </Table>
+      <Grid container direction='column'>
+        <Grid item xs={12}>
+          <Grid spacing={1} container>
+            {['Date', 'Product', 'Customer', ''].map(name => 
+              <Grid item xs={3}>
+                <span style={{fontWeight: 'bold'}}>{name}</span>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+        <Divider />
+        {orders.length > 0 ? orders.map((row) => (
+          <>
+          <Grid item xs={12}>
+            <Grid spacing={1} container direction='row'>
+              <Grid className={classes.row} item xs={3}>{row.createdAt}</Grid>
+              <Grid className={classes.row} item xs={3}>{row.Product.name}</Grid>
+              <Grid className={classes.row} item xs={3}>{`${row.User.firstName} ${row.User.lastName}`}</Grid>
+              <Grid className={classes.row} item xs={3}><RouterLink to={`/dashboard/orders/${row.id}`}>View Order</RouterLink></Grid>
+            </Grid>
+          </Grid>
+          <Divider />
+          </>
+        )) : ''}
+      </Grid>
     </Root>
   );
 }
