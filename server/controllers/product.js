@@ -497,15 +497,8 @@ async count(req, res, next) {
     })
     const deletedFields = await db.Field.findAll({
       where: {
-        name: {[Op.notIn]:newFields.concat(updateCustomFields).map(field => field.name)}
-      },
-      include: {
-        model: db.Form,
-        include: {
-          model: db.Product,
-          where: { id: product.id },
-          required: true
-        }
+        name: {[Op.notIn]:newFields.concat(updateCustomFields).map(field => field.name)},
+        FormId: (product.Form ? product.Form.id : null)
       }
     })
     for (let field of deletedFields) {
@@ -584,7 +577,9 @@ async count(req, res, next) {
         where: { ProductId: null }
       })
       await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
-      await this.updateCustomProductFields(product, req.body.product.fields)
+      if (product.custom) {
+        await this.updateCustomProductFields(product, req.body.product.fields)
+      }
       product = await db.Product.findByPk(req.body.product.id, 
         {
           include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]

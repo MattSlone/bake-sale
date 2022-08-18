@@ -239,7 +239,7 @@ export default function AddRegularProduct(props) {
             {edit ?
                 <StepLabel className={classes.stepLabel} onClick={(e) => handleGoToStep(i)}>{label}</StepLabel>
               : <StepLabel>{label}</StepLabel>
-              }
+            }
             <StepContent>
             {(() => {
               switch (activeStep) {

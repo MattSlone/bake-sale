@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.Form)
+      this.Form = this.belongsTo(models.Form)
       this.Value = this.hasMany(models.Value)
       this.ParagraphValue = this.hasMany(models.ParagraphValue)
       this.Option = this.hasMany(models.Option)

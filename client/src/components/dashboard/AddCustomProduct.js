@@ -22,7 +22,8 @@ const classes = {
   mobile: `${PREFIX}-mobile`,
   button: `${PREFIX}-button`,
   actionsContainer: `${PREFIX}-actionsContainer`,
-  resetContainer: `${PREFIX}-resetContainer`
+  resetContainer: `${PREFIX}-resetContainer`,
+  stepLabel: `${PREFIX}-stepLabel`
 };
 
 const Root = styled('div')((
@@ -53,7 +54,12 @@ const Root = styled('div')((
 
   [`& .${classes.resetContainer}`]: {
     padding: theme.spacing(3)
-  }
+  },
+
+  [`& .${classes.stepLabel}`]: {
+    cursor: 'pointer',
+    pointerEvents: 'all !important'
+  },
 }));
 
 function getSteps () {
@@ -196,12 +202,26 @@ export default function AddCustomProduct (props) {
     setActiveStep(0)
   }
 
+  const handleGoToStep = (i) => {
+    const valid = validate()
+    if (valid.success) {
+      setActiveStep(i)
+    } else if (props.product.error) {
+      setMessage(props.product.error)
+    } else {
+      setMessage(valid.error)
+    }
+  }
+
   return (
     <Root className={classes.root}>
       <Stepper classes={matches ? { root: classes.desktop } : { root: classes.mobile }} activeStep={activeStep} orientation='vertical'>
-        {steps.map((label, index) => (
+        {steps.map((label, i) => (
           <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+            {edit ?
+                <StepLabel className={classes.stepLabel} onClick={(e) => handleGoToStep(i)}>{label}</StepLabel>
+              : <StepLabel>{label}</StepLabel>
+            }
             <StepContent>
               {(() => {
                 switch (activeStep) {
