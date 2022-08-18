@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "craco start",
-    "build": "GENERATE_SOURCEMAP=false craco build",
+    "build": "craco build",
     "test": "craco test"
   },
   "dependencies": {
@@ -34,7 +34,6 @@
     "date-fns": "latest",
     "dotenv": "^8.6.0",
     "fg-loadcss": "^3.1.0",
-    "file-loader": "^6.2.0",
     "process": "^0.11.10",
     "prop-types": "^15.6.0",
     "react": "^17.0.0",

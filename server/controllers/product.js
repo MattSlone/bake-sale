@@ -247,16 +247,23 @@ module.exports = class ProductController {
         return []
       }
       const user = req.user ? await db.User.findByPk(req.user.id) : {}
+      const ownShop = req.query.shop ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
       const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
       const where = {
         /*** for shop owner: ***/
         // show their own products
-        ...(req.query.shop && { ShopId: req.query.shop }),
+        ...(req.query.shop && ownShop && { ShopId: req.query.shop }),
         /*** for buyers: ***/
         // only products that have inventory
         ...(!req.query.shop && {
           inventory: { [Op.gt]: 0 },
           published: true
+        }),
+        // shop page
+        ...(req.query.shop && !ownShop && {
+          inventory: { [Op.gt]: 0 },
+          published: true,
+          ShopId: req.query.shop
         }),
         // if delivery, only shops where user is in the delivery area
         ...((user.id && !req.query.shop && req.query.delivers) && { ShopId: shopIds }),
@@ -312,30 +319,37 @@ module.exports = class ProductController {
     }
   }
 
-async count(req, res, next) {
-  try {
-    const user = req.user ? await db.User.findByPk(req.user.id) : {}
-    const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
-    const where = {
-      /*** for shop owner: ***/
-      // show their own products
-      ...(req.query.shop && { ShopId: req.query.shop }),
-      /*** for buyers: ***/
-      // only products that have inventory
-      ...(!req.query.shop && {
-        inventory: { [Op.gt]: 0 },
-        published: true
-      }),
-      // if delivery, only shops where user is in the delivery area
-      ...((user.id && !req.query.shop && req.query.delivers) && { ShopId: shopIds }),
-      // matches search string
-      ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
-      // specific category
-      ...(req.query.category && { category: req.query.category }),
-      /*** for both: ***/
-      // if specific product(s)
-      ...(req.query.products && { id: req.query.products })
-    }
+  async count(req, res, next) {
+    try {
+      const user = req.user ? await db.User.findByPk(req.user.id) : {}
+      const ownShop = req.query.shop ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
+      const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
+      const where = {
+        /*** for shop owner: ***/
+        // show their own products
+        ...(req.query.shop && ownShop && { ShopId: req.query.shop }),
+        /*** for buyers: ***/
+        // only products that have inventory
+        ...(!req.query.shop && {
+          inventory: { [Op.gt]: 0 },
+          published: true
+        }),
+        // shop page
+        ...(req.query.shop && !ownShop && {
+          inventory: { [Op.gt]: 0 },
+          published: true,
+          ShopId: req.query.shop
+        }),
+        // if delivery, only shops where user is in the delivery area
+        ...((user.id && !req.query.shop && req.query.delivers) && { ShopId: shopIds }),
+        // matches search string
+        ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
+        // specific category
+        ...(req.query.category && { category: req.query.category }),
+        /*** for both: ***/
+        // if specific product(s)
+        ...(req.query.products && { id: req.query.products })
+      }
       const count = await db.Product.count({ where: where });
       return count
     }

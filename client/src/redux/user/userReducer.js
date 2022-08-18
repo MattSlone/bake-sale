@@ -1,5 +1,3 @@
-import { PURGE, REHYDRATE } from 'redux-persist';
-
 import {
   USER_SIGNUP_REQUEST,
   USER_SIGNUP_SUCCESS,

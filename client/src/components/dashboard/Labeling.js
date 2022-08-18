@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { PDFViewer } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import LabelFL from '../labels/FL'
 import { TextField, Typography } from '@mui/material';
 
@@ -80,9 +80,11 @@ export default function Labeling(props) {
         />
       </Grid>
       <Grid item xs={12}>
-        <PDFViewer className={classes.pdf}>
-          <LabelFL product={props.product} shop={props.shop} user={props.user}/>
-        </PDFViewer>
+        <PDFDownloadLink document={<LabelFL product={props.product} shop={props.shop} user={props.user}/>} fileName={`${props.product.name}-label.pdf`}>
+          {({ blob, url, loading, error }) =>
+            loading ? 'Loading document...' : 'Download Label'
+          }
+        </PDFDownloadLink>
       </Grid>
     </StyledGrid>
   );
