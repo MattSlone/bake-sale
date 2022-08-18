@@ -43,7 +43,7 @@ const devTools = process.env.NODE_ENV !== 'production' ? composeWithDevTools(app
 
 export const store = createStore(
   persistedReducer,
-  devTools
+  composeWithDevTools(applyMiddleware(thunk, logger))
 )
 
 export const persistor = persistStore(store)
