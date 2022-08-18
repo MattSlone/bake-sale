@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import { BlobProvider } from '@react-pdf/renderer';
 import LabelFL from '../labels/FL'
-import { Document, Page } from 'react-pdf/dist/umd/entry.webpack';
+import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import { TextField, Typography } from '@mui/material';
 
 const PREFIX = 'Labeling';
