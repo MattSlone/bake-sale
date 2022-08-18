@@ -7,7 +7,8 @@ WORKDIR /app
 ARG node_env
 
 COPY package.json /app
-RUN yarn install
+COPY yarn.lock /app
+RUN yarn install --silent
 COPY . .
 
 EXPOSE 3000
