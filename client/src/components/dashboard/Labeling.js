@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { BlobProvider } from '@react-pdf/renderer';
+import { PDFViewer } from '@react-pdf/renderer';
 import LabelFL from '../labels/FL'
-//import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
+import { Document, Page } from 'react-pdf/dist/umd/entry.webpack';
 import { TextField, Typography } from '@mui/material';
 
 const PREFIX = 'Labeling';
@@ -22,6 +22,11 @@ const StyledGrid = styled(Grid)((
       flexGrow: 1,
       padding: theme.spacing(2)
   },
+
+  [`& .${classes.pdf}`]: {
+    width: '100%',
+    height: 400
+  }
 }));
 
 export default function Labeling(props) {
@@ -76,7 +81,6 @@ export default function Labeling(props) {
         />
       </Grid>
       <Grid item xs={12} className={classes.pdf}>
-        {/*
         <BlobProvider
           document={<LabelFL product={props.product} shop={props.shop} user={props.user}/>}
         >
@@ -93,7 +97,6 @@ export default function Labeling(props) {
             );
           }}
         </BlobProvider>
-        */}
       </Grid>
     </StyledGrid>
   );

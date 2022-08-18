@@ -39,11 +39,10 @@ const rootReducer = (state, action) => {
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
-const devTools = process.env.NODE_ENV !== 'production' ? composeWithDevTools(applyMiddleware(thunk, logger)) : null
 
 export const store = createStore(
   persistedReducer,
-  devTools
+  composeWithDevTools(applyMiddleware(thunk, logger))
 )
 
 export const persistor = persistStore(store)
