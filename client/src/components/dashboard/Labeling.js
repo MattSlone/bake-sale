@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import { BlobProvider } from '@react-pdf/renderer';
 import LabelFL from '../labels/FL'
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
+//import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import { TextField, Typography } from '@mui/material';
 
 const PREFIX = 'Labeling';
@@ -76,6 +76,7 @@ export default function Labeling(props) {
         />
       </Grid>
       <Grid item xs={12} className={classes.pdf}>
+        {/*
         <BlobProvider
           document={<LabelFL product={props.product} shop={props.shop} user={props.user}/>}
         >
@@ -92,6 +93,7 @@ export default function Labeling(props) {
             );
           }}
         </BlobProvider>
+        */}
       </Grid>
     </StyledGrid>
   );
