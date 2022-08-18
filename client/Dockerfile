@@ -7,7 +7,6 @@ WORKDIR /app
 ARG node_env
 
 COPY package.json /app
-COPY yarn.lock /app
 RUN yarn install
 COPY . .
 
