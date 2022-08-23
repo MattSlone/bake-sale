@@ -56,7 +56,7 @@ export default function Request(props)
 
   let { id } = useParams()
   const [quote, setQuote] = useState(props.quote.quotes.find(quote => quote.id == id))
-  const [price, setPrice] = useState(Number(quote.price).toFixed(2))
+  const [price, setPrice] = useState(quote.price ? Number(quote.price).toFixed(2) : '')
   const [open, setOpen] = useState(false);
   const [quoted, setQuoted] = useState(quote.QuoteStatusId != 1)
 
@@ -104,14 +104,13 @@ export default function Request(props)
           variant="outlined"
           margin="normal"
           type="number"
-          minimum={0}
           required
           id="price"
           label="Price"
           name="price"
           value={price}
           disabled={quoted}
-          inputProps={ {inputMode: 'numeric', pattern: '[0-9]*', min: 0 } }
+          inputProps={ { min: 0, step: 0.01 } }
           autoFocus
           onChange={e => setPrice(e.target.value)}
         />
@@ -135,7 +134,7 @@ export default function Request(props)
             <h2 id="parent-modal-title">Are you sure?</h2>
             <p id="parent-modal-description">
               {`By clicking confirm, the customer will be notified and will be able to purchase
-              ${quote.Product.name} for $${price}. Only continue if you are ready to process the order.`}
+              ${quote.Product.name} for $${Number(price).toFixed(2)}. Only continue if you are ready to process the order.`}
             </p>
             <Button
               type="submit"

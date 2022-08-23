@@ -64,11 +64,15 @@ export default function ShopOrder(props)
   }
 
   const getBuyerAddress = () => {
-    return `${order.User.street}${order.User.street2 ? ' ' + order.User.street2 : ''}, ${order.User.state} ${order.User.zipcode}`
+    return `${order.FulfillmentAddress.street}${order.FulfillmentAddress.street2 ? ' '
+      + order.FulfillmentAddress.street2 : ''}, ${order.FulfillmentAddress.city}, \
+      ${order.FulfillmentAddress.state} ${order.FulfillmentAddress.zipcode}`
   }
 
   const getShopAddress = () => {
-    return `${order.User.street}${order.User.street2 ? ' ' + order.User.street2 : ''}, ${order.User.city}, ${order.User.state} ${order.User.zipcode}`
+    return `${order.Product.Shop.PickupAddress.street}${order.Product.Shop.PickupAddress.street2 ? ' '
+      + order.Product.Shop.PickupAddress.street2 : ''}, \
+      ${order.Product.Shop.PickupAddress.city}, ${order.Product.Shop.PickupAddress.state} ${order.Product.Shop.PickupAddress.zipcode}`
   }
 
   const convertTo12HourTime = time => {

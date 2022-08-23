@@ -3,6 +3,8 @@ import { styled } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
 import CheckoutContainer from './containers/CheckoutContainer';
 import Container from '@mui/material/Container';
+import axios from 'axios'
+import { addToCart } from '../redux';
 
 const PREFIX = 'Quote';
 
@@ -23,29 +25,72 @@ const StyledContainer = styled(Container)((
 
 export default function  Quote(props) {
   let { id } = useParams()
+  const [product, setProduct] = useState('')
+  const [fulfillment, setFulfillment] = useState('')
+  const [price, setPrice] = useState(0)
+  const [fulfillmentPrice, setFulfillmentPrice] = useState(0)
+  const [secondaryFulfillmentPrice, setSecondaryFulfillmentPrice] = useState(0)
 
   useEffect(async () => {
     props.resetCart()
-  }, []);
+  }, [])
 
   useEffect(async () => {
     props.getQuotes({ forUser: true, id: id })
-  }, [props.resetCart]);
+  }, [props.resetCart])
+
+  useEffect(async () => {
+    if (product && fulfillment) {
+      getPrices()
+    }
+  }, [product, fulfillment])
+
+  const getPrices = async () => {
+    const item = {
+      product: product,
+      personalization: '',
+      variation: 1,
+      fulfillment: fulfillment,
+      addons: [],
+      quantity: 1
+    }
+    const res = await axios.post('/api/product/price', item)
+    if(res.data.error) {
+      console.log(res.data.error)
+    } else {
+      const prices = res.data.success
+      setPrice(Number(prices.productPrice + prices.fulfillmentPrice).toFixed(2))
+      setFulfillmentPrice(prices.fulfillmentPrice)
+      setSecondaryFulfillmentPrice(prices.secondaryFulfillmentPrice)
+    }
+  }
+
+  useEffect(() => {
+    if (price > 0) {
+      addToCart()
+    }
+  }, [price])
+
+  const addToCart = () => {
+    props.addToCart({
+      product: product,
+      personalization: '',
+      variation: 1, // variation = quantity
+      fulfillment: fulfillment,
+      addons: [],
+      productPrice: price - fulfillmentPrice,
+      fulfillmentPrice: fulfillmentPrice,
+      secondaryFulfillmentPrice: secondaryFulfillmentPrice,
+      quantity: 1,
+      quote: true
+    })
+  }
 
   useEffect(() => {
     const tempQuote = props.quote.quotes.find(quote => quote.id == id)
     if (tempQuote && props.quote.loading == false) {
-      props.addToCart({
-        product: tempQuote.Product,
-        personalization: '',
-        variation: 1, // variation = quantity
-        fulfillment: tempQuote.fulfillment,
-        addons: [],
-        productPrice: tempQuote.price,
-        quantity: 1,
-        quote: true
-      })
-      console.log(props.cart.products)
+      setFulfillment(tempQuote.fulfillment)
+      setProduct(tempQuote.Product)
     }
   }, [props.quote.getQuotes]);
 

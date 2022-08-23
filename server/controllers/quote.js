@@ -102,7 +102,15 @@ module.exports = class QuoteController {
             include: {
               model: db.Field
             }
-          }
+          },
+          {
+            model: db.User,
+            attributes: [
+              'firstName',
+              'lastName',
+              'username'
+            ]
+          },
         ]
       });
       return quotes

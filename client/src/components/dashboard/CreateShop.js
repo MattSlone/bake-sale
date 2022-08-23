@@ -110,6 +110,7 @@ export default function CreateShop(props) {
   const [childStepsLength, setChildStepsLength] = useState(1)
   const [validPickupAndDelivery, setValidPickupAndDelivery] = useState(false)
   const [readyEditShop, setReadyEditShop] = useState({ready: false})
+  const [goToStep, setGoToStep] = useState(0)
 
   const validateShopName = () => {
     for (const field of [
@@ -146,7 +147,7 @@ export default function CreateShop(props) {
         console.log('handling create shop...')
         handleCreateShop(e)
       }
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      setGoToStep((prevActiveStep) => prevActiveStep + 1);
     }
   };
 
@@ -211,14 +212,22 @@ export default function CreateShop(props) {
     return valid
   }
 
+  useEffect(() => {
+    if (!props.shop.loading) {
+      if (props.shop.error) {
+        setMessage(props.shop.error)
+      } else {
+        if (goToStep == 0) {
+          setChildStep(0)
+        }
+        setActiveStep(goToStep)
+      }
+    }
+  }, [props.shop.loading])
+
   const handleGoToStep = (i) => {
     if (validate()) {
-      if (i == 0) {
-        setChildStep(0)
-      }
-      setActiveStep(i)
-    } else if (props.shop.error) {
-      setMessage(props.shop.error)
+      setGoToStep(i)
     }
   }
 

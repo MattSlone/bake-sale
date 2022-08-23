@@ -5,10 +5,6 @@
  * https://stripe.com/docs/connect/charges-transfers
  */
 
-const GMaps = require('../lib/gmaps')
-const order = require('../models/order')
-const product = require('../routes/product')
-
 const db = require('../models/index'),
   MakeStripeAPI = require('../lib/stripe'),
   StripeAPI = new MakeStripeAPI(),
@@ -59,6 +55,8 @@ module.exports = class OrderController {
             + fulfillmentPrice
             + secondaryFulfillmentPrice*(item.quantity-1)
           )
+          const fulfillmentAddress = await this.getFulfillmentAddress(req.user)
+          console.log('FULFILLMENT ADDRESS: ', fulfillmentAddress)
           const order = await db.Order.create({
             productPrice: productPrice,
             fulfillmentPrice: fulfillmentPrice,
@@ -72,7 +70,10 @@ module.exports = class OrderController {
             ProductId: item.product.id,
             VarietyId: variation.id,
             OrderStatusId: pendingStatus.id,
-            UserId: req.user.id
+            UserId: req.user.id,
+            FulfillmentAddressId: fulfillmentAddress.id
+          }, {
+            include: [db.FulfillmentAddress]
           })
           // addon: {"addon name": true if added / false if not}
           const addonIds = Object.entries(item.addons)
@@ -87,6 +88,19 @@ module.exports = class OrderController {
       console.log(err)
       return next(err)
     }
+  }
+
+  async getFulfillmentAddress(user) {
+    const [fulfillmentAddress, created] = await db.FulfillmentAddress.findOrCreate({
+      where: {
+        street: user.street,
+        street2: user.street2,
+        city: user.city,
+        state: user.state,
+        zipcode: user.zipcode
+      }
+    })
+    return fulfillmentAddress
   }
 
   calculateOurFee(amount) {
@@ -157,8 +171,6 @@ module.exports = class OrderController {
       console.log(err)
     }
   }
-
-  
 
   async handleStripePaymentIntentSucceeded(data) {
     const transfers = await db.Transfer.findAll({
@@ -259,14 +271,10 @@ module.exports = class OrderController {
                 attributes: [
                   'firstName',
                   'lastName',
-                  'street',
-                  'street2',
-                  'city',
-                  'state',
-                  'zipcode',
                   'username'
                 ]
               },
+              db.FulfillmentAddress,
               ...(shop ? [
                 {
                   model: db.Transfer,
@@ -281,6 +289,7 @@ module.exports = class OrderController {
             orders[i].setDataValue('nextPickupWindow', nextPickupWindow)
           }
         }
+        console.log(orders)
         return orders
     }
     catch(err) {

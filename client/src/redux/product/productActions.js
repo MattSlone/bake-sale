@@ -1,5 +1,4 @@
 import axios from 'axios'
-import productReducer from './productReducer'
 
 import {
   SET_PRODUCT_IMAGES_PREVIEW,

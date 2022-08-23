@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         this.belongsTo(models.Variety)
         this.belongsTo(models.Transfer)
         this.belongsTo(models.Product)
+        this.FulfillmentAddress = this.belongsTo(models.FulfillmentAddress)
         this.Addon = this.belongsToMany(models.Addon, { through: "order_addon" })
     }
   };

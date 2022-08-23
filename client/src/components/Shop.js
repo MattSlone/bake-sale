@@ -117,7 +117,7 @@ export default function Shop(props) {
 
   useEffect(() => {
     props.getProducts({
-      shop: id
+      shopName: id
     })
   }, [])
 

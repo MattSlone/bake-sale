@@ -129,6 +129,7 @@ module.exports = class ProductController {
         addonsTotal += Number(addonInstance.secondaryPrice) * Number(item.variation-1)
       }
     }
+    console.log('ADDONS COST: ', addonsTotal)
     return addonsTotal
   }
   
@@ -158,6 +159,7 @@ module.exports = class ProductController {
     } else if(item.fulfillment == 'shipping') {
       fulfillmentPrice = Number(selectedVariation.shipping)
     }
+    console.log('FULFILLMENT PRICE: ', fulfillmentPrice)
     return fulfillmentPrice
   }
 
@@ -248,6 +250,9 @@ module.exports = class ProductController {
       }
       const user = req.user ? await db.User.findByPk(req.user.id) : {}
       const ownShop = req.query.shop ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
+      const shop = req.query.shopName ? await db.Shop.findOne({ where: { 
+        uri: req.query.shopName
+      }}) : false
       const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
       const where = {
         /*** for shop owner: ***/
@@ -260,13 +265,13 @@ module.exports = class ProductController {
           published: true
         }),
         // shop page
-        ...(req.query.shop && !ownShop && {
+        ...(req.query.shopName && shop && {
           inventory: { [Op.gt]: 0 },
           published: true,
-          ShopId: req.query.shop
+          ShopId: shop.id
         }),
         // if delivery, only shops where user is in the delivery area
-        ...((user.id && !req.query.shop && req.query.delivers) && { ShopId: shopIds }),
+        ...((user.id && !req.query.shop && !req.query.shopName && req.query.delivers) && { ShopId: shopIds }),
         // matches search string
         ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
         // specific category
@@ -307,7 +312,7 @@ module.exports = class ProductController {
               },
               {
                 model: db.Shop,
-                attributes: ['id', 'name']
+                attributes: ['id', 'name', 'uri']
               }
           ]
       });
@@ -323,6 +328,9 @@ module.exports = class ProductController {
     try {
       const user = req.user ? await db.User.findByPk(req.user.id) : {}
       const ownShop = req.query.shop ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
+      const shop = req.query.shopName ? await db.Shop.findOne({ where: { 
+        uri: req.query.shopName
+      }}) : false
       const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
       const where = {
         /*** for shop owner: ***/
@@ -335,13 +343,13 @@ module.exports = class ProductController {
           published: true
         }),
         // shop page
-        ...(req.query.shop && !ownShop && {
+        ...(req.query.shopName && shop && {
           inventory: { [Op.gt]: 0 },
           published: true,
-          ShopId: req.query.shop
+          ShopId: shop.id
         }),
         // if delivery, only shops where user is in the delivery area
-        ...((user.id && !req.query.shop && req.query.delivers) && { ShopId: shopIds }),
+        ...((user.id && !req.query.shop && !req.query.shopName && req.query.delivers) && { ShopId: shopIds }),
         // matches search string
         ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
         // specific category

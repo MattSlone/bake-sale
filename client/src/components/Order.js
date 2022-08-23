@@ -102,9 +102,9 @@ export default function Order({ order }) {
   const [phone, setPhone] = useState('')
 
   useEffect(async () => {
-    await getShopDetails()
+    await setShopDetails()
     if (order.fulfillment !== 'pickup') {
-      await getShippingOrDeliveryAddress()
+      await setShippingOrDeliveryAddress()
     }
   }, [])
 
@@ -112,29 +112,12 @@ export default function Order({ order }) {
     return string.charAt(0).toUpperCase() + string.slice(1)
   }
 
-  const getShippingOrDeliveryAddress = async () => {
-    try {
-      const res = await axios.get('/api/user', {
-        params: {
-          UserId: order.UserId,
-          forOrder: true
-        }
-      })
-      if(res.data.error) {
-        console.log(res.data.error[0])
-      }
-      else {
-        const user = res.data.success
-        setStreet(user.street)
-        setStreet2(user.street2)
-        setCity(user.city)
-        setState(user.state)
-        setZipcode(user.zipcode)
-      }
-    } catch(error) {
-      console.log('Error getting delivery address')
-    }
-    
+  const setShippingOrDeliveryAddress = async () => {
+    setStreet(order.FulfillmentAddress.street)
+    setStreet2(order.FulfillmentAddress.street2)
+    setCity(order.FulfillmentAddress.city)
+    setState(order.FulfillmentAddress.state)
+    setZipcode(order.FulfillmentAddress.zipcode)
   }
 
   const convertTo12HourTime = time => {
@@ -142,33 +125,16 @@ export default function Order({ order }) {
     return `${(hoursMin[0] % 12) || 12}:${hoursMin[1]}${hoursMin[0] >= 12 ? 'pm' : 'am'}`;
   }
 
-  const getShopDetails = async () => {
-    try {
-      const res = await axios.get('/api/shop', {
-        params: {
-          id: order.Product.ShopId,
-          forOrder: true
-        }
-      })
-      if(res.data.error[0]) {
-        console.log(res.data.error[0])
-      }
-      else {
-        const shopContact = res.data.success.ShopContact
-        setPhone(shopContact.phone)
-        setEmail(shopContact.email)
-        if (order.fulfillment == 'pickup') {
-          const pickupAddress = res.data.success.PickupAddress
-          setStreet(pickupAddress.street)
-          setCity(pickupAddress.city)
-          setState(pickupAddress.state)
-          setZipcode(pickupAddress.zipcode)
-        }
-      }
-    } catch(error) {
-      console.log('Error getting pickup address')
+  const setShopDetails = async () => {
+    setPhone(order.Product.Shop.ShopContact.phone)
+    setEmail(order.Product.Shop.ShopContact.email)
+    if (order.fulfillment == 'pickup') {
+      const pickupAddress = order.Product.Shop.PickupAddress
+      setStreet(pickupAddress.street)
+      setCity(pickupAddress.city)
+      setState(pickupAddress.state)
+      setZipcode(pickupAddress.zipcode)
     }
-    
   }
 
   return (

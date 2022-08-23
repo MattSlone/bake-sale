@@ -4,7 +4,8 @@ const db = require('../models/index'),
   MakeStripeAPI = require('../lib/stripe'),
   StripeAPI = new MakeStripeAPI(),
   GMaps = require('../lib/gmaps'),
-  validator = require('validator')
+  validator = require('validator'),
+  { Op } = require('sequelize')
 
 module.exports = class ShopController {
   async create (req, res, next) {
@@ -12,6 +13,7 @@ module.exports = class ShopController {
       const inactiveStatus = await db.ShopStatus.findOne({ where: { status: 'inactive' } })
       const shop = await db.Shop.create({
           name: req.body.name,
+          uri: await this.makeURISafeName(req.body.name),
           state: req.body.state,
           allowPickups: req.body.allowPickups,
           UserId: req.user.id,
@@ -36,12 +38,16 @@ module.exports = class ShopController {
     }
   }
 
+  async makeURISafeName(name) {
+    return name.replace(/[^a-zA-Z0-9-_]/g, '');
+  }
+
   async validateGetShop(req, res) {
     try {
-      if (!(req.query.id || req.query.UserId)) {
+      if (!(req.query.id || req.query.name || req.query.UserId)) {
         return false
       }
-      const shop = await db.Shop.findOne({ where: { UserId: req.user.id } })
+      const ownShop = await db.Shop.findOne({ where: { UserId: req.user.id } })
       if (req.query.forOrder) {
         const order = await db.Order.findOne({
           where: {
@@ -51,7 +57,7 @@ module.exports = class ShopController {
             {
               model: db.Product,
               where: {
-                ShopId: req.query.id ? req.query.id : shop.id
+                ShopId: req.query.id ? req.query.id : ownShop.id
               }
             }
           ]
@@ -87,6 +93,20 @@ module.exports = class ShopController {
       }
       if (!validator.isByteLength(req.body.name, { max: 30 })) {
         req.flash('error', 'Shop names may have a max of 30 characters.')
+        res.redirect('/api/shop/create')
+        return
+      }
+      const nameAlreadyExists = await db.Shop.findOne({ where: {
+        [Op.or]: {
+          name: req.body.name,
+          uri: await (new ShopController).makeURISafeName(req.body.name)
+        },
+        [Op.not]: {
+          UserId: req.user.id
+        }
+      }})
+      if (nameAlreadyExists) {
+        req.flash('error', 'Shop name is taken.')
         res.redirect('/api/shop/create')
         return
       }
@@ -134,7 +154,7 @@ module.exports = class ShopController {
       }
       next()
     } catch (err) {
-      req.flash('error', err)
+      req.flash('error', err.message)
       res.redirect('/api/shop/create')
       return
     }
@@ -157,6 +177,7 @@ module.exports = class ShopController {
       ]
       const where = {
         ...(req.query.UserId && { UserId: req.user.id }),
+        ...(req.query.uri && { uri: req.query.uri }),
         ...(req.query.id && { id: req.query.id })
       }
       const attributes = [
@@ -176,11 +197,16 @@ module.exports = class ShopController {
 
   async update (req, res, next) {
     try {
-      let shop = await db.Shop.update(req.body,
+      console.log('inside update')
+      let shop = await db.Shop.update({
+          ...req.body,
+          uri: await this.makeURISafeName(req.body.name)
+        },
         {
           where: {id: req.body.id},
         }
       );
+      console.log('finished initial update')
 
       shop = await db.Shop.findByPk(req.body.id, 
         {
@@ -217,6 +243,7 @@ module.exports = class ShopController {
       return shop
     }
     catch (err) {
+      console.log('here', err)
       return next(err)
     }
   }

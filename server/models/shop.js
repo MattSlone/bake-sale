@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   Shop.init({
     name: DataTypes.STRING,
+    uri: DataTypes.STRING,
     allowPickups: DataTypes.BOOLEAN,
     stripeAccountId: DataTypes.STRING
   }, {

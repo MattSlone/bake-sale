@@ -206,7 +206,7 @@ export default function CustomProduct(props)
         <Grid item xs={12} md={4}>
           <Grid item container className={classes.sidebar} justifyContent="flex-start" direction="column">
             <Grid item>
-              <Link to={`/shop/${product.Shop.id}`}>
+              <Link to={`/s/${product.Shop.id}`}>
                 <Typography gutterBottom variant="h6" component="h4">
                   {product.Shop.name}
                 </Typography>

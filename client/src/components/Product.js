@@ -284,7 +284,7 @@ export default function Product(props)
         <Grid item xs={12} md={4}>
           <Grid container direction="column" className={classes.productAttributes}>
             <Grid item>
-              <Link to={`/shop/${product.Shop.id}`}>
+              <Link to={`/s/${product.Shop.id}`}>
                 <Typography gutterBottom variant="h6" component="h4">
                   {product.Shop.name}
                 </Typography>

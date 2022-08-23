@@ -75,7 +75,7 @@ export default function App() {
                 <Route path='/resetpassword' component={ResetPassword}/>
                 <Route path='/signout' component={HomeContainer} key='/' beforeEnter/>
                 <Route path={["/dashboard", "/checkout", "/user"].concat([
-                  "/products", "/shop"
+                  "/products", "/s/"
                 ])}>
                   {auth.userData.loggedIn ?
                     <Switch>
@@ -88,7 +88,7 @@ export default function App() {
                       <Route path='/user/account' component={AccountContainer}/>
                       <Route path='/products/custom/:id' children={<CustomProductContainer />} />
                       <Route path='/products/:id' children={<ProductContainer />} />
-                      <Route path='/shop/:id' children={<ShopContainer />} />
+                      <Route path='/s/:id' children={<ShopContainer />} />
                     </Switch>
                   : <Redirect to="/signin" />}
                 </Route>
