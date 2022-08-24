@@ -206,7 +206,7 @@ export default function Home(props) {
                     label="Fulfillment"
                     onChange={handleChangeFulfillment}
                   >
-                    <MenuItem value={''}></MenuItem>
+                    <MenuItem value={''}>Any</MenuItem>
                     <MenuItem value={'pickup'}>Pickup</MenuItem>
                     <MenuItem value={'delivery'}>Delivery</MenuItem>
                     <MenuItem value={'shipping'}>Shipping</MenuItem>
@@ -221,7 +221,7 @@ export default function Home(props) {
                     label="Miles"
                     onChange={handleChangeDistance}
                   >
-                    <MenuItem value={''}></MenuItem>
+                    <MenuItem value={''}>Any</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
                     <MenuItem value={15}>15</MenuItem>

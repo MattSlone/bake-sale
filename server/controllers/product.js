@@ -202,7 +202,7 @@ module.exports = class ProductController {
           const filterMeters = miles ? GMaps.convertMilesToMeters(miles) : distance
           if (
             ((fulfillmentType === 'delivery' && distance < shop.PickupAddress.radius)
-              || (fulfillmentType === 'pickup' || fulfillmentType === 'shipping')
+              || (true)
             ) && distance <= filterMeters
            ) {
             return shop.id
@@ -257,7 +257,9 @@ module.exports = class ProductController {
     const shop = req.query.shopName ? await db.Shop.findOne({ where: { 
       uri: req.query.shopName
     }}) : false
-    const shopIds = (!req.query.shop && !req.query.shopName) ? await this.getLocalShopIds(user, req.query.distance, req.query.fulfillment) : []
+    const shopIds = (!req.query.shop && !req.query.shopName)
+      ? await this.getLocalShopIds(user, req.query.distance, req.query.fulfillment)
+      : []
     const where = {
       /*** for shop owner: ***/
       // show their own products
