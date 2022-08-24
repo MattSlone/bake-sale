@@ -147,7 +147,11 @@ export default function CreateShop(props) {
         console.log('handling create shop...')
         handleCreateShop(e)
       }
-      setGoToStep((prevActiveStep) => prevActiveStep + 1);
+      if (edit) {
+        setGoToStep((prevActiveStep) => prevActiveStep + 1);
+      } else {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1)
+      }
     }
   };
 
@@ -224,6 +228,8 @@ export default function CreateShop(props) {
       }
     }
   }, [props.shop.loading])
+
+
 
   const handleGoToStep = (i) => {
     if (validate()) {
