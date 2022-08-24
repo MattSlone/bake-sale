@@ -181,21 +181,30 @@ module.exports = class ProductController {
     }
   }
 
-  async getLocalShopIds(user) {
+  async getLocalShopIds(user = null, miles = null, fulfillmentType = 'delivery') {
     try {
       const shops = await db.Shop.findAll({
         include: {
-            model: db.PickupAddress,
-            attributes: ['lat', 'lng', 'radius']
+          model: db.PickupAddress,
+          attributes: ['lat', 'lng', 'radius']
+        },
+        where: {
+          ...fulfillmentType === 'pickup'
+            && { allowPickups: true }
         }
       })
       const shopIds = await Promise.all(
         shops.map(async shop => {
-          const distance = await GMaps.haversine_distance(
+          const distance = user ? await GMaps.haversine_distance(
             { lat: user.lat, lng: user.lng },
             { lat: shop.PickupAddress.lat, lng: shop.PickupAddress.lng }
-          )
-          if (distance < shop.PickupAddress.radius) {
+          ) : GMaps.convertMilesToMeters(2892) // farthest distance across the US
+          const filterMeters = miles ? GMaps.convertMilesToMeters(miles) : distance
+          if (
+            ((fulfillmentType === 'delivery' && distance < shop.PickupAddress.radius)
+              || (fulfillmentType === 'pickup' || fulfillmentType === 'shipping')
+            ) && distance <= filterMeters
+           ) {
             return shop.id
           }
           return false
@@ -242,44 +251,55 @@ module.exports = class ProductController {
       }
   }
 
+  async buildWhereClause(req) {
+    const user = req.user ? await db.User.findByPk(req.user.id) : null
+    const ownShop = req.query.shop && user ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
+    const shop = req.query.shopName ? await db.Shop.findOne({ where: { 
+      uri: req.query.shopName
+    }}) : false
+    const shopIds = (!req.query.shop && !req.query.shopName) ? await this.getLocalShopIds(user, req.query.distance, req.query.fulfillment) : []
+    const where = {
+      /*** for shop owner: ***/
+      // show their own products
+      ...(req.query.shop && ownShop && { ShopId: req.query.shop }),
+      /*** for buyers: ***/
+      // only products that have inventory
+      ...(!req.query.shop && {
+        inventory: { [Op.gt]: 0 },
+        published: true
+      }),
+      // shop page
+      ...(req.query.shopName && shop && {
+        inventory: { [Op.gt]: 0 },
+        published: true,
+        ShopId: shop.id
+      }),
+      // matches search string
+      ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
+      // specific category
+      ...(req.query.category && { category: req.query.category }),
+      /*** for both: ***/
+      // if specific product(s)
+      ...(req.query.products && { id: req.query.products }),
+      /*** fulfillment filters ***/
+      // Filter shop ids on fulfillment and distance
+      ...((!req.query.shop && !req.query.shopName)
+        && {
+          ShopId: shopIds
+        }
+      ),
+    }
+    console.log(where)
+    return where
+  }
+
   async list(req, res, next) {
     try {
       // remove this check when go live
       if (!req.isAuthenticated()) {
         return []
       }
-      const user = req.user ? await db.User.findByPk(req.user.id) : {}
-      const ownShop = req.query.shop ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
-      const shop = req.query.shopName ? await db.Shop.findOne({ where: { 
-        uri: req.query.shopName
-      }}) : false
-      const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
-      const where = {
-        /*** for shop owner: ***/
-        // show their own products
-        ...(req.query.shop && ownShop && { ShopId: req.query.shop }),
-        /*** for buyers: ***/
-        // only products that have inventory
-        ...(!req.query.shop && {
-          inventory: { [Op.gt]: 0 },
-          published: true
-        }),
-        // shop page
-        ...(req.query.shopName && shop && {
-          inventory: { [Op.gt]: 0 },
-          published: true,
-          ShopId: shop.id
-        }),
-        // if delivery, only shops where user is in the delivery area
-        ...((user.id && !req.query.shop && !req.query.shopName && req.query.delivers) && { ShopId: shopIds }),
-        // matches search string
-        ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
-        // specific category
-        ...(req.query.category && { category: req.query.category }),
-        /*** for both: ***/
-        // if specific product(s)
-        ...(req.query.products && { id: req.query.products })
-      }
+      const where = await this.buildWhereClause(req)
       let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
       let limit = 6
       const products = await db.Product.findAll({
@@ -288,7 +308,15 @@ module.exports = class ProductController {
           limit: limit,
           include: [
               db.Ingredient,
-              db.Variety,
+              {
+                model: db.Variety,
+                where: {
+                  ...req.query.fulfillment === 'delivery' &&
+                    { delivery: { [Op.gt]: 0 } },
+                  ...req.query.fulfillment === 'shipping' &&
+                    { shipping: { [Op.gt]: 0 } }
+                }
+              },
               db.Addon,
               db.ProductImage,
               {
@@ -326,39 +354,21 @@ module.exports = class ProductController {
 
   async count(req, res, next) {
     try {
-      const user = req.user ? await db.User.findByPk(req.user.id) : {}
-      const ownShop = req.query.shop ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
-      const shop = req.query.shopName ? await db.Shop.findOne({ where: { 
-        uri: req.query.shopName
-      }}) : false
-      const shopIds = (user.id && !req.query.shop) ? await this.getLocalShopIds(user) : []
-      const where = {
-        /*** for shop owner: ***/
-        // show their own products
-        ...(req.query.shop && ownShop && { ShopId: req.query.shop }),
-        /*** for buyers: ***/
-        // only products that have inventory
-        ...(!req.query.shop && {
-          inventory: { [Op.gt]: 0 },
-          published: true
-        }),
-        // shop page
-        ...(req.query.shopName && shop && {
-          inventory: { [Op.gt]: 0 },
-          published: true,
-          ShopId: shop.id
-        }),
-        // if delivery, only shops where user is in the delivery area
-        ...((user.id && !req.query.shop && !req.query.shopName && req.query.delivers) && { ShopId: shopIds }),
-        // matches search string
-        ...(req.query.search && { name: { [Op.like]: `%${req.query.search}%` } }),
-        // specific category
-        ...(req.query.category && { category: req.query.category }),
-        /*** for both: ***/
-        // if specific product(s)
-        ...(req.query.products && { id: req.query.products })
-      }
-      const count = await db.Product.count({ where: where });
+      const where = await this.buildWhereClause(req)
+      const count = await db.Product.count({
+        where: where,
+        include: [
+          {
+            model: db.Variety,
+            where: {
+              ...req.query.fulfillment === 'delivery' &&
+                { delivery: { [Op.gt]: 0 } },
+              ...req.query.fulfillment === 'shipping' &&
+                { shipping: { [Op.gt]: 0 } }
+            }
+          },
+        ]
+      });
       return count
     }
     catch(err) {

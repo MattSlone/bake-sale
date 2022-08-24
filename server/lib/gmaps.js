@@ -24,6 +24,10 @@ module.exports = class GMaps {
     return (meters * MILES_MULTIPLE)
   }
 
+  static convertMilesToMeters(miles) {
+    return (miles / MILES_MULTIPLE)
+  }
+
   /*static async getFormattedAddress({ street, city, state, zipcode }) {
     try {
       const address = `${street} ${city}, ${state} ${zipcode}`

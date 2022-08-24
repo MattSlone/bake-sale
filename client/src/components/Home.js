@@ -12,6 +12,7 @@ import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import { Link as RouterLink } from "react-router-dom";
 import Pagination from '@mui/material/Pagination'
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 function Copyright() {
   return (
@@ -30,11 +31,32 @@ export default function Home(props) {
   const [count, setCount] = useState(props.product.count)
   const [lastId, setLastId] = useState(0)
   const [page, setPage] = useState(1)
+  const [distance, setDistance] = useState('')
+  const [fulfillment, setFulfillment] = useState('')
 
   useEffect(() => {
-    props.getProducts({ lastId: lastId })
-    props.getProductsCount()
+    props.getProducts({
+      lastId: lastId,
+      fulfillment: fulfillment,
+      distance: distance
+    })
+    props.getProductsCount({
+      fulfillment: fulfillment,
+      distance: distance
+    })
   }, [])
+
+  useEffect(() => {
+    props.getProducts({
+      lastId: lastId,
+      fulfillment: fulfillment,
+      distance: distance
+    })
+    props.getProductsCount({
+      fulfillment: fulfillment,
+      distance: distance
+    })
+  }, [fulfillment, distance])
 
   useEffect(() => {
     if (props.product.loading == false) {
@@ -46,8 +68,20 @@ export default function Home(props) {
   const handleChangePage = function(event, value) {
     const page = value
     const lastId = (page-1) * 6
-    props.getProducts({ lastId: lastId })
+    props.getProducts({
+      lastId: lastId,
+      fulfillment: fulfillment,
+      distance: distance
+    })
     setPage(page)
+  }
+
+  const handleChangeDistance = (e) => {
+    setDistance(e.target.value)
+  }
+
+  const handleChangeFulfillment = (e) => {
+    setFulfillment(e.target.value)
   }
 
   const PREFIX = 'Home';
@@ -162,7 +196,42 @@ export default function Home(props) {
         </div>
         <Container className={classes.cardGrid} maxWidth="lg">
           {/* End hero unit */}
-          <Grid container spacing={4}>
+          <Grid container spacing={2}>
+            <Grid item spacing={1} container alignItems={'center'} justifyContent={'flex-start'} direction={'row'} xs={12}>
+              <Grid item>
+                <FormControl sx={{ minWidth: 120 } } size="small">
+                  <InputLabel>Fulfillment</InputLabel>
+                  <Select
+                    value={fulfillment}
+                    label="Fulfillment"
+                    onChange={handleChangeFulfillment}
+                  >
+                    <MenuItem value={''}></MenuItem>
+                    <MenuItem value={'pickup'}>Pickup</MenuItem>
+                    <MenuItem value={'delivery'}>Delivery</MenuItem>
+                    <MenuItem value={'shipping'}>Shipping</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item>
+                <FormControl sx={{ minWidth: 80 } } size="small">
+                  <InputLabel>Miles</InputLabel>
+                  <Select
+                    value={distance}
+                    label="Miles"
+                    onChange={handleChangeDistance}
+                  >
+                    <MenuItem value={''}></MenuItem>
+                    <MenuItem value={5}>5</MenuItem>
+                    <MenuItem value={10}>10</MenuItem>
+                    <MenuItem value={15}>15</MenuItem>
+                    <MenuItem value={25}>25</MenuItem>
+                    <MenuItem value={50}>50</MenuItem>
+                    <MenuItem value={100}>100</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
             {props.product.products ? props.product.products.map((card) => (
               <Grid item key={card.id} xs={12} sm={6} md={4}>
                 <RouterLink className={classes.routerLink} to={`/products/${card.id}`}>
