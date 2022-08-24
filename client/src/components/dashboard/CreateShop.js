@@ -147,11 +147,10 @@ export default function CreateShop(props) {
         console.log('handling create shop...')
         handleCreateShop(e)
       }
-      if (edit) {
-        setGoToStep((prevActiveStep) => prevActiveStep + 1);
-      } else {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1)
+      if (!edit) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1) 
       }
+      setGoToStep((prevActiveStep) => prevActiveStep + 1)
     }
   };
 
