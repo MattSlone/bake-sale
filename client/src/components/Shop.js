@@ -119,6 +119,9 @@ export default function Shop(props) {
     props.getProducts({
       shopName: id
     })
+    props.getShop({
+      uri: id
+    })
   }, [])
 
   useEffect(() => {
@@ -126,6 +129,12 @@ export default function Shop(props) {
       setProducts(props.product.products)
     }
   }, [props.product.loading])
+
+  useEffect(() => {
+    if(!props.shop.loading) {
+      setShop(props.shop)
+    }
+  }, [props.shop.loading])
 
   return (
     <StyledContainer>

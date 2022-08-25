@@ -13,6 +13,7 @@ module.exports = class ShopController {
       const inactiveStatus = await db.ShopStatus.findOne({ where: { status: 'inactive' } })
       const shop = await db.Shop.create({
           name: req.body.name,
+          description: req.body.description,
           uri: await this.makeURISafeName(req.body.name),
           state: req.body.state,
           allowPickups: req.body.allowPickups,
@@ -44,7 +45,7 @@ module.exports = class ShopController {
 
   async validateGetShop(req, res) {
     try {
-      if (!(req.query.id || req.query.name || req.query.UserId)) {
+      if (!(req.query.id || req.query.uri || req.query.name || req.query.UserId)) {
         return false
       }
       const ownShop = await db.Shop.findOne({ where: { UserId: req.user.id } })
@@ -77,6 +78,7 @@ module.exports = class ShopController {
     try {
       for (const field of [
         { name: 'Shop Name', value: req.body.name },
+        { name: 'Shop Description', value: req.body.description },
         { name: 'Street', value: req.body.pickupAddress.street },
         { name: 'City', value: req.body.pickupAddress.city },
         { name: 'State', value: req.body.pickupAddress.state },
@@ -93,6 +95,11 @@ module.exports = class ShopController {
       }
       if (!validator.isByteLength(req.body.name, { max: 30 })) {
         req.flash('error', 'Shop names may have a max of 30 characters.')
+        res.redirect('/api/shop/create')
+        return
+      }
+      if (!validator.isByteLength(req.body.description, { max: 2000 })) {
+        req.flash('error', 'Shop descriptions may have a max of 2000 characters.')
         res.redirect('/api/shop/create')
         return
       }
@@ -170,10 +177,8 @@ module.exports = class ShopController {
       }
       const include = [
         db.PickupSchedule,
-        ...[(req.query.UserId || req.query.forOrder)
-          && db.PickupAddress],
-        ...[(req.query.UserId || req.query.forOrder) 
-          && db.ShopContact]
+        ...(req.query.UserId || req.query.forOrder)
+          ? [db.PickupAddress, db.ShopContact] : []
       ]
       const where = {
         ...(req.query.UserId && { UserId: req.user.id }),
@@ -191,6 +196,7 @@ module.exports = class ShopController {
       return shop
     }
     catch (err) {
+      console.log(err)
       req.flash('error', "Shop not found.")
     }
   }

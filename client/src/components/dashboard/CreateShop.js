@@ -104,6 +104,7 @@ export default function CreateShop(props) {
   const history = useHistory();
   const steps = getSteps(edit);
   const [shopName, setShopName] = useState(props.shop.name)
+  const [description, setDescription] = useState(props.shop.description)
   const [activeStep, setActiveStep] = useState(0);
   const [message, setMessage] = useState('')
   const [childStep, setChildStep] = useState(0)
@@ -114,7 +115,8 @@ export default function CreateShop(props) {
 
   const validateShopName = () => {
     for (const field of [
-      { name: 'Shop Name', value: shopName }
+      { name: 'Shop Name', value: shopName },
+      { name: 'Shop Description', value: description }
     ]) {
       if (!field.value) {
         setMessage(`${field.name} is required.`)
@@ -123,6 +125,10 @@ export default function CreateShop(props) {
     }
     if (!isByteLength(shopName, { max: 30 })) {
       setMessage("Shop names may have a max of 30 characters.")
+      return false
+    }
+    if (!isByteLength(description, { max: 2000 })) {
+      setMessage("Shop descriptions may have a max of 2000 characters.")
       return false
     }
     props.setShop({
@@ -144,7 +150,6 @@ export default function CreateShop(props) {
   const handleNext = (e) => {
     if (validate()) {
       if (activeStep === 1) {
-        console.log('handling create shop...')
         handleCreateShop(e)
       }
       if (!edit) {
@@ -165,6 +170,7 @@ export default function CreateShop(props) {
   let formData = {
     id: props.shop.id,
     name: shopName,
+    description: description,
     pickupAddress: props.shop.pickupAddress,
     pickupSchedule: props.shop.pickupSchedule,
     allowPickups: props.shop.allowPickups,
@@ -278,18 +284,36 @@ export default function CreateShop(props) {
                   {(() => {
                     switch (activeStep) {
                       case 0: 
-                        return <TextField
-                          variant="outlined"
-                          margin="normal"
-                          required
-                          fullWidth
-                          id="name"
-                          label="Shop Name"
-                          name="name"
-                          value={shopName}
-                          autoFocus
-                          onChange={e => setShopName(e.target.value)}
-                        />
+                        return (
+                          <>
+                          <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="name"
+                            label="Shop Name"
+                            name="name"
+                            value={shopName}
+                            autoFocus
+                            onChange={e => setShopName(e.target.value)}
+                          />
+                          <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            multiline
+                            rows={4}
+                            id="name"
+                            label="Shop Description"
+                            name="description"
+                            value={description}
+                            autoFocus
+                            onChange={e => setDescription(e.target.value)}
+                          />
+                          </>
+                        )
                       case 1: return <PickupAndDeliveryOptionsContainer
                         setChildStep={setChildStep}
                         childStep={childStep}

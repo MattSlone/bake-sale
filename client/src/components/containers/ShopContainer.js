@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import Shop from '../Shop'
-import { getProducts } from '../../redux'
+import { getProducts, getShop } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -12,7 +12,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getProducts: (formData) => dispatch(getProducts(formData))
+    getProducts: (formData) => dispatch(getProducts(formData)),
+    getShop: (formData) => dispatch(getShop(formData))
   }
 }
 

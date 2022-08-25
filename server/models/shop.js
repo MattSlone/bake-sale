@@ -19,7 +19,9 @@ module.exports = (sequelize, DataTypes) => {
   };
   Shop.init({
     name: DataTypes.STRING,
+    description: DataTypes.TEXT,
     uri: DataTypes.STRING,
+    bannerPath: DataTypes.STRING,
     allowPickups: DataTypes.BOOLEAN,
     stripeAccountId: DataTypes.STRING
   }, {

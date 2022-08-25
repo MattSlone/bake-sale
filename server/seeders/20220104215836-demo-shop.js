@@ -4,6 +4,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Shops', [{
       name: 'Test Shop',
+      description: 'This is a test.',
       uri: 'TestShop',
       allowPickups: 1,
       stripeAccountId: 'acct_1KUhO1PpZkF3RQIm', // test account tied to slonem01@gmail.com
