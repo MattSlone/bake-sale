@@ -251,6 +251,10 @@ module.exports = class OrderController {
                     attributes: ['name'],
                     include: [
                       db.PickupAddress,
+                      {
+                        model: db.DeliverySchedule,
+                        attributes: { exclude: ['id', 'ShopId', 'createdAt', 'updatedAt']}
+                      },
                       db.PickupSchedule,
                       db.ShopContact
                     ]
@@ -284,12 +288,11 @@ module.exports = class OrderController {
             ]
         })
         for (let i = 0; i < orders.length; i++) {
-          if (orders[i].fulfillment == 'pickup') {
-            const nextPickupWindow = await this.getNextAvailablePickupWindow(orders[i])
-            orders[i].setDataValue('nextPickupWindow', nextPickupWindow)
+          if (['pickup', 'delivery'].includes(orders[i].fulfillment)) {
+            const nextFulfillmentWindow = await this.getNextAvailableFulfillmentWindow(orders[i])
+            orders[i].setDataValue('nextFulfillmentWindow', nextFulfillmentWindow)
           }
         }
-        console.log(orders)
         return orders
     }
     catch(err) {
@@ -332,34 +335,50 @@ module.exports = class OrderController {
     }
   }
 
-  async getNextAvailablePickupWindow(order) {
-    const fulfillmentDay = Date.today()
-      .set({ day: new Date(order.createdAt).getDate() })
-      .clearTime()
-      .add(order.processingTime + 1).day()
-      .getDay()
-    console.log('fulfillMentDate and Day: ', fulfillmentDay)
-    order.Product.Shop.PickupSchedules.reverse()
-    let window = order.Product.Shop.PickupSchedules.find((day, index) => 
-      index >= fulfillmentDay && day.start !== day.end
-      && (new Date).getHours() < day.end.split(':')[0]
-    )
-    if (window === undefined) {
-      window = order.Product.Shop.PickupSchedules.find((day, index) => 
-        index > fulfillmentDay && day.start !== day.end
-      )
+  async getNextAvailableFulfillmentWindow(order) {
+    try {
+      const initialFulfillmentDay = Date.parse(order.createdAt)
+        .clearTime()
+        .addDays(order.processingTime)
+      let window
+      if (order.fulfillment === 'pickup') {
+        order.Product.Shop.PickupSchedules.reverse()
+        window = order.Product.Shop.PickupSchedules.find((day, index) => 
+          index >= initialFulfillmentDay.getDay() && day.start !== day.end
+          && new Date.getHours() < day.end.split(':')[0]
+        )
+        if (window === undefined) {
+          window = order.Product.Shop.PickupSchedules.find((day, index) => 
+            index > initialFulfillmentDay.getDay() && day.start !== day.end
+          )
+        }
+        if (window === undefined) {
+          window = order.Product.Shop.PickupSchedules.find(day => day.start !== day.end)
+        }
+        const pickupDate = new Date(initialFulfillmentDay).next()[window.day.toLowerCase()]().toString('dddd MMMM dS, yyyy')
+        window = {
+          ...window,
+          date: pickupDate
+        }
+      } else if (order.fulfillment === 'delivery') {
+        const deliveryDays = Object.keys(order.Product.Shop.DeliverySchedule.dataValues)
+          .filter(day => order.Product.Shop.DeliverySchedule.dataValues[day] == true)
+          .sort(
+            (day1, day2) => new Date(initialFulfillmentDay).next()[day1.toLowerCase()]() -
+              new Date(initialFulfillmentDay).next()[day2.toLowerCase()]()
+          )
+        const deliveryDate = new Date(initialFulfillmentDay).next()[deliveryDays[0].toLowerCase()]().toString('dddd MMMM dS, yyyy')
+        window = {
+          start: '00:00',
+          end: '24:00',
+          date: deliveryDate
+        }
+      }
+      console.log(window)
+      return window
+    } catch (err) {
+      console.log(err)
     }
-    if (window === undefined) {
-      window = order.Product.Shop.PickupSchedules.find(day => day.start !== day.end)
-    }
-    const pickupDate = Date.today().add(order.processingTime).day()
-      .next()[window.day.toLowerCase()]()
-      .toString('dddd MMMM dS, yyyy')
-    window = {
-      ...window,
-      date: pickupDate
-    }
-    return window
   }
 
   static async validateCart(req, res, next) {

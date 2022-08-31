@@ -140,8 +140,8 @@ export default function ShopOrder(props)
           <ListItem className={classes.listItem}>
             <ListItemText
               className={classes.listItemText}
-              primary={order.fulfillment == 'pickup' ?
-                order.nextPickupWindow.date
+              primary={['pickup', 'delivery'].includes(order.fulfillment) ?
+                order.nextFulfillmentWindow.date
                 :
                 new Date((new Date).setDate(new Date(order.createdAt).getDate() 
                 + order.Product.processingTime)).toDateString()
@@ -166,8 +166,8 @@ export default function ShopOrder(props)
           <ListItem className={classes.listItem}>
             <ListItemText
               primary={
-                `${convertTo12HourTime(order.nextPickupWindow.dataValues.start)} -
-                ${convertTo12HourTime(order.nextPickupWindow.dataValues.end)}`
+                `${convertTo12HourTime(order.nextFulfillmentWindow.dataValues.start)} -
+                ${convertTo12HourTime(order.nextFulfillmentWindow.dataValues.end)}`
               }
               secondary="Pickup Time"
             />

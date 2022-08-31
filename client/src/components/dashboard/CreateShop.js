@@ -176,6 +176,15 @@ export default function CreateShop(props) {
     allowPickups: props.shop.allowPickups,
     contact: props.shop.contact,
     area: props.shop.area,
+    deliverySchedule: {
+      Sunday: props.shop.deliveryDays.includes('Sunday'),
+      Monday: props.shop.deliveryDays.includes('Monday'),
+      Tuesday: props.shop.deliveryDays.includes('Tuesday'),
+      Wednesday: props.shop.deliveryDays.includes('Wenesday'),
+      Thursday: props.shop.deliveryDays.includes('Thursday'),
+      Friday: props.shop.deliveryDays.includes('Friday'),
+      Saturday: props.shop.deliveryDays.includes('Saturday'),
+    },
     user: auth.userData.user.id
   }
 

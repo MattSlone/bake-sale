@@ -9,6 +9,9 @@ import { TextField, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
+import Autocomplete from '@mui/material/Autocomplete';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useRouteMatch } from "react-router-dom";
 import { GoogleMap, Circle } from '@react-google-maps/api';
 import Grid from '@mui/material/Grid';
@@ -87,9 +90,12 @@ function getSteps() {
     address: 'Set your address',
     pickups: 'Configure pickup options',
     contact: 'Configure contact options',
-    delivery: 'Determine delivery area'
+    delivery: 'Configure delivery options'
   }
 }
+
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export default function PickupAndDeliveryOptions(props) {
   let recaptcha
@@ -126,7 +132,8 @@ export default function PickupAndDeliveryOptions(props) {
   const [validPickupSchedule, setValidPickupSchedule] = useState(edit ? {valid: true} : {valid: false})
   const [validShopContact, setValidShopContact] = useState(edit ? {valid: true} : {valid: false})
   const [validDeliveryArea, setValidDeliveryArea] = useState(edit ? {valid: true} : {valid: false})
-  
+  const [deliveryDays, setDeliveryDays] = useState(props.shop.deliveryDays)
+
   const convertMetersToMiles = (meters) => {
     return Number(Number(meters * MILES_MULTIPLE).toFixed(2))
   }
@@ -347,6 +354,7 @@ export default function PickupAndDeliveryOptions(props) {
               lat: circle.center.lat(),
               lng: circle.center.lng()
             })
+            props.setDeliveryDays(deliveryDays)
             setValidDeliveryArea({valid: true})
           } else {
             setValidDeliveryArea({valid: false})
@@ -448,7 +456,7 @@ export default function PickupAndDeliveryOptions(props) {
     if (activeStep == 3) {
       validate()
     }
-  }, [radius])
+  }, [radius, deliveryDays])
 
   const validateDeliveryArea = () => {
     console.log('validating delivery area...')
@@ -505,6 +513,11 @@ export default function PickupAndDeliveryOptions(props) {
 
   const handleRadiusChange = (e) => {
     setRadius(convertMilesToMeters(e.target.value))
+  }
+
+  const handleChangeDeliveryDays = (newValue) => {
+    console.log(newValue)
+    setDeliveryDays(newValue)
   }
 
   return (
@@ -719,7 +732,44 @@ export default function PickupAndDeliveryOptions(props) {
                   )
                 case 3:
                   return (
-                    <Grid container  spacing={2} className={classes.root}>
+                    <Grid container spacing={2} className={classes.root}>
+                      <Grid item xs={12}>
+                      <Typography>
+                        Choose your delivery days. If you offer deliveries for your product(s), these days will be
+                        used in conjunction with the processing time for your product(s) to determine the fulfillment date
+                        for your orders. For example, if an order is made on Monday for a product with a processing time
+                        of 3 days, and you've chosen Saturday and Sunday as your delivery days, then the fulfillment date
+                        will be Saturday, not Thursday.
+                      </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Autocomplete
+                          multiple
+                          id='deliveryDays'
+                          options={[
+                            'Sunday', 'Monday', 'Tuesday', 'Wenesday',
+                            'Thursday', 'Friday', 'Saturday'
+                          ]}
+                          value={deliveryDays}
+                          onChange={(e, newValue) => handleChangeDeliveryDays(newValue)}
+                          disableCloseOnSelect
+                          getOptionLabel={(option) => option}
+                          renderOption={(props, option, { selected }) => (
+                            <li {...props}>
+                            <Checkbox
+                              icon={icon}
+                              checkedIcon={checkedIcon}
+                              style={{ marginRight: 8 }}
+                              checked={selected}
+                            />
+                            {option}
+                          </li>
+                          )}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="outlined" label={'Delivery Days'} />
+                          )}
+                        />
+                      </Grid>
                       <Grid item xs={12} md={6} >
                         <Grid container direction="column" spacing={2}>
                           <Grid item>

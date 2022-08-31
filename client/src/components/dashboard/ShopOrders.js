@@ -57,7 +57,7 @@ export default function ShopOrders(props) {
           <>
           <Grid item xs={12}>
             <Grid spacing={1} container direction='row'>
-              <Grid className={classes.row} item xs={3}>{row.createdAt}</Grid>
+              <Grid className={classes.row} item xs={3}>{new Date(row.createdAt).toDateString()}</Grid>
               <Grid className={classes.row} item xs={3}>{row.Product.name}</Grid>
               <Grid className={classes.row} item xs={3}>{`${row.User.firstName} ${row.User.lastName}`}</Grid>
               <Grid className={classes.row} item xs={3}><RouterLink to={`/dashboard/orders/${row.id}`}>View Order</RouterLink></Grid>

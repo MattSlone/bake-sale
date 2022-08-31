@@ -6,6 +6,7 @@ import {
     EDIT_SHOP_SUCCESS,
     EDIT_SHOP_FAILURE,
     SET_DELIVERY_AREA,
+    SET_DELIVERY_DAYS,
     SET_SHOP,
     SET_VALID_SHOP,
     GET_SHOP_REQUEST,
@@ -32,6 +33,10 @@ import {
     valid: false,
     allowPickups: false,
     status: '',
+    deliveryDays: [
+      'Sunday', 'Monday', 'Tuesday', 'Wenesday',
+      'Thursday', 'Friday', 'Saturday'
+    ],
     pickupAddress: {
       street: '',
       street2: '',
@@ -110,6 +115,11 @@ import {
           radius: action.payload.radius
         }
       }
+      case SET_DELIVERY_DAYS: 
+      return {
+        ...state,
+        deliveryDays: action.payload
+      }
       case SET_CONTACT: return {
         ...state,
         contact: action.payload
@@ -134,6 +144,7 @@ import {
         description: action.payload.success.description,
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
+        deliveryDays: mapDeliveryDays(action.payload.success.DeliverySchedule),
         loading: false,
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
@@ -162,6 +173,7 @@ import {
         contact: action.payload.success.ShopContact,
         created: true,
         status: action.payload.success.ShopStatusId,
+        deliveryDays: mapDeliveryDays(action.payload.success.DeliverySchedule),
         stripeAccountId: action.payload.success.stripeAccountId,
         error: ''
       }
@@ -186,6 +198,7 @@ import {
         description: action.payload.success.description,
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
+        deliveryDays: mapDeliveryDays(action.payload.success.DeliverySchedule),
         loading: false,
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
@@ -235,6 +248,12 @@ import {
       }
       default: return state
     }
+  }
+
+  function mapDeliveryDays(DeliverySchedule) {
+    return Object.keys(DeliverySchedule).filter(
+      day => DeliverySchedule[day] == true
+    )
   }
   
   export default shopReducer

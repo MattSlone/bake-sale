@@ -7,7 +7,7 @@ import {
   setContact,
   getFormattedShopAddress,
   getFormattedShopAddressRequest,
-  getFormattedAddressFailure,
+  setDeliveryDays,
   getFormattedShopAddressSuccess,
   setValidShop,
   getFormattedShopAddressFailure
@@ -24,6 +24,7 @@ const mapDispatchToProps = dispatch => {
     setDeliveryArea: (formData) => dispatch(setDeliveryArea(formData)),
     setPickupAddress: (pickupAddress) => dispatch(setPickupAddress(pickupAddress)),
     setPickupSchedule: (schedule) => dispatch(setPickupSchedule(schedule)),
+    setDeliveryDays: (days) => dispatch(setDeliveryDays(days)),
     setContact: (contact) => dispatch(setContact(contact)),
     getFormattedShopAddress: (formData) => dispatch(getFormattedShopAddress(formData)),
     getFormattedShopAddressSuccess: (formData) => dispatch(getFormattedShopAddressSuccess(formData)),

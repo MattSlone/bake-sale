@@ -20,6 +20,7 @@ module.exports = class ShopController {
           UserId: req.user.id,
           PickupAddress: req.body.pickupAddress,
           PickupSchedules: req.body.pickupSchedule,
+          DeliverySchedule: req.body.deliverySchedule,
           ShopContact: {
             ...req.body.contact,
             email: req.body.contact.email.replace(/\s/g, "")
@@ -177,6 +178,10 @@ module.exports = class ShopController {
       }
       const include = [
         db.PickupSchedule,
+        {
+          model: db.DeliverySchedule,
+          attributes: { exclude: ['id', 'ShopId', 'createdAt', 'updatedAt'] }
+        },
         ...(req.query.UserId || req.query.forOrder)
           ? [db.PickupAddress, db.ShopContact] : []
       ]
@@ -225,6 +230,13 @@ module.exports = class ShopController {
           where: { ShopId: null }
       })
 
+      let deliverySchedule = await this.upsertAssociation(shop, db.DeliverySchedule, [req.body.deliverySchedule])
+      console.log(deliverySchedule)
+      await shop.setDeliverySchedule(deliverySchedule.map(day => day.id))
+      await db.DeliverySchedule.destroy({
+          where: { ShopId: null }
+      })
+
       let pickupSchedules = await this.upsertAssociation(shop, db.PickupSchedule, req.body.pickupSchedule)
       await shop.setPickupSchedules(pickupSchedules.map(schedule => schedule.id))
       await db.PickupSchedule.destroy({
@@ -242,7 +254,15 @@ module.exports = class ShopController {
 
       shop = await db.Shop.findByPk(req.body.id, 
         {
-            include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
+          include: [
+            db.PickupAddress,
+            {
+              model: db.DeliverySchedule,
+              attributes: { exclude: ['id', 'ShopId', 'createdAt', 'updatedAt'] }
+            },
+            db.PickupSchedule,
+            db.ShopContact
+          ]
         }
       );
       

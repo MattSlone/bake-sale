@@ -8,6 +8,7 @@ import {
     EDIT_SHOP_SUCCESS,
     EDIT_SHOP_FAILURE,
     SET_DELIVERY_AREA,
+    SET_DELIVERY_DAYS,
     SET_SHOP,
     SET_VALID_SHOP,
     GET_SHOP_REQUEST,
@@ -53,6 +54,13 @@ export const setContact = (contact) => {
   return {
     type: SET_CONTACT,
     payload: contact
+  }
+}
+
+export const setDeliveryDays = (days) => {
+  return {
+    type: SET_DELIVERY_DAYS,
+    payload: days
   }
 }
 

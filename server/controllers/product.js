@@ -342,7 +342,7 @@ module.exports = class ProductController {
               },
               {
                 model: db.Shop,
-                attributes: ['id', 'name', 'uri']
+                attributes: ['id', 'name', 'uri', 'allowPickups']
               }
           ]
       });

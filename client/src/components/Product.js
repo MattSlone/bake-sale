@@ -375,7 +375,7 @@ export default function Product(props)
                       onChange={handleSelectFulfillment}
                     >
                       <MenuItem value=''>Select an option</MenuItem>
-                      {props.shop.pickupAddress ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
+                      {product.Shop.allowPickups ? <MenuItem value='pickup'>Pickup</MenuItem> : ""}
                       {
                         (product.Varieties.find(v => v.quantity == variation).delivery > 0) && 
                         <MenuItem value='delivery'>

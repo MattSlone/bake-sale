@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.User)
       this.PickupAddress = this.hasOne(models.PickupAddress)
+      this.DeliverySchedule = this.hasOne(models.DeliverySchedule)
       this.PickupSchedule = this.hasMany(models.PickupSchedule)
       this.ShopContact = this.hasOne(models.ShopContact)
       this.Product = this.hasMany(models.Product)

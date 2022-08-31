@@ -121,6 +121,7 @@ export default function Order({ order }) {
   }
 
   const convertTo12HourTime = time => {
+    console.log(time)
     const hoursMin = time.split(':')
     return `${(hoursMin[0] % 12) || 12}:${hoursMin[1]}${hoursMin[0] >= 12 ? 'pm' : 'am'}`;
   }
@@ -180,12 +181,12 @@ export default function Order({ order }) {
               </ListItemText>
             </ListItem>
             <Divider />
-              {order.fulfillment !== 'pickup' && (
+              {order.fulfillment == 'shipping' && (
               <ListItem disableGutters>
                 <ListItemText>
                   <Box component="span" fontWeight="bold">Fulfillment By: </Box>
                   {new Date((new Date).setDate(new Date(order.createdAt).getDate() 
-                      + order.Product.processingTime)).toDateString()}
+                    + order.Product.processingTime)).toDateString()}
                 </ListItemText>
               </ListItem>
               )}
@@ -197,33 +198,35 @@ export default function Order({ order }) {
               </ListItem>
               <ListItem disableGutters>
                 <ListItemText>
-                <Box display="flex" flexDirection="column">
-                  <Box component="span" fontWeight="bold">{capitalize(order.fulfillment)} Location:</Box>
-                  <Box>{street}</Box>
-                  {street2 && <Box>{street2}</Box>}
-                  <Box>{city}, {state}</Box>
-                  <Box>{zipcode}</Box>
-                </Box>
+                  <Box display="flex" flexDirection="column">
+                    <Box component="span" fontWeight="bold">{capitalize(order.fulfillment)} Location:</Box>
+                    <Box>{street}</Box>
+                    {street2 && <Box>{street2}</Box>}
+                    <Box>{city}, {state}</Box>
+                    <Box>{zipcode}</Box>
+                  </Box>
                 </ListItemText>
               </ListItem>
-              {order.fulfillment == 'pickup' &&
+              {['pickup', 'delivery'].includes(order.fulfillment) &&
               <>
                 <ListItem disableGutters>
                   <ListItemText>
-                    <Box component="span" fontWeight="bold">Next Pickup Date: </Box>
-                    {order.nextPickupWindow.date}
+                    <Box component="span" fontWeight="bold">{order.fulfillment == 'pickup' ? 'Next Pickup' : 'Delivery'} Date: </Box>
+                    {order.nextFulfillmentWindow.date}
                   </ListItemText>
                 </ListItem>
-                <ListItem disableGutters>
-                  <ListItemText>
-                    <Box component="span" fontWeight="bold">Pickup Time: </Box>
-                    {convertTo12HourTime(
-                      order.nextPickupWindow.dataValues.start
-                    )} - {convertTo12HourTime(
-                      order.nextPickupWindow.dataValues.end
-                    )}
-                  </ListItemText>
-                </ListItem>
+                {order.fulfillment == 'pickup' &&
+                  <ListItem disableGutters>
+                    <ListItemText>
+                      <Box component="span" fontWeight="bold">Fulfillment Time: </Box>
+                      {convertTo12HourTime(
+                        order.nextFulfillmentWindow.dataValues.start
+                      )} - {convertTo12HourTime(
+                        order.nextFulfillmentWindow.dataValues.end
+                      )}
+                    </ListItemText>
+                  </ListItem>
+                }
               </> }
               <Divider />
               <Typography size="1" sx={{fontWeight: 'bold', padding: '4px 0px 4px 0px'}}>
