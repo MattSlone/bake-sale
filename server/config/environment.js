@@ -9,6 +9,10 @@ module.exports = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD
   },
+  stripe: {
+    api_key: process.env.STRIPE_API_KEY,
+    webhook_secret: process.env.STRIPE_WEBHOOK_SECRET
+  },
   nodeEnv: process.env.NODE_ENV,
   baseUrl: process.env.BASE_URL,
   email: process.env.EMAIL,
