@@ -9,7 +9,10 @@ const db = require('../models/index'),
   MakeStripeAPI = require('../lib/stripe'),
   StripeAPI = new MakeStripeAPI(),
   { Op } = require("sequelize"),
-  ProductController = require('./product')
+  ProductController = require('./product'),
+  Email = require('email-templates'),
+  nodemailer = require('nodemailer'),
+  env = require('../config/environment')
 require('datejs')
 
 const STRIPE_FEE_MULTIPLE = 0.029
@@ -56,7 +59,6 @@ module.exports = class OrderController {
             + secondaryFulfillmentPrice*(item.quantity-1)
           )
           const fulfillmentAddress = await this.getFulfillmentAddress(req.user)
-          console.log('FULFILLMENT ADDRESS: ', fulfillmentAddress)
           const order = await db.Order.create({
             productPrice: productPrice,
             fulfillmentPrice: fulfillmentPrice,
@@ -172,6 +174,68 @@ module.exports = class OrderController {
     }
   }
 
+  async sendOrderCompleteEmails(order) {
+    const user = await db.User.findByPk(order.UserId)
+    const shopUser = await db.User.findByPk(order.Product.Shop.UserId)
+    try {
+      const transporter = nodemailer.createTransport({
+        host: 'smtpout.secureserver.net',
+        port: 465,
+        secure: true,
+        secureConnection: false,
+        requireTLS: true,
+        tls: {
+          ciphers: 'SSLv3'
+        },
+        debug: true,
+        auth: {
+          user: env.email,
+          pass: env.emailPass
+        }
+      });
+      const email = new Email({
+        message: {
+          from: env.email
+        },
+        // uncomment below to send emails in development/test env:
+        send: true,
+        transport: transporter
+      });
+      
+      await email.send({
+        template: 'orderComplete',
+        message: {
+          to: user.username
+        },
+        locals: {
+          name: user.firstName,
+          total: Number(order.total).toFixed(2),
+          productName: order.Product.name,
+          id: order.id,
+          baseUrl: env.baseUrl,
+          port: env.port
+        }
+      })
+
+      await email.send({
+        template: 'newShopOrder',
+        message: {
+          to: shopUser.username
+        },
+        locals: {
+          name: shopUser.firstName,
+          total: Number(order.total).toFixed(2),
+          productName: order.Product.name,
+          id: order.id,
+          baseUrl: env.baseUrl,
+          port: env.port
+        }
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   async handleStripePaymentIntentSucceeded(data) {
     const transfers = await db.Transfer.findAll({
       include: {
@@ -194,7 +258,15 @@ module.exports = class OrderController {
         await transfer.save()
 
         const completedStatus = await db.OrderStatus.findOne({ where: { status: 'completed' } })
-        const order = await db.Order.findOne({ where: { TransferId: transfer.id } })
+        const order = await db.Order.findOne({
+          where: { TransferId: transfer.id },
+          include: [
+            {
+              model: db.Product,
+              include: [ db.Shop ]
+            }
+          ]
+        })
         order.OrderStatusId = completedStatus.id
         const product = await db.Product.findByPk(order.ProductId)
         await (new ProductController).updateInventoryOnSuccessfulOrder(
@@ -203,7 +275,8 @@ module.exports = class OrderController {
           order.quantity
         )
         await order.save()
-        this.removeStaleOrders(order.UserId)
+        await this.sendOrderCompleteEmails(order)
+        await this.removeStaleOrders(order.UserId)
       } catch (err) {
         console.log(err)
       }

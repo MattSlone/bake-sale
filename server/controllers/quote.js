@@ -1,6 +1,5 @@
 'use strict'
 
-const { CurrencyCodes } = require('validator/lib/isISO4217')
 const db = require('../models/index'),
   Email = require('email-templates'),
   nodemailer = require('nodemailer'),
@@ -38,10 +37,78 @@ module.exports = class QuoteController {
           db.Value
         ]
       })
+      await this.sendQuoteRequestEmail(quote)
       return quote
     }
     catch (err) {
       return next(err)
+    }
+  }
+
+  async sendQuoteRequestEmail(quote) {
+    const product = await db.Product.findOne({
+      where: { id: quote.ProductId },
+      include: [
+        {
+          model: db.Shop,
+          include: [ db.User ]
+        }
+      ]
+    })
+    const user = await db.User.findByPk(quote.UserId)
+    try {
+      const transporter = nodemailer.createTransport({
+        host: 'smtpout.secureserver.net',
+        port: 465,
+        secure: true,
+        secureConnection: false,
+        requireTLS: true,
+        tls: {
+          ciphers: 'SSLv3'
+        },
+        debug: true,
+        auth: {
+          user: env.email,
+          pass: env.emailPass
+        }
+      });
+      const email = new Email({
+        message: {
+          from: env.email
+        },
+        // uncomment below to send emails in development/test env:
+        send: true,
+        transport: transporter
+      });
+      
+      await email.send({
+        template: 'newQuoteRequest',
+        message: {
+          to: product.Shop.User.username
+        },
+        locals: {
+          name: product.Shop.User.firstName,
+          productName: product.name,
+          id: quote.id,
+          baseUrl: env.baseUrl,
+          port: env.port
+        }
+      })
+
+      await email.send({
+        template: 'requestConfirmation',
+        message: {
+          to: user.username
+        },
+        locals: {
+          name: user.firstName,
+          productName: product.name,
+          baseUrl: env.baseUrl,
+          port: env.port
+        }
+      })
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -154,9 +221,15 @@ module.exports = class QuoteController {
     try {
       const requestedStatus = await db.QuoteStatus.findOne({ where: { status: 'requested' } })
       const quotedStatus = await db.QuoteStatus.findOne({ where: { status: 'quoted' } })
-      let quote = await db.Quote.findByPk(req.body.QuoteId)
-      console.log(quote, req.body)
-      if (quote.UserId === req.user.id && quote.QuoteStatusId === requestedStatus.id) {
+      let quote = await db.Quote.findByPk(req.body.QuoteId, {
+        include: {
+          model: db.Product,
+          include: {
+            model: db.Shop
+          }
+        }
+      })
+      if (quote.Product.Shop.UserId === req.user.id && quote.QuoteStatusId === requestedStatus.id) {
         quote.price = req.body.price
         console.log(req.body.price, quote.price)
         quote.QuoteStatusId = quotedStatus.id

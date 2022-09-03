@@ -83,7 +83,6 @@ export default function App() {
                       <Route path='/checkout' component={CheckoutContainer} />
                       <Route path='/user/quotes/:id' component={QuoteContainer} />
                       <Route path='/user/orders' component={OrdersContainer} />
-                      <Route path='/user/quotes/:id' component={QuoteContainer} />
                       <Route path='/user/profile' component={ProfileContainer}/>
                       <Route path='/user/account' component={AccountContainer}/>
                       <Route path='/products/custom/:id' children={<CustomProductContainer />} />

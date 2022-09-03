@@ -1,0 +1,5 @@
+p Hi #{name},
+p You've received a new order for #{productName} in the amount of $#{total}.
+p You can see the order details, including the expected fulfillment window and address in your dashboard: 
+- var href = `//${baseUrl}:${port}/dashboard/orders/${id}`;
+a(href=href) Order Details

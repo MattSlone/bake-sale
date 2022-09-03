@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import CustomProduct from '../CustomProduct'
-import { requestQuote, getShop, setCustomForm, getProducts } from '../../redux'
+import { requestQuote, getShop, setCustomForm, getProducts, getQuotes } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -15,7 +15,8 @@ const mapDispatchToProps = dispatch => {
     requestQuote: (formData) => dispatch(requestQuote(formData)),
     getShop: (id) => dispatch(getShop(id)),
     setCustomForm: (fields) => dispatch(setCustomForm(fields)),
-    getProducts: (productIds) => dispatch(getProducts(productIds))
+    getProducts: (productIds) => dispatch(getProducts(productIds)),
+    getQuotes: (formData) => dispatch(getQuotes(formData))
   }
 }
 

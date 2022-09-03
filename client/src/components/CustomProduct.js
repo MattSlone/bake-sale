@@ -16,6 +16,7 @@ import Select from '@mui/material/Select';
 import { Link } from 'react-router-dom';
 import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios'
+import { useIsMount } from '../hooks/useIsMount'
 
 const PREFIX = 'CustomProduct';
 
@@ -118,7 +119,8 @@ export default function CustomProduct(props)
   }
 
   useEffect(() => {
-    props.getProducts({products: [id]})
+    props.getProducts({ products: [id] })
+    props.getQuotes({ forUser: true, id: auth.userData.user.success.id })
   }, [])
 
   useEffect(() => {
