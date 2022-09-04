@@ -1,5 +1,5 @@
 p Hi #{name},
 p Your requested quote for #{productName} is complete.
-p The final quoted price is $#{price}. This does not include fulfillment costs.
+p The final quoted price is $#{price} + $#{fulfillmentPrice} for #{fulfillmentType}.
 - var href = `//${baseUrl}:${port}/user/quotes/${id}`;
 a(href=href) Complete Order

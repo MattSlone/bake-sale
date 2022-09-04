@@ -4,6 +4,7 @@ const db = require('../models/index'),
   Email = require('email-templates'),
   nodemailer = require('nodemailer'),
   env = require('../config/environment')
+const ProductController = require('./product')
 
 module.exports = class QuoteController {
   async create (req, res, next) {
@@ -244,6 +245,16 @@ module.exports = class QuoteController {
   async sendQuotedEmail (quote) {
     const user = await db.User.findByPk(quote.UserId)
     const product = await db.Product.findByPk(quote.ProductId)
+    const item = {
+      ...quote,
+      product: product
+    }
+    // TODO need to cleanup calculate methods to not require req object
+    const placeHolderReq = {
+      user: user
+    }
+    const selectedVariation = await db.Variety.findOne({ where: { ProductId: quote.ProductId } })
+    const fulfillmentPrice = await (new ProductController).calculateFulfillmentPrice(req, item, selectedVariation )
     try {
       const transporter = nodemailer.createTransport({
         host: 'smtpout.secureserver.net',
@@ -277,6 +288,8 @@ module.exports = class QuoteController {
         locals: {
           name: user.firstName,
           price: Number(quote.price).toFixed(2),
+          fulfillmentType: quote.fulfillment,
+          fulfillmentPrice: fulfillmentPrice,
           productName: product.name,
           id: quote.id,
           baseUrl: env.baseUrl,

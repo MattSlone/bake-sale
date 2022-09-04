@@ -67,7 +67,6 @@ module.exports = class ProductController {
     const productPrice = await this.calculateProductPrice(req, req.body, variation)
     const fulfillmentPrice = await this.calculateFulfillmentPrice(req, req.body, variation)
     const secondaryFulfillmentPrice = await this.calculateSecondaryFulfillmentPrice(req, req.body, variation)
-    console.log(fulfillmentPrice)
     return {
       productPrice: productPrice,
       fulfillmentPrice: fulfillmentPrice,

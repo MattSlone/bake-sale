@@ -17,7 +17,8 @@ import {
   RESET_USER_ERROR,
   IS_LOGGED_IN_FAILURE,
   IS_LOGGED_IN_REQUEST,
-  IS_LOGGED_IN_SUCCESS
+  IS_LOGGED_IN_SUCCESS,
+  SET_ATTEMPTED_ROUTE
  } from './userTypes'
 
 const initialState = {
@@ -35,11 +36,16 @@ const initialState = {
   seller: false,
   validAddress: false,
   error: '',
-  message: ''
+  message: '',
+  attemptedRoute: ''
 }
 
 const userReducer = (state = initialState, action) => {
   switch(action.type) {
+    case SET_ATTEMPTED_ROUTE: return {
+      ...state,
+      attemptedRoute: action.payload
+    }
     case USER_SIGNUP_REQUEST: return {
       ...state,
       validAddress: false,
@@ -61,6 +67,7 @@ const userReducer = (state = initialState, action) => {
       loading: true
     }
     case USER_SIGNIN_SUCCESS: return {
+      attemptedRoute: state.attemptedRoute,
       loggedIn: true,
       firstName: action.payload.success.firstName,
       lastName: action.payload.success.lastName,
@@ -96,7 +103,10 @@ const userReducer = (state = initialState, action) => {
       error: '',
       message: ''
     }
-    case RESET_USER: return initialState
+    case RESET_USER: return {
+      ...initialState,
+      attemptedRoute: state.attemptedRoute
+    }
     case EDIT_USER_REQUEST: return {
       ...state,
       loading: true

@@ -23,10 +23,18 @@ import {
   IS_LOGGED_IN_SUCCESS,
   IS_LOGGED_IN_REQUEST,
   RESET_USER_ERROR,
-  RESET_USER
+  RESET_USER,
+  SET_ATTEMPTED_ROUTE
  } from './userTypes'
 
  import { getShop } from '../shop/shopActions'
+
+export const setAttemptedRoute = (route) => {
+  return {
+    type: SET_ATTEMPTED_ROUTE,
+    payload: route
+  }
+}
 
 // SIGNUP
 export const userSignUpRequest = () => {

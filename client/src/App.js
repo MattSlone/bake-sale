@@ -13,11 +13,10 @@ import Maintenance from './components/Maintenance';
 import Box from '@mui/material/Box';
 import { useAuth } from './hooks/use-auth';
 import { useTheme } from '@mui/styles';
-
+import { useRouteMatch } from "react-router-dom";
 import CheckoutContainer from './components/containers/CheckoutContainer';
 import QuoteContainer from './components/containers/QuoteContainer';
-
-import { Route, Redirect, Switch, useHistory, withRouter } from "react-router-dom";
+import { Route, Redirect, Switch, useHistory, useLocation } from "react-router-dom";
 import ResetPassword from './components/ResetPassword';
 import ProfileContainer from './components/containers/ProfileContainer';
 import AccountContainer from './components/containers/AccountContainer';
@@ -49,11 +48,14 @@ const StyledBox = styled(Box)((
 }));
 
 
-export default function App() {
+export default function App({ setAttemptedRoute }) {
   const auth = useAuth()
   const history = useHistory()
+  
+  const url = useLocation()
   const [location, setLocation] = useState('')
   history.listen((newLocation, action) => {
+    console.log(newLocation)
     if (newLocation.pathname != location)
     setLocation(newLocation.pathname)
   })
@@ -61,6 +63,7 @@ export default function App() {
   useEffect(() => {
     auth.isLoggedIn()
   }, [location])
+
   return (
         <StyledBox>
           <div className={classes.root}>
@@ -89,7 +92,8 @@ export default function App() {
                       <Route path='/products/:id' children={<ProductContainer />} />
                       <Route path='/s/:id' children={<ShopContainer />} />
                     </Switch>
-                  : <Redirect to="/signin" />}
+                  : (!['/', '/signin', '/signup', '/forgotpassword'].includes(url.pathname) ? setAttemptedRoute(url.pathname) : true)
+                   && <Redirect to="/signin" />}
                 </Route>
               </Switch>
             </main>

@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import { composeWithDevTools } from '@redux-devtools/extension'
 import logger from 'redux-logger'
 import thunk from 'redux-thunk'
@@ -39,11 +39,13 @@ const rootReducer = (state, action) => {
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
-const devTools = process.env.NODE_ENV !== 'production' ? composeWithDevTools(applyMiddleware(thunk, logger)) : null
+const composeEnhancers = process.env.NODE_ENV !== 'production'
+  ? composeWithDevTools(applyMiddleware(thunk, logger))
+  : compose(applyMiddleware(thunk))
 
 export const store = createStore(
   persistedReducer,
-  composeWithDevTools(applyMiddleware(thunk, logger))
+  composeEnhancers
 )
 
 export const persistor = persistStore(store)

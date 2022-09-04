@@ -8,9 +8,8 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider'
 import { useLocation } from 'react-router-dom';
-const stripePromise = loadStripe("pk_test_51KMDSaL7rHJy0SQFdZI0Q9HFv1wbLuCHm6AuVequIPtqFCa738z7EjGXncDblPZowGe8ALzhjbwh9W25NtejoyxW00YxzwtmYo");
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_KEY);
 import './Checkout.css'
 
 const PREFIX = 'Checkout';
@@ -32,8 +31,9 @@ function useQuery() {
 
   return useMemo(() => new URLSearchParams(search), [search]);
 }
-
+console.log(process.env)
 export default function  Checkout(props) {
+  
   const query = useQuery()
   const [clientSecret, setClientSecret] = useState(query.get('payment_intent_client_secret'))
   const [message, setMessage] = useState("")

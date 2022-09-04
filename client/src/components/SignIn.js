@@ -71,11 +71,12 @@ function Copyright() {
   );
 }
 
-export default function SignIn({ userSignIn, userData }) {
+export default function SignIn() {
   const auth = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
+  const [attemptedRoute, setAttemptedRoute] = useState(auth.userData.attemptedRoute)
 
   let formData = {
     username: username,
@@ -117,10 +118,12 @@ export default function SignIn({ userSignIn, userData }) {
     auth.userSignIn(formData)
   }
 
-  if(userData.loggedIn == true) {
-    return (
-      <Redirect to='/' />
-    )
+  if(auth.userData.loggedIn == true) {
+    if (attemptedRoute) {
+      auth.setAttemptedRoute('')
+      return <Redirect to={attemptedRoute} />
+    }
+    return <Redirect to='/' />
   }
 
   return (

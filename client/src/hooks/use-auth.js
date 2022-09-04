@@ -12,7 +12,8 @@ export function ProvideAuth({
   userSignOut,
   isLoggedIn,
   resetUser,
-  resetUserError
+  resetUserError,
+  setAttemptedRoute
 }) {
   const auth = {
     userData,
@@ -21,7 +22,8 @@ export function ProvideAuth({
     userSignUp,
     userSignOut,
     resetUser,
-    resetUserError
+    resetUserError,
+    setAttemptedRoute
   }
   return <authContext.Provider value={auth}>{children}</authContext.Provider>;
 }
