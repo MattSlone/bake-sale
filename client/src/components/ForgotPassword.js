@@ -62,7 +62,6 @@ export default function ForgotPassword() {
   }
 
   const validate = () => {
-    console.log(email)
     for (const field of [
       { name: 'Email', value: email }
     ]) {

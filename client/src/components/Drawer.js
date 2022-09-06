@@ -9,7 +9,6 @@ import Drawer from '@mui/material/Drawer';
 import Hidden from '@mui/material/Hidden';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import MainListItems from './dashboard/ListItems';
@@ -89,7 +88,7 @@ function ResponsiveDrawer(props) {
 
   useEffect(() => {
     const node = loadCSS(
-      'https://use.fontawesome.com/releases/v5.12.0/css/all.css',
+      'https://use.fontawesome.com/releases/v6.2.0/css/all.css',
       document.querySelector('#font-awesome-css'),
     );
   })
@@ -102,7 +101,6 @@ function ResponsiveDrawer(props) {
   }
 
   const handleDrawerToggle = () => {
-    console.log('toggling!!!')
     setMobileOpen(!mobileOpen);
   };
 
@@ -115,12 +113,17 @@ function ResponsiveDrawer(props) {
     <>
     <List>
       <ListSubheader inset>Categories</ListSubheader>
-      {[{key: 'bread', class: 'fas fa-bread-slice', text: 'Bread'},
-        {key: 'cakes', class: 'fas fa-birthday-cake', text: 'Cakes'},
-        {key: 'candy', class: 'fas fa-candy-cane', text: 'Candy & Chocolate'},
-        {key: 'glutenfree', class: 'fas fa-cloud', text: 'Gluten Free'},
-        {key: 'piestarts', class: 'fas fa-stroopwafel', text: 'Pies & Tarts'},
-        {key: 'vegetarian', class: 'fas fa-leaf', text: 'Vegan / Vegetarian'}].map((item, index) => (
+      {[
+        {key: 'breadandpastries', class: 'fas fa-bread-slice', text: 'Bread & Pastries'},
+        {key: 'cakesandcupcakes', class: 'fas fa-birthday-cake', text: 'Cakes & Cupcakes'},
+        {key: 'cookies', class: 'fas fa-cookie', text: 'Cookies'},
+        {key: 'candyandchocolate', class: 'fas fa-candy-cane', text: 'Candy & Chocolate'},
+        {key: 'piesandtarts', class: 'fas fa-stroopwafel', text: 'Pies & Tarts'},
+        {key: 'honeyandjams', class: 'fas fa-jar', text: 'Honey & Jams'},
+        {key: 'fruitandsnuts', class: 'fas fa-apple-whole', text: 'Fruits & Nuts'},
+        {key: 'herbsandspices', class: 'fas fa-pepper-hot', text: 'Herbs & Spices'},
+        {key: 'other', class: 'fas fa-bowl-food', text: 'Other'}
+      ].map((item, index) => (
         <ListItem button key={item.key} onClick={() => handleListItemClick(item.key)}>
           <Icon className={item.class} style={style}/>
           <ListItemText className={classes.listItemText} primary={item.text} />

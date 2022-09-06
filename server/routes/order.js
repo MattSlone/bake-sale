@@ -5,7 +5,7 @@ const UserController = require('../controllers/user');
 const MakeOrderController = require('../controllers/order'),
   OrderController = new MakeOrderController()
 
-module.exports = (app, webhookApp) => {
+module.exports = (app, express) => {
   app.get('/api/orders',
   UserController.isLoggedIn,
   async (req, res, next) => {
@@ -50,7 +50,9 @@ module.exports = (app, webhookApp) => {
     }
   })
   
-  webhookApp.post('/webhook', async (req, res, next) => {
+  app.post('/webhook',
+  express.raw({ type: 'application/json' }),
+  async (req, res, next) => {
     try {
       const response = await OrderController.handleStripeWebhooks(req, res, next)
       res.sendStatus(response)

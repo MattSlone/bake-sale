@@ -1,14 +1,12 @@
 const express = require('express'),
-  bodyParser = require('body-parser'),
   path = require('path'),
   passport = require('passport'),
   session = require('express-session'),
   flash = require('connect-flash'),
   app = express(),
-  webhookApp = express(),
   env = require('./config/environment')
 
-const { Sequelize, Transaction } = require('sequelize')
+const { Sequelize } = require('sequelize')
 
 require('./lib/passport')(passport)
 
@@ -31,27 +29,8 @@ const sequelize = new Sequelize(env.db.name, env.db.username, env.db.password, {
       /Deadlock/i
     ],
     max: 3
-}
-  //isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
-  //logging: (...msg) => console.log(msg)
-});
-
-/*sequelize.getQueryInterface().describeTable('Shops').then((tableObj) => {
-    console.log('// Tables in database','==========================');
-    console.log(tableObj);
-})
-.catch((err) => {
-    console.log('showAllSchemas ERROR',err);
-})*/
-
-/*(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
   }
-})()*/
+});
 
 /* Session stuff for cookies and passwords */
 var myStore = new SequelizeStore({
@@ -80,10 +59,21 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
 
-app.use(express.json({limit: '50mb'}))
-app.use(bodyParser.json({limit: '50mb'}))
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
-webhookApp.use(express.raw({ type: 'application/json' }))
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhook') {
+    next();
+  } else {
+    express.json({limit: '50mb'})(req, res, next)
+  }
+})
+
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhook') {
+    next();
+  } else {
+    express.urlencoded({ extended: true, limit: '50mb' })(req, res, next)
+  }
+})
 
 app.use(express.static(path.join(__dirname, '../build')));
 app.use(express.static(path.join(__dirname, '../uploads')))
@@ -94,7 +84,7 @@ require('./routes/shop')(app)
 require('./routes/product')(app)
 require('./routes/ingredient')(app)
 require('./routes/quote')(app)
-require('./routes/order')(app, webhookApp)
+require('./routes/order')(app, express)
 
 if (env.nodeEnv === 'production') {
   const root = require('path').join('/public')
@@ -104,11 +94,9 @@ if (env.nodeEnv === 'production') {
   })
 }
 
-
 // Default response for any other request
 app.use(function(req, res) {
     res.status(404);
 });
 
 app.listen(env.expressPort, () => console.log(`App listening at http://server:${env.expressPort}`))
-webhookApp.listen(env.stripeWebhookPort, () => console.log(`Webhook App listening at http://server:${env.stripeWebhookPort}`))

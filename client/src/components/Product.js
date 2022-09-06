@@ -154,7 +154,6 @@ export default function Product(props)
     if (tempProduct) {
       setProduct(tempProduct)
       if (!tempProduct.custom) {
-        console.log(tempProduct.ShopId)
         props.getShop({id: tempProduct.ShopId})
         setVariation(tempProduct.Varieties[0].quantity)
         setPrice(Number.parseFloat(tempProduct.Varieties[0].price).toFixed(2))
@@ -259,7 +258,6 @@ export default function Product(props)
       if(res.data.error) {
         console.log(res.data.error)
       } else {
-        console.log(res.data.success.miles)
         setDeliveryCost(res.data.success.cost)
         setMiles(res.data.success.miles)
       }

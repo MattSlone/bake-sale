@@ -129,7 +129,6 @@ export default function AddProductImages(props) {
           }
         }))
         newImageFiles = newImageFiles.filter(file => file !== null)
-        console.log(newImageFiles)
         dispatchImageFiles({ payload: { files: newImageFiles } })
       } else if ((edit && isMount && props.product.id == id) || (!edit && !props.product.id)) {
         dispatchImageFiles({ payload: { files: props.product.imageFiles } })

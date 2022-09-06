@@ -60,8 +60,8 @@ export default function Home(props) {
 
   useEffect(() => {
     if (props.product.loading == false) {
-      console.log(props.product.count)
-      console.log('getting products...')
+      // console.log(props.product.count)
+      // console.log('getting products...')
     }
   }, [props.product.loading])
 
@@ -260,12 +260,6 @@ export default function Home(props) {
       </main>
       {/* Footer */}
       <footer className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
-        <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-          Something here to give the footer a purpose!
-        </Typography>
         <Copyright />
       </footer>
       {/* End footer */}

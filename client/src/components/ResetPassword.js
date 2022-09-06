@@ -77,7 +77,6 @@ export default function ResetPassword() {
       { name: 'Password', value: password },
       { name: 'Token', value: token }
     ]) {
-      console.log(field.value)
       if (!field.value) {
         setMessage(`${field.name} is required.`)
         return false

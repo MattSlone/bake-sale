@@ -126,12 +126,15 @@ export default function ListingDetails(props) {
                   onChange={handleCategoryChange}
                 >
                   <MenuItem value={''}>Select</MenuItem>
-                  <MenuItem value={'bread'}>Bread</MenuItem>
-                  <MenuItem value={'cakes'}>Cakes</MenuItem>
-                  <MenuItem value={'candy,chocolate'}>Candy & Chocolate</MenuItem>
-                  <MenuItem value={'glutenfree'}>Gluten Free</MenuItem>
-                  <MenuItem value={'pies,tarts'}>Pies & Tarts</MenuItem>
-                  <MenuItem value={'vegan,vegetarian'}>Vegan / Vegetarian</MenuItem>
+                  <MenuItem value={'breadandpastries'}>Bread &amp; Pastries</MenuItem>
+                  <MenuItem value={'cakesandcupcakes'}>Cakes &amp; Cupcakes</MenuItem>
+                  <MenuItem value={'cookies'}>Cookies</MenuItem>
+                  <MenuItem value={'candyandchocolate'}>Candy &amp; Chocolate</MenuItem>
+                  <MenuItem value={'piesandtarts'}>Pies &amp; Tarts</MenuItem>
+                  <MenuItem value={'honeyandjams'}>Honey &amp; Jams</MenuItem>
+                  <MenuItem value={'fruitsandnuts'}>Fruits &amp; Nuts</MenuItem>
+                  <MenuItem value={'herbsandspices'}>Herbs &amp; Spices</MenuItem>
+                  <MenuItem value={'other'}>Other</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

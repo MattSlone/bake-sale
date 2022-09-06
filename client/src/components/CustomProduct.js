@@ -184,7 +184,6 @@ export default function CustomProduct(props)
       if(res.data.error) {
         console.log(res.data.error)
       } else {
-        console.log(res.data.success.miles)
         setDeliveryCost(res.data.success.cost)
         setMiles(res.data.success.miles)
       }

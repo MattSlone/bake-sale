@@ -55,7 +55,6 @@ export default function App({ setAttemptedRoute }) {
   const url = useLocation()
   const [location, setLocation] = useState('')
   history.listen((newLocation, action) => {
-    console.log(newLocation)
     if (newLocation.pathname != location)
     setLocation(newLocation.pathname)
   })

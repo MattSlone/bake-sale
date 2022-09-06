@@ -121,7 +121,6 @@ export default function Order({ order }) {
   }
 
   const convertTo12HourTime = time => {
-    console.log(time)
     const hoursMin = time.split(':')
     return `${(hoursMin[0] % 12) || 12}:${hoursMin[1]}${hoursMin[0] >= 12 ? 'pm' : 'am'}`;
   }

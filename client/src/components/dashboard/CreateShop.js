@@ -201,7 +201,6 @@ export default function CreateShop(props) {
   const handleCreateShop = e => {
     e.preventDefault()
     if (!props.shop.id && props.shop.valid) {
-      console.log('creating shop now')
       props.createShop(formData)
     }
   }

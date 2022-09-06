@@ -31,7 +31,6 @@ function useQuery() {
 
   return useMemo(() => new URLSearchParams(search), [search]);
 }
-console.log(process.env)
 export default function  Checkout(props) {
   
   const query = useQuery()

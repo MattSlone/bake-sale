@@ -127,7 +127,6 @@ export default function Ingredients({ ingredients, setIngredients, setValidIngre
   useEffect(async () => {
     const res = await axios.get('/api/ingredients')
     if(res.data.success) {
-      console.log(res.data.success)
       setLeft(res.data.success)
     }
   }, [])

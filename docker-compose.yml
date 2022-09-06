@@ -30,7 +30,6 @@ services:
     build: ./server
     ports:
       - 8080:8080
-      - 4242:4242
     volumes:
       - ./server:/app
       - /app/node_modules
