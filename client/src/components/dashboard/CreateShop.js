@@ -143,6 +143,7 @@ export default function CreateShop(props) {
 
   useEffect(() => {
     if (window.location.href.includes('stripe')) {
+      setGoToStep(2)
       setActiveStep(2)
     }
   }, [])
