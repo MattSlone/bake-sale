@@ -52,9 +52,7 @@ module.exports = (app) => {
   UserController.isLoggedIn,
   async (req, res, next) => {
     try {
-      console.log('in route')
       let response = await (new ShopController).checkDetailsSubmitted(req, res, next)
-      console.log(response)
       res.send({
         error: req.flash('error'),
         success: response

@@ -18,10 +18,11 @@ module.exports = class StripeAPI {
   async createAccountLink (account, edit) {
     try {
       const createOrEdit = edit ? 'edit' : 'create'
+      const protocol = env.nodeEnv === 'development' ? 'http' : 'https'
       const accountLink = await stripe.accountLinks.create({
         account: account,
-        refresh_url: `http://${env.baseUrl}:${env.port}/dashboard/shop/${createOrEdit}/stripe/reauth`,
-        return_url: `http://${env.baseUrl}:${env.port}/dashboard/shop/${createOrEdit}/stripe/return`,
+        refresh_url: `${protocol}://${env.baseUrl}:${env.port}/dashboard/shop/${createOrEdit}/stripe/reauth`,
+        return_url: `${protocol}://${env.baseUrl}:${env.port}/dashboard/shop/${createOrEdit}/stripe/return`,
         type: 'account_onboarding',
       });
       return accountLink

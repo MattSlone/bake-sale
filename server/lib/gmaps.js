@@ -61,11 +61,9 @@ module.exports = class GMaps {
   static async getFormattedAddress({ street, city, state, zipcode }) {
     try {
       const address = `${street} ${city}, ${state} ${zipcode}`
-      console.log('ADDRESS: ', address)
       const res = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${env.gmapsKey}`
       )
-      console.log(res)
       if(res.error_message) {
         return res.error_message
       } else if (res.data.status != "OK") {

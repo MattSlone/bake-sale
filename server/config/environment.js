@@ -3,7 +3,6 @@ require('dotenv').config()
 module.exports = {
   port: process.env.PORT,
   expressPort: process.env.EXPRESS_PORT,
-  stripeWebhookPort: process.env.STRIPE_WEBHOOK_PORT,
   db: {
     name: process.env.DB_NAME,
     username: process.env.DB_USERNAME,

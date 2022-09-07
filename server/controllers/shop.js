@@ -88,7 +88,6 @@ module.exports = class ShopController {
         
       ]) {
         if (!field.value) {
-          console.log(field)
           req.flash('error', `${field.name} is required.`)
           res.redirect('/api/shop/create')
           return
@@ -148,7 +147,6 @@ module.exports = class ShopController {
         res.redirect('/api/shop/create')
         return
       }
-      console.log('or here...', req.body.pickupAddress)
       if (!(req.body.pickupAddress.radius >= 0)) {
         req.flash('error', 'Radius must be at least 0.')
         res.redirect('/api/shop/create')
@@ -208,7 +206,6 @@ module.exports = class ShopController {
 
   async update (req, res, next) {
     try {
-      console.log('inside update')
       let shop = await db.Shop.update({
           ...req.body,
           uri: await this.makeURISafeName(req.body.name)
@@ -217,8 +214,6 @@ module.exports = class ShopController {
           where: {id: req.body.id},
         }
       );
-      console.log('finished initial update')
-
       shop = await db.Shop.findByPk(req.body.id, 
         {
             include: [db.PickupAddress, db.PickupSchedule, db.ShopContact]
@@ -231,7 +226,6 @@ module.exports = class ShopController {
       })
 
       let deliverySchedule = await this.upsertAssociation(shop, db.DeliverySchedule, [req.body.deliverySchedule])
-      console.log(deliverySchedule)
       await shop.setDeliverySchedule(deliverySchedule.map(day => day.id))
       await db.DeliverySchedule.destroy({
           where: { ShopId: null }
@@ -317,7 +311,6 @@ module.exports = class ShopController {
   async checkDetailsSubmitted(req, res, next) {
     try {
       const detailsSubmitted = await StripeAPI.checkDetailsSubmitted(req.user.id)
-      console.log("DETAILS SUBMITTED: ", detailsSubmitted)
       return detailsSubmitted
     }
     catch (err) {
