@@ -121,17 +121,15 @@ export default function Shop(props) {
 
   useEffect(() => {
     if (!props.product.loading) {
-      console.log(props.product.products)
       setProducts(props.product.products)
     }
-  }, [props.product.loading])
+  }, [props.product])
 
   useEffect(() => {
     if(!props.shop.loading) {
-      console.log(props.shop)
       setShop(props.shop)
     }
-  }, [props.shop.loading])
+  }, [props.shop])
 
   return (
     <StyledContainer>

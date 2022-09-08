@@ -144,7 +144,7 @@ import {
         description: action.payload.success.description,
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
-        deliveryDays: mapDeliveryDays(action.payload.success.DeliverySchedule),
+        deliveryDays: !action.payload.success.DeliverySchedule ? [] : mapDeliveryDays(action.payload.success.DeliverySchedule),
         loading: false,
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
@@ -173,7 +173,7 @@ import {
         contact: action.payload.success.ShopContact,
         created: true,
         status: action.payload.success.ShopStatusId,
-        deliveryDays: mapDeliveryDays(action.payload.success.DeliverySchedule),
+        deliveryDays: !action.payload.success.DeliverySchedule ? [] : mapDeliveryDays(action.payload.success.DeliverySchedule),
         stripeAccountId: action.payload.success.stripeAccountId,
         error: ''
       }
@@ -198,7 +198,7 @@ import {
         description: action.payload.success.description,
         allowPickups: action.payload.success.allowPickups,
         pickupAddress: action.payload.success.PickupAddress,
-        deliveryDays: mapDeliveryDays(action.payload.success.DeliverySchedule),
+        deliveryDays: !action.payload.success.DeliverySchedule ? [] : mapDeliveryDays(action.payload.success.DeliverySchedule),
         loading: false,
         pickupSchedule: action.payload.success.PickupSchedules,
         contact: action.payload.success.ShopContact,
