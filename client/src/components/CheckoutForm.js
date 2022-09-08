@@ -46,19 +46,19 @@ export default function CheckoutForm({ resetCart, createOrder, setPaymentComplet
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!stripe || !elements) {
       // Stripe.js has not yet loaded.
       // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
     setIsLoading(true);
-
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: `http://${process.env.REACT_APP_BASE_URL}:${process.env.REACT_APP_PORT}/checkout`,
+        return_url: `${protocol}://${process.env.REACT_APP_BASE_URL}:${process.env.REACT_APP_PORT}/checkout`,
       },
     });
 

@@ -418,7 +418,7 @@ module.exports = class OrderController {
         order.Product.Shop.PickupSchedules.reverse()
         window = order.Product.Shop.PickupSchedules.find((day, index) => 
           index >= initialFulfillmentDay.getDay() && day.start !== day.end
-          && new Date.getHours() < day.end.split(':')[0]
+          && new Date().getHours() < day.end.split(':')[0]
         )
         if (window === undefined) {
           window = order.Product.Shop.PickupSchedules.find((day, index) => 
