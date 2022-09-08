@@ -12,7 +12,7 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {Redirect,  Link as RouterLink } from "react-router-dom";
+import {Redirect,  Link as RouterLink, useHistory } from "react-router-dom";
 import isEmail from 'validator/lib/isEmail';
 import isByteLength from 'validator/lib/isByteLength';
 import { useAuth } from '../hooks/use-auth';
@@ -73,6 +73,7 @@ function Copyright() {
 
 export default function SignIn() {
   const auth = useAuth()
+  const history = useHistory()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
@@ -118,13 +119,18 @@ export default function SignIn() {
     auth.userSignIn(formData)
   }
 
-  if(auth.userData.loggedIn == true) {
-    if (attemptedRoute) {
-      auth.setAttemptedRoute('')
-      return <Redirect to={attemptedRoute} />
+  useEffect(() => {
+    console.log(auth.userData.loading)
+    if(auth.userData.loggedIn == true) {
+      if (attemptedRoute) {
+        auth.setAttemptedRoute('')
+        history.push(attemptedRoute)
+      } else {
+        history.push('/')
+      }
+      
     }
-    return <Redirect to='/' />
-  }
+  }, [auth.userData.loading])
 
   return (
     <StyledContainer component="main" maxWidth="xs">

@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
-import Fab from '@mui/material/Fab';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
-import { useHistory, Link as RouterLink, useParams } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 
 const PREFIX = 'Shop';
 
@@ -106,14 +104,11 @@ const StyledContainer = styled(Container)((
   },
 }));
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 export default function Shop(props) {
   let { id } = useParams()
 
   const [products, setProducts] = useState(props.product.products)
   const [shop, setShop] = useState(props.shop)
-  const history = useHistory()
 
   useEffect(() => {
     props.getProducts({
@@ -126,12 +121,14 @@ export default function Shop(props) {
 
   useEffect(() => {
     if (!props.product.loading) {
+      console.log(props.product.products)
       setProducts(props.product.products)
     }
   }, [props.product.loading])
 
   useEffect(() => {
     if(!props.shop.loading) {
+      console.log(props.shop)
       setShop(props.shop)
     }
   }, [props.shop.loading])
@@ -141,7 +138,9 @@ export default function Shop(props) {
       <Header title={shop.name} />
       <Paper className={classes.infoBox}>
         <Typography variant="body1">
-          {shop.description}
+          <ReactMarkdown remarkPlugins={[remarkGfm]} >
+            {shop.description}
+          </ReactMarkdown>
         </Typography>
       </Paper>
       <Container disableGutters spacing={2} className={classes.cardGrid} maxWidth="lg">

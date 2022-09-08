@@ -260,12 +260,14 @@ export default function Order({ order }) {
                     )) : "No addons"}
                   </ListItemText>
                 </ListItem>
-                <ListItem disableGutters>
-                  <ListItemText>
-                    <Box component="span" fontWeight="bold">{order.Product.personalizationPrompt}: </Box>
-                    {order.personalization ? order.personalization : 'No answer provided'}
-                  </ListItemText>
-                </ListItem>
+                {order.Product.personalizationPrompt &&
+                  <ListItem disableGutters>
+                    <ListItemText>
+                      <Box component="span" fontWeight="bold">{order.Product.personalizationPrompt}: </Box>
+                      {order.personalization ? order.personalization : 'No answer provided'}
+                    </ListItemText>
+                  </ListItem>
+                }
               </>
               }
             </List>

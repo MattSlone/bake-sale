@@ -412,7 +412,7 @@ module.exports = class OrderController {
     try {
       const initialFulfillmentDay = Date.parse(order.createdAt)
         .clearTime()
-        .addDays(order.processingTime)
+        .addDays(order.processingTime + 1)
       let window
       if (order.fulfillment === 'pickup') {
         order.Product.Shop.PickupSchedules.reverse()
@@ -428,7 +428,9 @@ module.exports = class OrderController {
         if (window === undefined) {
           window = order.Product.Shop.PickupSchedules.find(day => day.start !== day.end)
         }
-        const pickupDate = new Date(initialFulfillmentDay).next()[window.day.toLowerCase()]().toString('dddd MMMM dS, yyyy')
+        const pickupDate = new Date(initialFulfillmentDay).is()[window.day.toLowerCase()]()
+          ? new Date(initialFulfillmentDay).toString('dddd MMMM dS, yyyy')
+          : new Date(initialFulfillmentDay).next()[window.day.toLowerCase()]().toString('dddd MMMM dS, yyyy')
         window = {
           ...window,
           date: pickupDate
@@ -440,7 +442,9 @@ module.exports = class OrderController {
             (day1, day2) => new Date(initialFulfillmentDay).next()[day1.toLowerCase()]() -
               new Date(initialFulfillmentDay).next()[day2.toLowerCase()]()
           )
-        const deliveryDate = new Date(initialFulfillmentDay).next()[deliveryDays[0].toLowerCase()]().toString('dddd MMMM dS, yyyy')
+        const deliveryDate = new Date(initialFulfillmentDay).is()[deliveryDays[0].toLowerCase()]()
+          ? new Date(initialFulfillmentDay).toString('dddd MMMM dS, yyyy')
+          : new Date(initialFulfillmentDay).next()[deliveryDays[0].toLowerCase()]().toString('dddd MMMM dS, yyyy')
         window = {
           start: '00:00',
           end: '24:00',

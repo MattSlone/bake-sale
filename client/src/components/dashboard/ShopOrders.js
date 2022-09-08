@@ -30,7 +30,6 @@ export default function ShopOrders(props) {
 
   useEffect(() => {
     props.getOrders({ forShop: true })
-    console.log(props)
   }, [])
 
   useEffect(() => {

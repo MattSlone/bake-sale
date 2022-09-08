@@ -25,6 +25,7 @@ const classes = {
   formControl: `${PREFIX}-formControl`,
   routerLink: `${PREFIX}-routerLink`,
   stepLabel: `${PREFIX}-stepLabel`,
+  description: `${PREFIX}-description`,
 };
 
 const Root = styled('div')((
@@ -69,6 +70,10 @@ const Root = styled('div')((
 
   [`& .${classes.routerLink}`]: {
     textDecoration: 'none'
+  },
+
+  [`& .${classes.description} textarea`]: {
+    resize: 'vertical'
   }
 }));
 
@@ -308,6 +313,7 @@ export default function CreateShop(props) {
                             onChange={e => setShopName(e.target.value)}
                           />
                           <TextField
+                            className={classes.description}
                             variant="outlined"
                             margin="normal"
                             required
