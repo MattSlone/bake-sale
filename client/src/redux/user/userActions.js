@@ -234,8 +234,8 @@ export const userSignIn = (formData) => {
     try {
       dispatch(userSignInRequest())
       const res = await axios.post('/api/signin', formData)
-      if(res.data.error[0]) {
-        dispatch(userSignInFailure(res.data.error[0]))
+      if(res.data.error) {
+        dispatch(userSignInFailure(res.data.error))
       }
       else {
         console.log(res.data)

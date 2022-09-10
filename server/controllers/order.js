@@ -17,7 +17,7 @@ require('datejs')
 
 const STRIPE_FEE_MULTIPLE = 0.029
 const STRIPED_FIXED_FEE = 0.3
-const OUR_FEE_MULTIPLE = 0.05
+const OUR_FEE_MULTIPLE = 0.065
 
 module.exports = class OrderController {
   async createPaymentIntent (req, res, next) {
@@ -106,11 +106,11 @@ module.exports = class OrderController {
   }
 
   calculateOurFee(amount) {
-    return amount * OUR_FEE_MULTIPLE
+    return Number(amount * OUR_FEE_MULTIPLE).toFixed(2)
   }
 
   calculateStripeFee(amount) {
-    return amount * STRIPE_FEE_MULTIPLE + STRIPED_FIXED_FEE
+    return Number(amount * STRIPE_FEE_MULTIPLE + STRIPED_FIXED_FEE).toFixed(2)
   }
 
   async calculateOrderTotal(req, item, variation) {

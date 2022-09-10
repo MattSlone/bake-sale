@@ -59,7 +59,7 @@ const StyledPaper = styled(Paper)((
   },
 
   [`& .${classes.cardMedia}`]: {
-    paddingTop: '56.25%', // 16:9
+    objectFit: 'contain'
   },
 
   [`& .${classes.sidebar}`]: {
@@ -113,6 +113,14 @@ export default function CustomProduct(props)
         rtn.error = `${field.name} is required.`
         return rtn
       }
+    }
+    if (!auth.userData.loggedIn) {
+      rtn.error = `You're not logged in.`
+      return rtn
+    }
+    if (!auth.userData.street) {
+      rtn.error = `You must finish creating your profile to place a request.`
+      return rtn
     }
     rtn.success = true
     return rtn
@@ -297,6 +305,7 @@ function Item(props)
           className={classes.cardMedia}
           image={`/api${props.item.path}`}
           title={props.product.name}
+          component="img"
         />
       </Card>
     )

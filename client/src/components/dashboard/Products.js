@@ -30,7 +30,6 @@ const StyledContainer = styled(Container)((
 ) => ({
   [`&.${classes.cardGrid}`]: {
     paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(8),
   },
 
   [`& .${classes.card}`]: {
@@ -51,6 +50,7 @@ const StyledContainer = styled(Container)((
 
   [`& .${classes.cardContent}`]: {
     flexGrow: 1,
+    maxWidth: '300px',
   },
 
   [`& .${classes.routerLinkButton}`]: {
@@ -157,7 +157,7 @@ export default function Products(props) {
                 <Typography gutterBottom variant="h5" component="h2">
                   {product.name}
                 </Typography>
-                <Typography>
+                <Typography noWrap>
                   {product.description}
                   {product.price}
                 </Typography>

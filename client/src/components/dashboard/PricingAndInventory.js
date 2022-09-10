@@ -286,6 +286,7 @@ export default function PricingAndInventory(props) {
                   labelId="variation-label"
                   id="variation-select"
                   label="Delivery Fee Type"
+                  disabled={!props.shop.deliveryDays.length > 0}
                   value={deliveryFeeType}
                   onChange={handleSelectDeliveryFeeType}
                 >

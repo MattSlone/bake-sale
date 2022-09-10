@@ -118,28 +118,22 @@ export default function Home(props) {
       marginBottom: theme.spacing(4),
     },
 
-    [`& .${classes.cardGrid}`]: {
-      padding: 0,
-      paddingTop: (userdata) => theme.spacing(parseInt(`${userdata.loggedIn ? 0 : 8}`)),
-      paddingBottom: theme.spacing(8),
-    },
-
     [`& .${classes.card}`]: {
-      height: '100%',
+      height: '300px',
+      width: '100%',
       display: 'flex',
       flexDirection: 'column',
     },
 
     [`& .${classes.cardMedia}`]: {
-      paddingTop: '56.25%', // 16:9
+      height: '75%',
+      objectFit: 'contain'
     },
 
     [`& .${classes.cardContent}`]: {
-      flexGrow: 1,
+      height: '25%',
+      maxWidth: '300px',
       padding: theme.spacing(1),
-      "&:last-child": {
-        paddingBottom: 0
-      }
     },
 
     [`& .${classes.footer}`]: {
@@ -194,44 +188,44 @@ export default function Home(props) {
             {props.userData.loggedIn ? null : <WelcomeHeader />}
           </Container>
         </div>
-        <Container className={classes.cardGrid} maxWidth="lg">
-          {/* End hero unit */}
-          <Grid container spacing={2}>
-            <Grid item spacing={1} container alignItems={'center'} justifyContent={'flex-start'} direction={'row'} xs={12}>
-              <Grid item>
-                <FormControl sx={{ minWidth: 120 } } size="small">
-                  <InputLabel>Fulfillment</InputLabel>
-                  <Select
-                    value={fulfillment}
-                    label="Fulfillment"
-                    onChange={handleChangeFulfillment}
-                  >
-                    <MenuItem value={''}>Any</MenuItem>
-                    <MenuItem value={'pickup'}>Pickup</MenuItem>
-                    <MenuItem value={'delivery'}>Delivery</MenuItem>
-                    <MenuItem value={'shipping'}>Shipping</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item>
-                <FormControl sx={{ minWidth: 80 } } size="small">
-                  <InputLabel>Miles</InputLabel>
-                  <Select
-                    value={distance}
-                    label="Miles"
-                    onChange={handleChangeDistance}
-                  >
-                    <MenuItem value={''}>Any</MenuItem>
-                    <MenuItem value={5}>5</MenuItem>
-                    <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={15}>15</MenuItem>
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={50}>50</MenuItem>
-                    <MenuItem value={100}>100</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+        {/* End hero unit */}
+        <Grid container spacing={2}>
+          <Grid item spacing={1} container alignItems={'center'} justifyContent={'flex-start'} direction={'row'} xs={12}>
+            <Grid item>
+              <FormControl sx={{ minWidth: 120 } } size="small">
+                <InputLabel>Fulfillment</InputLabel>
+                <Select
+                  value={fulfillment}
+                  label="Fulfillment"
+                  onChange={handleChangeFulfillment}
+                >
+                  <MenuItem value={''}>Any</MenuItem>
+                  <MenuItem value={'pickup'}>Pickup</MenuItem>
+                  <MenuItem value={'delivery'}>Delivery</MenuItem>
+                  <MenuItem value={'shipping'}>Shipping</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
+            <Grid item>
+              <FormControl sx={{ minWidth: 80 } } size="small">
+                <InputLabel>Miles</InputLabel>
+                <Select
+                  value={distance}
+                  label="Miles"
+                  onChange={handleChangeDistance}
+                >
+                  <MenuItem value={''}>Any</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={15}>15</MenuItem>
+                  <MenuItem value={25}>25</MenuItem>
+                  <MenuItem value={50}>50</MenuItem>
+                  <MenuItem value={100}>100</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+          <Grid item xs={12} spacing={1} container justifyContent={'flex-start'}>
             {props.product.products ? props.product.products.map((card) => (
               <Grid item key={card.id} xs={12} sm={6} md={4}>
                 <RouterLink className={classes.routerLink} to={`/products/${card.id}`}>
@@ -239,12 +233,13 @@ export default function Home(props) {
                     <CardMedia
                       className={classes.cardMedia}
                       image={`/api${card.ProductImages[0]?.path}`}
+                      component="img"
                     />
-                    <CardContent noGutter className={classes.cardContent}>
-                      <Typography noWrap gutterBottom variant="h5" component="h5">
+                    <CardContent className={classes.cardContent}>
+                      <Typography noWrap variant="h5" component="h5">
                         {card.name}
                       </Typography>
-                      <Typography noWrap gutterBottom variant="p" component="p">
+                      <Typography noWrap variant="p" component="p">
                         {card.description}
                       </Typography>
                     </CardContent>
@@ -252,11 +247,11 @@ export default function Home(props) {
                 </RouterLink>
               </Grid>
             )) : ''}
-            <Grid item xs={12} container justifyContent="center">
-              <Pagination count={Math.ceil(props.product.count / 6)} page={page} color="primary" onChange={handleChangePage} />
-            </Grid>
           </Grid>
-        </Container>
+          <Grid item xs={12} container justifyContent="center">
+            <Pagination count={Math.ceil(props.product.count / 6)} page={page} color="primary" onChange={handleChangePage} />
+          </Grid>
+        </Grid>
       </main>
       {/* Footer */}
       <footer className={classes.footer}>

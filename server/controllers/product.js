@@ -689,7 +689,7 @@ module.exports = class ProductController {
         return
       }
       if (!req.body.product.custom) {
-        const validVarieties = await ProductController.validateVarieties(req.body.product.varieties)
+        const validVarieties = await ProductController.validateVarieties(req.body.product.varieties, req.user.id)
         if (!validVarieties.success) {
           console.log(validVarieties.error)
           req.flash('error', validVarieties.error)
@@ -717,9 +717,17 @@ module.exports = class ProductController {
     }
   }
 
-  static async validateVarieties(varieties) {
+  static async validateVarieties(varieties, userId) {
     try {
       let rtn = { error: '', success: false }
+      const shop = await db.Shop.findOne({
+        where: { UserId: userId }
+      })
+      const deliverySchedule = await db.DeliverySchedule.findOne({
+        where: { ShopId: shop.id } ,
+        attributes: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      })
+      const deliveryDays = Object.keys(deliverySchedule.dataValues).filter(day => deliverySchedule.dataValues[day])
       for (let variety of varieties) {
         for (const field of [
           { name: 'Quantity', value: variety.quantity },
@@ -737,11 +745,16 @@ module.exports = class ProductController {
           rtn.error = "Product price must be at least $1.00"
           return rtn
         }
+        console.log(deliveryDays)
+        if (variety.delivery && variety.delivery > 0 && deliveryDays.length < 1) {
+          rtn.error = "You cannot offer delivery without setting a delivery schedule for you shop."
+          return rtn
+        }
         rtn.success = true
         return rtn
       }
     } catch (err) {
-      return { error: err, success: false}
+      return { error: err.message, success: false}
     }
   }
 }

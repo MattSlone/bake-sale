@@ -91,7 +91,7 @@ export default function App({ setAttemptedRoute }) {
                       <Route path='/products/:id' children={<ProductContainer />} />
                       <Route path='/s/:id' children={<ShopContainer />} />
                     </Switch>
-                  : (!['/', '/signin', '/signup', '/forgotpassword'].includes(url.pathname) ? setAttemptedRoute(url.pathname) : true)
+                  : (!['/', '/signin', '/signup', '/forgotpassword', '/resetpassword'].includes(url.pathname) ? setAttemptedRoute(url.pathname) : true)
                    && <Redirect to="/signin" />}
                 </Route>
               </Switch>

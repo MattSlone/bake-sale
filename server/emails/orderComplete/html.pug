@@ -2,4 +2,5 @@ p Hi #{name},
 p This is confirmation of your order for #{productName} in the amount of $#{total}.
 p You can see your order details, including the expected fulfillment window and address on your orders page: 
 - var href = `//${baseUrl}:${port}/user/orders`;
-a(href=href) My Orders
+a(href=href) #{href}
+p If the link doesn't work, you can copy the url into your address bar.

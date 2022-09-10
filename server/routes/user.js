@@ -7,7 +7,6 @@ module.exports = (app, passport) => {
   app.get('/api/signin', (req, res, next) => {
     res.send({
       error: req.flash('error'),
-      success: false
     })
   })
 

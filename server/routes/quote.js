@@ -1,14 +1,17 @@
 'use strict';
 
 const MakeQuoteController = require('../controllers/quote'),
-  QuoteController = new MakeQuoteController()
+  QuoteController = new MakeQuoteController(),
+  UserController = require('../controllers/user')
 
 module.exports = (app) => {
   /*app.get('/tenant', UserController.isLoggedIn, (req, res, next) => {
     res.send({ user: req.user })
   })*/
 
-  app.post('/api/quote/create', async (req, res, next) => {
+  app.post('/api/quote/create',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
     try {
         let quote = await QuoteController.create(req, res, next)
         res.send({
@@ -21,7 +24,9 @@ module.exports = (app) => {
     }
   })
 
-  app.post('/api/quote/setprice', async (req, res, next) => {
+  app.post('/api/quote/setprice',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
     try {
         await QuoteController.updatePrice(req, res, next)
         res.send({
@@ -35,7 +40,9 @@ module.exports = (app) => {
     }
   })
 
-  app.get('/api/quotes', async (req, res, next) => {
+  app.get('/api/quotes',
+  UserController.isLoggedIn,
+  async (req, res, next) => {
     try {
         let quotes = await QuoteController.list(req, res, next)
         res.send({

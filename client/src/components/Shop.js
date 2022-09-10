@@ -40,21 +40,21 @@ const StyledContainer = styled(Container)((
   },
 
   [`& .${classes.card}`]: {
-    height: '100%',
+    height: '300px',
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
 
   [`& .${classes.cardMedia}`]: {
-    paddingTop: '56.25%', // 16:9
+    height: '75%',
+    objectFit: 'contain'
   },
 
   [`& .${classes.cardContent}`]: {
-    flexGrow: 1,
+    height: '25%',
+    maxWidth: '300px',
     padding: theme.spacing(1),
-    "&:last-child": {
-      paddingBottom: 0
-    }
   },
 
   [`& .${classes.routerLinkButton}`]: {
@@ -90,7 +90,7 @@ const StyledContainer = styled(Container)((
   },
 
   [`& .${classes.infoBox}`]: {
-    padding: '1em',
+    padding: '0.5em',
     marginTop: '1em'
   },
 
@@ -135,7 +135,7 @@ export default function Shop(props) {
     <StyledContainer>
       <Header title={shop.name} />
       <Paper className={classes.infoBox}>
-        <Typography variant="body1">
+        <Typography sx={{fontSize: '10pt'}}>
           <ReactMarkdown remarkPlugins={[remarkGfm]} >
             {shop.description}
           </ReactMarkdown>
@@ -150,12 +150,13 @@ export default function Shop(props) {
                   <CardMedia
                     className={classes.cardMedia}
                     image={`/api${card.ProductImages[0]?.path}`}
+                    component="img"
                   />
-                  <CardContent noGutter className={classes.cardContent}>
-                    <Typography noWrap gutterBottom variant="h5" component="h5">
+                  <CardContent className={classes.cardContent}>
+                    <Typography noWrap variant="h5" component="h5">
                       {card.name}
                     </Typography>
-                    <Typography noWrap gutterBottom variant="p" component="p">
+                    <Typography noWrap variant="p" component="p">
                       {card.description}
                     </Typography>
                   </CardContent>

@@ -53,10 +53,6 @@ const StyledPaper = styled(Paper)((
     flexDirection: 'column',
   },
 
-  [`& .${classes.cardMedia}`]: {
-    paddingTop: '56.25%', // 16:9
-  },
-
   [`& .${classes.productAttributes}`]: {
     height: '100%'
   },
@@ -80,6 +76,10 @@ const StyledPaper = styled(Paper)((
     [theme.breakpoints.down('md')]: {
       display: "none"
     },
+  },
+
+  [`& .${classes.cardMedia}`]: {
+    objectFit: 'contain'
   },
 
   [`& .${classes.descriptionContainerBottom}`]: {
@@ -428,6 +428,7 @@ function Item(props)
           className={classes.cardMedia}
           image={`/api${props.item.path}`}
           title={props.product.name}
+          component="img"
         />
       </Card>
     )

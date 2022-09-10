@@ -67,6 +67,7 @@ module.exports = (passport) => {
       }
       let valid = await user.validPassword(password);
       if(!valid) {
+        console.log('invalid password yo')
         return done(null, false, { message: 'Incorrect password.' }); // code 5 (incorrect password)
       }
       console.log('good to go: ', user.id)
