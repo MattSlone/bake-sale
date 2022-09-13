@@ -99,7 +99,7 @@ export default function AddCustomProduct (props) {
         productImages: product.ProductImages,
         custom: true,
         varieties: product.Varieties,
-        ingredients: product.Ingredients,
+        ingredients: product.ingredients,
         addons: product.Addons,
       })
     } else {

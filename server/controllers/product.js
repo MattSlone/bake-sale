@@ -308,7 +308,7 @@ module.exports = class ProductController {
           offset: offset,
           limit: limit,
           include: [
-              db.Ingredient,
+              { model: db.Ingredient, as: 'ingredients' },
               {
                 model: db.Variety,
                 where: {
@@ -345,8 +345,10 @@ module.exports = class ProductController {
               }
           ]
       });
+      console.log(JSON.stringify(products))
       return products
     }
+    
     catch(err) {
       console.log('ERROR:', err)
       throw Error(err)
@@ -413,16 +415,23 @@ module.exports = class ProductController {
   async updateProductIngredients(userId, product, ingredients) {
       const updateUserIngredients = (await Promise.all(ingredients.map(async newIngredient => {
           const ingredient = await db.Ingredient.findOne({
-              where: { 
-                  name: newIngredient.name
-              },
-              include: { model: db.Product, include: { model: db.Shop, include: {
-                model: db.User,
-                where: {
-                    id: userId
-                },
-                required: true
-              }}}
+            where: { 
+              name: newIngredient.name
+            },
+            include: { 
+              model: db.Product,
+              as: 'products',
+              include: {
+                model: db.Shop,
+                include: {
+                  model: db.User,
+                  where: {
+                      id: userId
+                  },
+                  required: true
+                }
+              }
+            }
           })
           return ingredient ? ingredient : false
       }))).filter(ingredient => ingredient)
@@ -439,6 +448,7 @@ module.exports = class ProductController {
           },
           include: {
               model: db.Product,
+              as: 'products',
               where: { id: product.id }
           }
       })
@@ -581,7 +591,7 @@ module.exports = class ProductController {
       );
       product = await db.Product.findByPk(req.body.product.id, 
         {
-          include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage, db.Form]
+          include: [db.Variety, db.Addon, { model: db.Ingredient, as: 'ingredients' }, db.ProductImage, db.Form]
         }
       )
       let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
@@ -600,7 +610,7 @@ module.exports = class ProductController {
       }
       product = await db.Product.findByPk(req.body.product.id, 
         {
-          include: [db.Variety, db.Addon, db.Ingredient, db.ProductImage]
+          include: [db.Variety, db.Addon, { model: db.Ingredient, as: 'ingredients' }, db.ProductImage]
         }
       )
       return product

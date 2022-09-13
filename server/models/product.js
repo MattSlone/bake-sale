@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-        this.belongsTo(models.Shop)
-        this.Ingredient = this.belongsToMany(models.Ingredient, { through: "product_ingredient" })
+        this.Shop = this.belongsTo(models.Shop)
+        this.Ingredient = this.belongsToMany(models.Ingredient, { as: 'ingredients', through: "product_ingredient" })
         this.Variety = this.hasMany(models.Variety)
         this.Addon = this.hasMany(models.Addon)
         this.Form = this.hasOne(models.Form)

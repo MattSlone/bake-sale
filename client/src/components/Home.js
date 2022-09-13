@@ -127,7 +127,7 @@ export default function Home(props) {
 
     [`& .${classes.cardMedia}`]: {
       height: '75%',
-      objectFit: 'contain'
+      objectFit: 'cover'
     },
 
     [`& .${classes.cardContent}`]: {

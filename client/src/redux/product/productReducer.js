@@ -168,7 +168,7 @@ const productReducer = (state = initialState, action) => {
       category: action.payload.category,
       processingTime: action.payload.processingTime,
       automaticRenewal: action.payload.automaticRenewal,
-      ingredients: action.payload.Ingredients,
+      ingredients: action.payload.ingredients,
       varieties: action.payload.Varieties,
       addons: action.payload.Addons,
       personalizationPrompt: action.payload.personalizationPrompt,

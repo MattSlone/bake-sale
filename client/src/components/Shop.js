@@ -48,7 +48,7 @@ const StyledContainer = styled(Container)((
 
   [`& .${classes.cardMedia}`]: {
     height: '75%',
-    objectFit: 'contain'
+    objectFit: 'cover'
   },
 
   [`& .${classes.cardContent}`]: {

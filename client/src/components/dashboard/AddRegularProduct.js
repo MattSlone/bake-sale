@@ -146,7 +146,7 @@ export default function AddRegularProduct(props) {
         id: product.id,
         custom: product.custom,
         varieties: product.Varieties,
-        ingredients: product.Ingredients,
+        ingredients: product.ingredients,
         addons: product.Addons,
         productImages: product.ProductImages,
         custom: false,
