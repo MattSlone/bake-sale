@@ -46,7 +46,8 @@ module.exports = class OrderController {
           const variation = await db.Variety.findOne({
             where: {
               ProductId: item.product.id,
-              quantity: item.variation
+              quantity: item.variation,
+              deleted: false
             }
           })
           const pendingStatus = await db.OrderStatus.findOne({ where: { status: 'pending' } })
@@ -150,7 +151,8 @@ module.exports = class OrderController {
             let selectedVariation = await db.Variety.findOne({
               where: {
                 ProductId: item.product.id,
-                quantity: item.variation
+                quantity: item.variation,
+                deleted: false
               }
             })
             const shopItemOrderTotal = await this.calculateOrderTotal(req, item, selectedVariation)
@@ -473,7 +475,11 @@ module.exports = class OrderController {
         return await db.Product.findOne({
           attributes: ['id', 'inventory', 'name'],
           where: { id: item.product.id },
-          include: [db.Variety, db.Addon, db.Shop]
+          include: [
+            { model: db.Variety, where: { deleted: false } },
+            { model: db.Addon, where: { deleted: false }, required: false },
+            db.Shop
+          ]
         })
       }))
       const productsUnique = products.filter((product, index) => products.indexOf(product) === index)

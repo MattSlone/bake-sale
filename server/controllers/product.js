@@ -57,11 +57,11 @@ module.exports = class ProductController {
   }
 
   async getProductPrice(req) {
-    console.log(req.body)
     const variation = await db.Variety.findOne({
       where: {
         ProductId: req.body.product.id,
-        quantity: req.body.variation
+        quantity: req.body.variation,
+        deleted: false
       }
     })
     const productPrice = await this.calculateProductPrice(req, req.body, variation)
@@ -119,7 +119,10 @@ module.exports = class ProductController {
     for (const addon of addons) {
       if(addon.checked) {
         let addonInstance = await db.Addon.findByPk(addon.id,
-          { attributes: ['price', 'secondaryPrice', 'ProductId'] }
+          {
+            attributes: ['price', 'secondaryPrice', 'ProductId'],
+            where: { deleted: false }
+          }
         )
         if (addonInstance.ProductId != item.product.id) {
           throw Error('ERROR: addon doesn\'t exist for this product. Handle accordingly')
@@ -229,10 +232,11 @@ module.exports = class ProductController {
               quantity = 1
           }
           const variation = await db.Variety.findOne({ 
-              where: {
-                  ProductId: product.id,
-                  quantity: quantity 
-              }
+            where: {
+              ProductId: product.id,
+              quantity: quantity ,
+              deleted: false
+            }
           })
           const distance_meters = GMaps.haversine_distance(
               { lat: user.lat, lng: user.lng },
@@ -296,29 +300,34 @@ module.exports = class ProductController {
 
   async list(req, res, next) {
     try {
-      // remove this check when go live
-      if (!req.isAuthenticated()) {
-        return []
-      }
+      const ownShop = req.query.shop && req.isAuthenticated() ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: req.user.id } }) : false
+      const shopPage = req.query.shopName ? await db.Shop.findOne({ where: { 
+        uri: req.query.shopName
+      }}) : false
       const where = await this.buildWhereClause(req)
       let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
       let limit = 6
       const products = await db.Product.findAll({
           where: where,
           offset: offset,
-          limit: limit,
+          limit: (ownShop || shopPage) ? 100 : limit,
           include: [
               { model: db.Ingredient, as: 'ingredients' },
               {
                 model: db.Variety,
                 where: {
+                  deleted: false,
                   ...req.query.fulfillment === 'delivery' &&
                     { delivery: { [Op.gt]: 0 } },
                   ...req.query.fulfillment === 'shipping' &&
                     { shipping: { [Op.gt]: 0 } }
                 }
               },
-              db.Addon,
+              {
+                model: db.Addon,
+                where: { deleted: false },
+                required: false
+              },
               db.ProductImage,
               {
                   association: db.Product.Form,
@@ -359,11 +368,14 @@ module.exports = class ProductController {
     try {
       const where = await this.buildWhereClause(req)
       const count = await db.Product.count({
+        distinct: true,
+        col: 'id',
         where: where,
         include: [
           {
             model: db.Variety,
             where: {
+              deleted: false,
               ...req.query.fulfillment === 'delivery' &&
                 { delivery: { [Op.gt]: 0 } },
               ...req.query.fulfillment === 'shipping' &&
@@ -594,23 +606,45 @@ module.exports = class ProductController {
           include: [db.Variety, db.Addon, { model: db.Ingredient, as: 'ingredients' }, db.ProductImage, db.Form]
         }
       )
-      let varieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
-      await product.setVarieties(varieties.map(variety => variety.id))
-      await db.Variety.destroy({
-          where: { ProductId: null }
+      let newVarieties = await this.upsertAssociation(product, db.Variety, req.body.product.varieties)
+      let allVarieties = await db.Variety.findAll({
+        where: { ProductId: product.id }
       })
-      let addons = await this.upsertAssociation(product, db.Addon, req.body.product.addons)
-      await product.setAddons(addons.map(addon => addon.id))
-      await db.Addon.destroy({
-        where: { ProductId: null }
+      const deletedVarieties = allVarieties.filter(
+        variety => !newVarieties.map(
+          newVariety => newVariety.id
+        ).includes(variety.id)
+      )
+      for (let variety of deletedVarieties) {
+        variety.deleted = true
+        await variety.save()
+      }
+
+      let newAddons = await this.upsertAssociation(product, db.Addon, req.body.product.addons)
+      let allAddons = await db.Addon.findAll({
+        where: { ProductId: product.id }
       })
+      const deletedAddons = allAddons.filter(
+        addon => !newAddons.map(
+          newAddon => newAddon.id
+        ).includes(addon.id)
+      )
+      for (let addon of deletedAddons) {
+        addon.deleted = true
+        await addon.save()
+      }
+
       await this.updateProductIngredients(req.user.id, product, req.body.product.ingredients)
       if (product.custom) {
         await this.updateCustomProductFields(product, req.body.product.fields)
       }
       product = await db.Product.findByPk(req.body.product.id, 
         {
-          include: [db.Variety, db.Addon, { model: db.Ingredient, as: 'ingredients' }, db.ProductImage]
+          include: [
+            { model: db.Variety, where: { deleted: false } },
+            { model: db.Addon, where: { deleted: false }, required: false },
+            { model: db.Ingredient, as: 'ingredients' },
+            db.ProductImage]
         }
       )
       return product

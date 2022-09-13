@@ -12,8 +12,6 @@ import CustomProductContainer from './components/containers/CustomProductContain
 import Maintenance from './components/Maintenance';
 import Box from '@mui/material/Box';
 import { useAuth } from './hooks/use-auth';
-import { useTheme } from '@mui/styles';
-import { useRouteMatch } from "react-router-dom";
 import CheckoutContainer from './components/containers/CheckoutContainer';
 import QuoteContainer from './components/containers/QuoteContainer';
 import { Route, Redirect, Switch, useHistory, useLocation } from "react-router-dom";
@@ -70,15 +68,22 @@ export default function App({ setAttemptedRoute }) {
             <main className={classes.content}>
               <Box sx={{height: 64}} />
               <Switch>
-                <Route path='/' exact component={auth.userData.loggedIn ? HomeContainer : Maintenance} key='/'/>
+                
+                <Route path='/' exact component={
+                  HomeContainer
+                  // auth.userData.loggedIn ? HomeContainer : Maintenance
+                } key='/'/>
                 <Route path='/signin' component={SignInContainer} key='/signin'/>
                 <Route path='/signup' component={SignUpContainer}/>
                 <Route path='/forgotpassword' component={ForgotPasswordContainer}/>
                 <Route path='/resetpassword' component={ResetPassword}/>
                 <Route path='/signout' component={HomeContainer} key='/' beforeEnter/>
-                <Route path={["/dashboard", "/checkout", "/user"].concat([
-                  "/products", "/s/"
-                ])}>
+                <Route path='/products/custom/:id' children={<CustomProductContainer />} />
+                <Route path='/products/:id' children={<ProductContainer />} />
+                <Route path='/s/:id' children={<ShopContainer />} />
+                <Route path={["/dashboard", "/checkout", "/user"]
+                  // .concat(["/products", "/s/"])
+                }>
                   {auth.userData.loggedIn ?
                     <Switch>
                       <Route path='/dashboard' component={DashboardContainer} />
@@ -87,11 +92,16 @@ export default function App({ setAttemptedRoute }) {
                       <Route path='/user/orders' component={OrdersContainer} />
                       <Route path='/user/profile' component={ProfileContainer}/>
                       <Route path='/user/account' component={AccountContainer}/>
-                      <Route path='/products/custom/:id' children={<CustomProductContainer />} />
-                      <Route path='/products/:id' children={<ProductContainer />} />
-                      <Route path='/s/:id' children={<ShopContainer />} />
                     </Switch>
-                  : (!['/', '/signin', '/signup', '/forgotpassword', '/resetpassword'].includes(url.pathname) ? setAttemptedRoute(url.pathname) : true)
+                  : (![
+                      /\/$/,
+                      /\/signin/,
+                      /\/signup/,
+                      /\/forgotpassword/,
+                      /\/resetpassword/,
+                      /\/s\//,
+                      /\/products\//
+                    ].some(regex => url.pathname.match(regex)) ? setAttemptedRoute(url.pathname) : true)
                    && <Redirect to="/signin" />}
                 </Route>
               </Switch>

@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import { useRouteMatch } from 'react-router-dom';
-
+import { useAuth } from '../../hooks/use-auth'
 const PREFIX = 'SetupPaymentAccount';
 
 const classes = {
@@ -24,6 +24,7 @@ const StyledContainer = styled(Container)((
 
 export default function SetupPaymentAccount(props) {
   const [message, setMessage] = useState('')
+  const auth = useAuth()
   const match = useRouteMatch();
   const edit = match.path.includes('edit')
 
@@ -56,6 +57,7 @@ export default function SetupPaymentAccount(props) {
   useEffect(() => {
     if (props.shop.stripeDetailsSubmitted) {
       setMessage("Your stripe account has been created! You're good to go!")
+      props.getShop({ UserId: auth.userData.user })
     }
   }, [props.shop.stripeDetailsSubmitted])
 

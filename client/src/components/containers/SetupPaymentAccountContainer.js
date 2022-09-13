@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import SetupPaymentAccount from '../dashboard/SetupPaymentAccount'
-import { createStripeAccount, checkStripeDetailsSubmitted } from '../../redux'
+import { createStripeAccount, checkStripeDetailsSubmitted, getShop } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -13,6 +13,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    getShop: (params) => dispatch(getShop(params)),
     createStripeAccount: (shopId) => dispatch(createStripeAccount(shopId)),
     checkStripeDetailsSubmitted: (accountId) => dispatch(checkStripeDetailsSubmitted(accountId))
   }

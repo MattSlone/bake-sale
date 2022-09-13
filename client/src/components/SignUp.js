@@ -109,7 +109,7 @@ export default function SignUp(props) {
         setUsername('')
         setPassword('')
         if (auth.userData.message) {
-        setMessage(auth.userData.message)
+          setMessage(auth.userData.message)
         } else {
           setMessage('')
         }

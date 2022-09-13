@@ -54,7 +54,11 @@ const userReducer = (state = initialState, action) => {
     case USER_SIGNUP_SUCCESS: return {
       ...state,
       loading: false,
+      loggedIn: true,
       message: action.payload.message,
+      email: action.payload.success.email,
+      username: action.payload.success.username,
+      user: action.payload,
       error: ''
     }
     case USER_SIGNUP_FAILURE: return {

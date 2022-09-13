@@ -200,7 +200,10 @@ export const userSignUp = (formData) => {
       }
       else {
         // dispatch(getShop({ UserId: res.data.success.id }))
-        dispatch(userSignUpSuccess({ message: 'You\'re signed up! Check your email for confirmation.' }))
+        dispatch(userSignUpSuccess({
+          ...res.data,
+          message: 'You\'re signed up! Check your email for confirmation.'
+        }))
       }
     } catch(error) {
       if (error.response) {
@@ -238,7 +241,6 @@ export const userSignIn = (formData) => {
         dispatch(userSignInFailure(res.data.error))
       }
       else {
-        console.log(res.data)
         dispatch(getShop({ UserId: res.data.success.id }))
         dispatch(userSignInSuccess(res.data))
       }

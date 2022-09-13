@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   Addon.init({
     name: DataTypes.STRING,
     price: DataTypes.FLOAT,
-    secondaryPrice: DataTypes.FLOAT
+    secondaryPrice: DataTypes.FLOAT,
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'Addon',

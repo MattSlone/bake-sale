@@ -83,6 +83,10 @@ module.exports = class UserController {
         template: 'signup',
         message: {
           to: req.user.username
+        },
+        locals: {
+          baseUrl: env.baseUrl,
+          port: env.port
         }
       })
     } catch (err) {

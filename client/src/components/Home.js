@@ -152,13 +152,14 @@ export default function Home(props) {
 
   const WelcomeHeader = () => (
     <>
-    <Typography variant="h5" align="center" color="textSecondary" paragraph>
+    {/*<Typography variant="h5" align="center" color="textSecondary" paragraph>
       Buy and sell baked goods and other food from the comfort of your home!
       Did you know 49 out of the 50 states
       have <Link href="https://foodpreneurinstitute.com/cottage-food-law/">cottage food laws</Link> governing
       the sale of homemade food? We streamlined the process to make it easy
       for home chefs. All that's left to do is order what looks good!
     </Typography>
+  */}
     <div className={classes.heroButtons}>
       <Grid container spacing={2} justifyContent="center">
         <Grid item>
@@ -182,13 +183,6 @@ export default function Home(props) {
     <Root>
       <CssBaseline />
       <main>
-        {/* Hero unit */}
-        <div className={classes.heroContent}>
-          <Container maxWidth="sm">
-            {props.userData.loggedIn ? null : <WelcomeHeader />}
-          </Container>
-        </div>
-        {/* End hero unit */}
         <Grid container spacing={2}>
           <Grid item spacing={1} container alignItems={'center'} justifyContent={'flex-start'} direction={'row'} xs={12}>
             <Grid item>
@@ -224,6 +218,15 @@ export default function Home(props) {
                 </Select>
               </FormControl>
             </Grid>
+            {!props.userData.loggedIn &&
+              <Grid item>
+                <RouterLink style={{ textDecoration: 'none' }} to="/signin">
+                  <Button variant='contained' color='primary'>
+                    Sign in
+                  </Button>
+                </RouterLink>
+              </Grid>
+            }
           </Grid>
           <Grid item xs={12} spacing={1} container justifyContent={'flex-start'}>
             {props.product.products ? props.product.products.map((card) => (

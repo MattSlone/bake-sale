@@ -120,7 +120,6 @@ export default function SignIn() {
   }
 
   useEffect(() => {
-    console.log(auth.userData.loading)
     if(auth.userData.loggedIn == true) {
       if (attemptedRoute) {
         auth.setAttemptedRoute('')
@@ -128,7 +127,6 @@ export default function SignIn() {
       } else {
         history.push('/')
       }
-      
     }
   }, [auth.userData.loading])
 

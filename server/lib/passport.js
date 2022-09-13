@@ -41,7 +41,7 @@ module.exports = (passport) => {
             lng: req.body.lng,
             seller: req.body.seller,
             email: username,
-            active: 0,
+            active: 1,
             password: await User.generateHash(password),
           }
         });

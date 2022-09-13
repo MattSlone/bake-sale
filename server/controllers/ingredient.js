@@ -55,21 +55,27 @@ module.exports = class IngredientController {
       const include = {
         model: db.Product,
         as: 'products',
-        include: {
-          model: db.Shop,
-          include: {
-            model: db.User,
-            where: { id: req.user.id }
-          }
-        },
         ...req.query.productId && { where: { id: req.body.productId } }
       }
-      const ingredients = await db.Ingredient.findAll({
+      let ingredients = await db.Ingredient.findAll({
         where: where,
         include: include,
         attributes: ['name', 'allergen']
       })
-      return ingredients
+      ingredients = await Promise.all(ingredients.map(async ingredient => {
+        const validProducts = await Promise.all(ingredient.products.map(async product => {
+          const validShop = await db.Shop.findOne({
+            where: { id: product.ShopId },
+            include: {
+              model: db.User,
+              where: { id: req.user.id }
+            }
+          })
+          return !!validShop
+        }))
+        return validProducts.some(product => !!product) ? ingredient : false
+      }))
+      return ingredients.filter(ingredient => !!ingredient)
     } catch (err) {
       req.flash('error', err.message)
       return false

@@ -20,7 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     secondaryShipping: DataTypes.FLOAT,
     deliveryFeeType: DataTypes.STRING,
     delivery: DataTypes.FLOAT,
-    secondaryDelivery: DataTypes.FLOAT
+    secondaryDelivery: DataTypes.FLOAT,
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'Variety',
