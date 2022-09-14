@@ -21,7 +21,8 @@ import {
   RESET_PRODUCT,
   SET_CUSTOM_FORM,
   SET_PRODUCT_WEIGHT,
-  SET_VALID_PRODUCT
+  SET_VALID_PRODUCT,
+  SET_CATEGORY
 } from './productTypes'
 
 const initialState = {
@@ -45,6 +46,7 @@ const initialState = {
   products: [],
   fields: [],
   count: 0,
+  filterCategory: '',
   valid: false
 }
 
@@ -57,6 +59,10 @@ const productReducer = (state = initialState, action) => {
     case SET_INGREDIENTS: return {
       ...state,
       ingredients: action.payload
+    }
+    case SET_CATEGORY: return {
+      ...state,
+      filterCategory: action.payload
     }
     case SET_CUSTOM_FORM: return {
       ...state,

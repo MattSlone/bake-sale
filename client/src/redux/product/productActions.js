@@ -23,7 +23,8 @@ import {
   RESET_PRODUCT,
   SET_CUSTOM_FORM,
   SET_PRODUCT_WEIGHT,
-  SET_VALID_PRODUCT
+  SET_VALID_PRODUCT,
+  SET_CATEGORY
 } from './productTypes'
 
 export const setProductImagesPreview = (files) => {
@@ -66,6 +67,13 @@ export const setValidProduct = (valid) => {
   return {
     type: SET_VALID_PRODUCT,
     payload: valid
+  }
+}
+
+export const setCategory = (category) => {
+  return {
+    type: SET_CATEGORY,
+    payload: category
   }
 }
 

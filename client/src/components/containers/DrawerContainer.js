@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import Drawer from '../Drawer'
-import { getProducts } from '../../redux'
+import { setCategory, getProducts, getProductsCount } from '../../redux'
 
 const mapStateToProps = state => {
   return {
@@ -10,7 +10,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getProducts: (formData) => dispatch(getProducts(formData))
+    getProducts: (formData) => dispatch(getProducts(formData)),
+    getProductsCount: (formData) => dispatch(getProductsCount(formData)),
+    setCategory: (category) => dispatch(setCategory(category))
   }
 }
 

@@ -10,9 +10,10 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import Pagination from '@mui/material/Pagination'
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { useIsMount } from '../hooks/useIsMount';
 
 function Copyright() {
   return (
@@ -29,33 +30,34 @@ function Copyright() {
 
 export default function Home(props) {
   const [count, setCount] = useState(props.product.count)
+  const isMount = useIsMount()
+  const history = useHistory()
   const [lastId, setLastId] = useState(0)
   const [page, setPage] = useState(1)
   const [distance, setDistance] = useState('')
   const [fulfillment, setFulfillment] = useState('')
 
   useEffect(() => {
-    props.getProducts({
-      lastId: lastId,
-      fulfillment: fulfillment,
-      distance: distance
-    })
-    props.getProductsCount({
-      fulfillment: fulfillment,
-      distance: distance
-    })
+    props.getProducts()
+    props.getProductsCount()
   }, [])
 
   useEffect(() => {
-    props.getProducts({
-      lastId: lastId,
-      fulfillment: fulfillment,
-      distance: distance
-    })
-    props.getProductsCount({
-      fulfillment: fulfillment,
-      distance: distance
-    })
+    console.log(history.location.state?.from)
+    if (!isMount || history.location.state?.from === 'drawer') {
+      props.getProducts({
+        lastId: lastId,
+        fulfillment: fulfillment,
+        distance: distance,
+        ...props.product.filterCategory && { category: props.product.filterCategory }
+      })
+      props.getProductsCount({
+        fulfillment: fulfillment,
+        distance: distance,
+        ...props.product.filterCategory && { category: props.product.filterCategory }
+      })
+      window.history.replaceState({}, document.title)
+    }
   }, [fulfillment, distance])
 
   useEffect(() => {

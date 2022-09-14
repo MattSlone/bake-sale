@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AppBarContainer from './containers/AppBarContainer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -80,7 +80,7 @@ const drawerWidth = 240;
 
 function ResponsiveDrawer(props) {
   const { window } = props;
-
+  const history = useHistory()
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -94,10 +94,17 @@ function ResponsiveDrawer(props) {
   })
 
   const handleListItemClick = (category) => {
-    console.log(category)
-    props.getProducts({
-      category: category
-    })
+    props.setCategory(category)
+    if (location.pathname !== '/') {
+      history.push('/', { from: 'drawer' })
+    } else {
+      props.getProducts({
+        category: category
+      })
+      props.getProductsCount({
+        category: category
+      })
+    }
   }
 
   const handleDrawerToggle = () => {

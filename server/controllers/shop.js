@@ -49,7 +49,7 @@ module.exports = class ShopController {
       if (!(req.query.id || req.query.uri || req.query.name || req.query.UserId)) {
         return false
       }
-      const ownShop = await db.Shop.findOne({ where: { UserId: req.user.id } })
+      const ownShop = req.isAuthenticated() ? await db.Shop.findOne({ where: { UserId: req.user.id } }) : false
       if (req.query.forOrder) {
         const order = await db.Order.findOne({
           where: {

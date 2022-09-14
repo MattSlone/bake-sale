@@ -242,14 +242,15 @@ export default function PrimarySearchAppBar(props) {
   }
 
   function handleHomeClick() {
-    console.log(location.pathname)
     if (location.pathname == "/") {
       props.getProducts()
+      props.getProductsCount()
     }
   }
 
   useEffect(() => {
     props.getProducts({ search: search })
+    props.getProductsCount({ search: search })
   }, [search])
 
   const renderSignOutButton = (
