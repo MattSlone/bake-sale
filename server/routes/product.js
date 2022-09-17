@@ -45,10 +45,14 @@ module.exports = (app) => {
   })
 
   app.get('/api/product/error', async (req, res, next) => {
-    res.send({
-      error: req.flash('error'),
-      success: false
-    })
+    try {
+      res.send({
+        error: req.flash('error'),
+        success: false
+      })
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   app.post('/api/product/images',
@@ -158,21 +162,25 @@ module.exports = (app) => {
   })
 
   app.get('/api/uploads/:name', async (req, res, next) => {
-    var options = {
-      root: path.join(__dirname, '../../uploads'),
-      dotfiles: 'deny',
-      headers: {
-        'x-timestamp': Date.now(),
-        'x-sent': true
+    try {
+      var options = {
+        root: path.join(__dirname, '../../uploads'),
+        dotfiles: 'deny',
+        headers: {
+          'x-timestamp': Date.now(),
+          'x-sent': true
+        }
       }
+      var fileName = req.params.name
+      res.sendFile(fileName, options, function (err) {
+        if (err) {
+          res.sendStatus(404)
+        } else {
+          console.log('Sent:', fileName)
+        }
+      })
+    } catch(err) {
+      console.log(err)
     }
-    var fileName = req.params.name
-    res.sendFile(fileName, options, function (err) {
-      if (err) {
-        res.sendStatus(404)
-      } else {
-        console.log('Sent:', fileName)
-      }
-    })
   })
 }

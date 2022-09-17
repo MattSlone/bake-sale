@@ -243,6 +243,7 @@ export default function PrimarySearchAppBar(props) {
 
   function handleHomeClick() {
     if (location.pathname == "/") {
+      props.setCategory('')
       props.getProducts()
       props.getProductsCount()
     }

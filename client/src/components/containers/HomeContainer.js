@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { getProducts, getProductsCount } from '../../redux'
+import { getProducts, getProductsCount, setCategory } from '../../redux'
 import Home from '../Home'
 
 const mapStateToProps = state => {
@@ -12,10 +12,10 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     getProducts: (fields) => dispatch(getProducts(fields)),
-    getProductsCount: (fields) => dispatch(getProductsCount(fields))
+    getProductsCount: (fields) => dispatch(getProductsCount(fields)),
+    setCategory: (category) => dispatch(setCategory(category))
   }
 }
 
 const HomeContainer = connect(mapStateToProps, mapDispatchToProps)(Home)
-
 export default HomeContainer

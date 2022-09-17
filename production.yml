@@ -22,6 +22,7 @@ services:
       - ./server/uploads:/uploads
     networks:
       - app-network
+    restart: always
   webserver:
     image: nginx:mainline-alpine
     container_name: webserver

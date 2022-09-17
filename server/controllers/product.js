@@ -307,6 +307,7 @@ module.exports = class ProductController {
       const where = await this.buildWhereClause(req)
       let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
       let limit = 6
+      console.log('WHERE: ', where)
       const products = await db.Product.findAll({
           where: where,
           offset: offset,

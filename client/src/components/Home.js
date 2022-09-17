@@ -14,6 +14,8 @@ import { Link as RouterLink, useHistory } from "react-router-dom";
 import Pagination from '@mui/material/Pagination'
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useIsMount } from '../hooks/useIsMount';
+import { useAuth } from '../hooks/use-auth'
+import { setCategory } from '../redux';
 
 function Copyright() {
   return (
@@ -29,6 +31,7 @@ function Copyright() {
 }
 
 export default function Home(props) {
+  const auth = useAuth()
   const [count, setCount] = useState(props.product.count)
   const isMount = useIsMount()
   const history = useHistory()
@@ -36,6 +39,8 @@ export default function Home(props) {
   const [page, setPage] = useState(1)
   const [distance, setDistance] = useState('')
   const [fulfillment, setFulfillment] = useState('')
+  const [message, setMessage] = useState('')
+  const [category, setCategory] = useState(props.product.filterCategory)
 
   useEffect(() => {
     props.getProducts()
@@ -43,29 +48,33 @@ export default function Home(props) {
   }, [])
 
   useEffect(() => {
-    console.log(history.location.state?.from)
     if (!isMount || history.location.state?.from === 'drawer') {
       props.getProducts({
         lastId: lastId,
         fulfillment: fulfillment,
         distance: distance,
-        ...props.product.filterCategory && { category: props.product.filterCategory }
+        ...category && { category: category }
       })
       props.getProductsCount({
         fulfillment: fulfillment,
         distance: distance,
-        ...props.product.filterCategory && { category: props.product.filterCategory }
+        ...category && { category: category }
       })
       window.history.replaceState({}, document.title)
     }
   }, [fulfillment, distance])
 
   useEffect(() => {
-    if (props.product.loading == false) {
-      // console.log(props.product.count)
-      // console.log('getting products...')
+    setCategory(props.product.filterCategory)
+    setDistance('')
+    setFulfillment('')
+  }, [props.product.filterCategory])
+
+  useEffect(() => {
+    if(!isMount && !auth.userData.isLoggedIn) {
+      setMessage('Login and complete profile to see accurate distances.')
     }
-  }, [props.product.loading])
+  }, [distance])
 
   const handleChangePage = function(event, value) {
     const page = value
@@ -73,7 +82,8 @@ export default function Home(props) {
     props.getProducts({
       lastId: lastId,
       fulfillment: fulfillment,
-      distance: distance
+      distance: distance,
+      ...category && { category: category }
     })
     setPage(page)
   }
@@ -229,6 +239,11 @@ export default function Home(props) {
                 </RouterLink>
               </Grid>
             }
+          </Grid>
+          <Grid item xs={12}>
+            <Typography style={{color: 'red'}}>
+              {message}
+            </Typography>
           </Grid>
           <Grid item xs={12} spacing={1} container justifyContent={'flex-start'}>
             {props.product.products ? props.product.products.map((card) => (
