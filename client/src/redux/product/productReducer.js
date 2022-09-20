@@ -103,10 +103,12 @@ const productReducer = (state = initialState, action) => {
     }
     case CREATE_PRODUCT_SUCCESS: return {
       ...state,
+      loading: false,
       error: ''
     }
     case CREATE_PRODUCT_FAILURE: return {
       ...state,
+      loading: false,
       error: action.payload
     }
     case GET_PRODUCTS_REQUEST: return {
@@ -180,10 +182,12 @@ const productReducer = (state = initialState, action) => {
       personalizationPrompt: action.payload.personalizationPrompt,
       productImages: action.payload.ProductImages,
       inventory: action.payload.inventory,
+      loading: false,
       error: ''
     }
     case EDIT_PRODUCT_FAILURE: return {
       ...state,
+      loading: false,
       error: action.payload
     }
     case RESET_PRODUCT: return {

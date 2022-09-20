@@ -75,6 +75,26 @@ module.exports = class ShopController {
     }
   }
 
+  async nameAlreadyExists(name, userId) {
+    try {
+      console.log('inside nameAlreadyExists')
+      const nameAlreadyExists = await db.Shop.findOne({ where: {
+        [Op.or]: {
+          name: name,
+          uri: await (new ShopController).makeURISafeName(name)
+        },
+        [Op.not]: {
+          UserId: userId
+        }
+      }})
+      console.log(nameAlreadyExists)
+      return !!nameAlreadyExists
+    } catch (err) {
+      console.log(err)
+      return true
+    }
+  }
+
   static async validateCreateOrEditShop(req, res, next) {
     try {
       for (const field of [
@@ -103,15 +123,7 @@ module.exports = class ShopController {
         res.redirect('/api/shop/create')
         return
       }
-      const nameAlreadyExists = await db.Shop.findOne({ where: {
-        [Op.or]: {
-          name: req.body.name,
-          uri: await (new ShopController).makeURISafeName(req.body.name)
-        },
-        [Op.not]: {
-          UserId: req.user.id
-        }
-      }})
+      const nameAlreadyExists = await (new ShopController).nameAlreadyExists(req.body.name, req.user.id)
       if (nameAlreadyExists) {
         req.flash('error', 'Shop name is taken.')
         res.redirect('/api/shop/create')

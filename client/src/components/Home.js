@@ -71,7 +71,7 @@ export default function Home(props) {
   }, [props.product.filterCategory])
 
   useEffect(() => {
-    if(!isMount && !auth.userData.isLoggedIn) {
+    if(!isMount && !auth.userData.loggedIn) {
       setMessage('Login and complete profile to see accurate distances.')
     }
   }, [distance])

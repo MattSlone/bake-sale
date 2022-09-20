@@ -12,6 +12,7 @@ import { useAuth } from '../../hooks/use-auth'
 import { useHistory, Link, useRouteMatch } from "react-router-dom";
 import PickupAndDeliveryOptionsContainer from '../containers/PickupAndDeliveryOptionsContainer';
 import SetupPaymentAccountContainer from '../containers/SetupPaymentAccountContainer';
+import axios from 'axios';
 
 const PREFIX = 'CreateShop';
 
@@ -118,13 +119,23 @@ export default function CreateShop(props) {
   const [readyEditShop, setReadyEditShop] = useState({ready: false})
   const [goToStep, setGoToStep] = useState(0)
 
-  const validateShopName = () => {
+  const validateShopName = async () => {
     for (const field of [
       { name: 'Shop Name', value: shopName },
       { name: 'Shop Description', value: description }
     ]) {
       if (!field.value) {
         setMessage(`${field.name} is required.`)
+        return false
+      }
+      setMessage('loading...')
+      const res = await axios.get('/api/shop/validateName', {
+        params: {
+          name: shopName
+        }
+      })
+      if (res.data.error) {
+        setMessage(`Shop name is taken or invalid.`)
         return false
       }
     }
@@ -139,6 +150,7 @@ export default function CreateShop(props) {
     props.setShop({
       name: shopName
     })
+    setMessage('')
     return true
   }
 
@@ -153,15 +165,28 @@ export default function CreateShop(props) {
     }
   }, [])
 
-  const handleNext = (e) => {
-    if (validate()) {
-      if (activeStep === 1) {
-        handleCreateShop(e)
-      }
-      if (!edit) {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1) 
-      }
+  const handleFinish = async (e) => {
+    if (await validate()) {
+      handleCreateShop(e)
+      setActiveStep((prevActiveStep) => prevActiveStep + 1) 
       setGoToStep((prevActiveStep) => prevActiveStep + 1)
+    }
+  }
+
+  const handleNext = async (e) => {
+    if (activeStep === 1) {
+      handleFinish(e)
+    } else {
+      if (await validate()) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1) 
+        setGoToStep((prevActiveStep) => prevActiveStep + 1)
+      }
+    }
+  };
+
+  const handleSave = async (e) => {
+    if (await validate()) {
+      props.editShop(formData)
     }
   };
 
@@ -211,13 +236,13 @@ export default function CreateShop(props) {
     }
   }
 
-  const validate = () => {
+  const validate = async () => {
     let valid = false
     props.setValidShop(false)
     setMessage('')
     switch (activeStep) {
       case 0:
-        valid = validateShopName()
+        valid = await validateShopName()
         break
       case 1:
         valid = validPickupAndDelivery
@@ -227,9 +252,6 @@ export default function CreateShop(props) {
         break
     }
     if (valid) {
-      if (edit) {
-        props.editShop(formData)
-      }
       props.setValidShop(true)
     }
     return valid
@@ -240,20 +262,25 @@ export default function CreateShop(props) {
       if (props.shop.error) {
         setMessage(props.shop.error)
       } else {
-        if (goToStep == 0) {
-          setChildStep(0)
+        if (activeStep === 0) {
+          setMessage('Your changes have been saved.')
         }
-        setActiveStep(goToStep)
       }
+    } else if (activeStep === 0) {
+      setMessage('loading...')
     }
   }, [props.shop.loading])
 
-
+  useEffect(() => {
+    setMessage('')
+  }, [activeStep])
 
   const handleGoToStep = (i) => {
-    if (validate()) {
-      setGoToStep(i)
+    setGoToStep(i)
+    if (i == 0) {
+      setChildStep(0)
     }
+    setActiveStep(i)
   }
 
   return (
@@ -363,12 +390,19 @@ export default function CreateShop(props) {
                         !(activeStep === 2)
                         || props.shop.stripeDetailsSubmitted 
                       ) && (
-                        <Link to={match.path + (activeStep === 1 && validPickupAndDelivery ? '/stripe' : '')}>
+                        !edit || activeStep !== steps.length - 1
+                      ) && (
+                        <Link style={{textDecoration: 'none', marginRight: '5px'}} to={match.path + (activeStep === 1 && validPickupAndDelivery ? '/stripe' : '')}>
                           <Button variant="contained" color="primary" onClick={handleNext}>
-                            {activeStep === steps.length - 1 ? 'Finish' : (edit ? 'Save' : 'Next')}
+                            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                           </Button>
                         </Link>
                       )}
+                      {(edit && (activeStep == 0)) &&
+                        <Button variant="contained" color="primary" onClick={handleSave}>
+                          Save
+                        </Button>
+                      }
                     </div>
                 </div>
               )}

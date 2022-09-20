@@ -171,6 +171,7 @@ export default function PickupAndDeliveryOptions(props) {
     ]) {
       if (!field.value) {
         rtn.error = `${field.name} is required.`
+        console.log(rtn)
         return rtn
       }
     }
@@ -302,73 +303,88 @@ export default function PickupAndDeliveryOptions(props) {
     if (props.shop.loading) {
       setMessage('loading...')
     } else {
-      setMessage('')
+      if (props.shop.error) {
+        setMessage(props.shop.error)
+      } else {
+        if (edit) {
+          setMessage('Your changes have been saved.')
+        }
+      }
     }
   }, [props.shop.loading])
 
-  const validate = async () => {
+  const validate = async (fromNext) => {
     try {
       setMessage('')
+      props.setParentMessage('')
       props.setValidPickupAndDelivery(false)
       let valid = { error: '', success: false }
-      switch (activeStep) {
-        case 0:
-          valid = await validateAddress()
-          if (valid.success) {
-            setValidAddress({ valid: true })
-          } else {
-            setValidAddress({ valid: false })
-          }
-          break
-        case 1:
-          valid = validatePickupSchedule()
-          if (valid.success) {
-            props.setPickupSchedule({
-              schedule: pickupSchedule,
-              allowPickups: pickup
-            })
-            setValidPickupSchedule({valid: true})
-          } else {
-            setValidPickupSchedule({valid: false})
-          }
-          break
-        case 2:
-          valid = validateShopContact()
-          if (valid.success) {
-            props.setContact({
-              ...props.shop.contact,
-              phone: phone,
-              email: email,
-              type: contactType
-            })
-            setValidShopContact({valid: true})
-          } else {
-            setValidShopContact({valid: false})
-          }
-          break
-        case 3:
-          valid = validateDeliveryArea()
-          if (valid.success) {
-            props.setDeliveryArea({
-              radius: circle.radius,
-              lat: circle.center.lat(),
-              lng: circle.center.lng()
-            })
-            props.setDeliveryDays(deliveryDays)
-            setValidDeliveryArea({valid: true})
-          } else {
-            setValidDeliveryArea({valid: false})
-          }
-          break
-        default:
-          valid = {error: '', success: false }
+      if (!edit || (!fromNext && edit)) {
+        switch (activeStep) {
+          case 0:
+            valid = await validateAddress()
+            console.log(valid)
+            if (valid.success) {
+              setValidAddress({ valid: true })
+            } else {
+              setValidAddress({ valid: false })
+            }
+            break
+          case 1:
+            valid = validatePickupSchedule()
+            if (valid.success) {
+              props.setPickupSchedule({
+                schedule: pickupSchedule,
+                allowPickups: pickup
+              })
+              setValidPickupSchedule({valid: true})
+            } else {
+              setValidPickupSchedule({valid: false})
+            }
+            break
+          case 2:
+            valid = validateShopContact()
+            if (valid.success) {
+              props.setContact({
+                ...props.shop.contact,
+                phone: phone,
+                email: email,
+                type: contactType
+              })
+              setValidShopContact({valid: true})
+            } else {
+              setValidShopContact({valid: false})
+            }
+            break
+          case 3:
+            valid = validateDeliveryArea()
+            if (valid.success) {
+              props.setDeliveryArea({
+                radius: circle.radius,
+                lat: circle.center.lat(),
+                lng: circle.center.lng()
+              })
+              props.setDeliveryDays(deliveryDays)
+              setValidDeliveryArea({valid: true})
+            } else {
+              setValidDeliveryArea({valid: false})
+            }
+            break
+          default:
+            valid = {error: '', success: false }
+        }
       }
+      console.log(valid)
       if (valid.success) {
         props.setReadyEditShop({ready: true})
         return true
+      } else if (edit && fromNext) {
+        return true
       } else if (valid.error) {
+        console.log(valid.error)
         props.setReadyEditShop({ready: false})
         setMessage(valid.error)
+        return false
       }
     } catch (err) {
       return false
@@ -420,10 +436,14 @@ export default function PickupAndDeliveryOptions(props) {
   }, [props.childStep])
 
   const handleNext = async () => {
-    if (await validate()) {
+    if (await validate(true)) {
       props.setChildStep((prevActiveStep) => prevActiveStep + 1)
       setActiveStep((prevActiveStep) => prevActiveStep + 1)
     }
+  };
+
+  const handleSave = async () => {
+    validate(false)
   };
 
   const handleBack = async () => {
@@ -454,7 +474,7 @@ export default function PickupAndDeliveryOptions(props) {
 
   useEffect(() => {
     if (activeStep == 3) {
-      validate()
+      validate(false)
     }
   }, [radius, deliveryDays])
 
@@ -516,7 +536,6 @@ export default function PickupAndDeliveryOptions(props) {
   }
 
   const handleChangeDeliveryDays = (newValue) => {
-    console.log(newValue)
     setDeliveryDays(newValue)
   }
 
@@ -838,14 +857,26 @@ export default function PickupAndDeliveryOptions(props) {
                   >
                     Back
                   </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    className={classes.button}
-                  >
-                    {activeStep !== Object.keys(steps).length - 1 ? (edit ? 'Save' : 'Next') : 'Finish'}
-                  </Button>
+                  {(!edit || activeStep !== Object.keys(steps).length - 1) &&
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleNext}
+                      className={classes.button}
+                    >
+                      {activeStep !== Object.keys(steps).length - 1 ? 'Next' : 'Finish'}
+                    </Button>
+                  }
+                  {edit &&
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSave}
+                      className={classes.button}
+                    >
+                      Save
+                    </Button>
+                  }
                 </div>
               </div>
             </StepContent>

@@ -13,6 +13,7 @@ import { useRouteMatch, useParams } from 'react-router-dom'
 import FormGeneratorContainer from '../containers/FormGeneratorContainer'
 import ListingDetailsContainer from '../containers/ListingDetailsContainer'
 import PricingAndInventoryContainer from '../containers/PricingAndInventoryContainer'
+import { useIsMount } from '../../hooks/useIsMount';
 
 const PREFIX = 'AddCustomProduct';
 
@@ -75,6 +76,7 @@ export default function AddCustomProduct (props) {
   const steps = getSteps()
   let { id } = useParams()
   const match = useRouteMatch()
+  const isMount = useIsMount()
   const edit = match.path.includes('edit')
   const matches = useMediaQuery('(min-width:600px)')
   const [product, setProduct] = useState(props.product.products.find(product => product.id === Number(id)))
@@ -83,6 +85,7 @@ export default function AddCustomProduct (props) {
   const [validListingDetails, setValidListingDetails] = useState({ error: '', success: edit ? true : false })
   const [validPricingAndDelivery, setValidPricingAndInventory] = useState({ error: '', success: edit ? true : false })
   const [imageFormData, setImageFormData] = useState(null)
+  const [fromNext, setFromNext] = useState(false)
   const [formData, setFormData] = useState({
     product: {
       ...props.product,
@@ -162,9 +165,6 @@ export default function AddCustomProduct (props) {
         break
     }
     if (valid.success) {
-      if (edit) {
-        props.editProduct(formData)
-      }
       props.setValidProduct(true)
     } else {
       setMessage(valid.error)
@@ -173,23 +173,37 @@ export default function AddCustomProduct (props) {
   }
 
   useEffect(() => {
-    if (props.product.error) {
-      setMessage(props.product.error)
+    if (props.product.loading) {
+      setMessage('loading...')
+    } else {
+      if (props.product.error) {
+        setMessage(props.product.error)
+      } else if (edit && !isMount && !fromNext) {
+        setMessage('Your changes have been saved.')
+      } else {
+        setMessage('')
+      }
     }
-  }, [props.product.error])
+  }, [props.product.loading])
 
   const handleNext = () => {
+    setFromNext(true)
     const valid = validate()
     if (valid.success) {
-      if (activeStep === steps.length-1) {
-        handleFinish()
-      }
       setActiveStep((prevActiveStep) => prevActiveStep + 1)
     }
   }
 
+  const handleSave = () => {
+    setFromNext(false)
+    const valid = validate()
+    if (valid.success) {
+      props.editProduct(formData)
+    }
+  }
+
   const handleFinish = () => {
-    if (!props.product.id && props.product.valid) {
+    if (!edit && !props.product.id && props.product.valid) {
       props.createProduct(formData)
     }
   }
@@ -248,29 +262,26 @@ export default function AddCustomProduct (props) {
                   >
                     Back
                   </Button>
-                  {(() => {
-                    if (activeStep === steps.length - 1) {
-                      return (
-                        <Button
-                          variant='contained'
-                          color='primary'
-                          onClick={handleNext}
-                          className={classes.button}
-                        >
-                          Finish
-                        </Button>
-                      )
-                    } else {
-                      return <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        className={classes.button}
-                      >
-                        {edit ? 'Save' : 'Next'}
-                      </Button>
-                    }
-                  })()}
+                  {(!edit || activeStep !== steps.length -1) &&
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {activeStep === steps.length -1 ? handleFinish() : handleNext()}}
+                      className={classes.button}
+                    >
+                      {activeStep === steps.length -1 ? 'Finish' : "Next"}
+                    </Button>
+                  }
+                  {edit && 
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSave}
+                      className={classes.button}
+                    >
+                      Save
+                    </Button>
+                  }
                 </div>
               </div>
             </StepContent>
