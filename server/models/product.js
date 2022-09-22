@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         this.Shop = this.belongsTo(models.Shop)
         this.Ingredient = this.belongsToMany(models.Ingredient, { as: 'ingredients', through: "product_ingredient" })
         this.Variety = this.hasMany(models.Variety)
+        this.Order = this.hasMany(models.Order)
         this.Addon = this.hasMany(models.Addon)
         this.Form = this.hasOne(models.Form)
         this.ProductImage = this.hasMany(models.ProductImage)

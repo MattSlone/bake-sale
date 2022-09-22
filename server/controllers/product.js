@@ -298,29 +298,14 @@ module.exports = class ProductController {
     return where
   }
 
-  async calculatePaginationOffsetAndLimit(lastRecordNum) {
-    let offset = Number(lastRecordNum) ? Number(lastRecordNum) : 0
-    const limit = 6
-    const unPublishedProducts = await db.Product.count({
+  async sortByPopular(id) {
+    const numOrders = await db.Orders.count({
       where: {
-        [Op.or]: {
-          published: 0,
-          inventory: 0
-        },
-        id: {
-          [Op.lte]: offset > 0 ? offset : 1
-        }
+        ProductId: id,
+        OrderStatusId: 2 // completed
       }
     })
-    if (offset - unPublishedProducts >= 0) {
-      offset = offset - unPublishedProducts
-    } else {
-      offset = 0
-    }
-    return {
-      offset: offset,
-      limit: limit
-    }
+    return numOrders
   }
 
   async list(req, res, next) {
@@ -330,14 +315,20 @@ module.exports = class ProductController {
         uri: req.query.shopName
       }}) : false
       const where = await this.buildWhereClause(req)
-      const { offset, limit } = await this.calculatePaginationOffsetAndLimit(req.query.lastId)
-      console.log('WHERE: ', where)
+      let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
+      const limit = 6
       const products = await db.Product.findAll({
           where: where,
           offset: offset,
           limit: (ownShop || shopPage) ? 100 : limit,
           include: [
               { model: db.Ingredient, as: 'ingredients' },
+              {
+                model: db.Order,
+                attributes: ['id'],
+                where: { OrderStatusId: 2 },
+                required: false
+              },
               {
                 model: db.Variety,
                 where: {
@@ -379,7 +370,7 @@ module.exports = class ProductController {
               }
           ],
           order: [
-            ['id', 'DESC'],
+            [{model: db.Order, as: 'Orders'}, 'id', 'DESC']
           ]
       });
       return products

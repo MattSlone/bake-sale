@@ -35,12 +35,16 @@ export default function Home(props) {
   const [count, setCount] = useState(props.product.count)
   const isMount = useIsMount()
   const history = useHistory()
-  const [lastId, setLastId] = useState(0)
+  const [lastId, setLastId] = useState(1)
   const [page, setPage] = useState(1)
   const [distance, setDistance] = useState('')
   const [fulfillment, setFulfillment] = useState('')
   const [message, setMessage] = useState('')
   const [category, setCategory] = useState(props.product.filterCategory)
+
+  useEffect(() => {
+    setLastId(Math.max(props.product.products.map(product => product.id)))
+  }, [props.product.products])
 
   useEffect(() => {
     props.getProducts()
@@ -78,7 +82,6 @@ export default function Home(props) {
 
   const handleChangePage = function(event, value) {
     const page = value
-    const lastId = (page-1) * 6
     props.getProducts({
       lastId: lastId,
       fulfillment: fulfillment,
