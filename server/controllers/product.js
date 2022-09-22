@@ -317,9 +317,6 @@ module.exports = class ProductController {
     } else {
       offset = 0
     }
-    if (lastRecordNum >= limit) {
-      offset += 1
-    }
     return {
       offset: offset,
       limit: limit
@@ -380,6 +377,9 @@ module.exports = class ProductController {
                 model: db.Shop,
                 attributes: ['id', 'name', 'uri', 'allowPickups']
               }
+          ],
+          order: [
+            ['id', 'DESC'],
           ]
       });
       return products
