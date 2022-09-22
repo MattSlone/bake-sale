@@ -298,6 +298,34 @@ module.exports = class ProductController {
     return where
   }
 
+  async calculatePaginationOffsetAndLimit(lastRecordNum) {
+    let offset = Number(lastRecordNum) ? Number(lastRecordNum) : 0
+    const limit = 6
+    const unPublishedProducts = await db.Product.count({
+      where: {
+        [Op.or]: {
+          published: 0,
+          inventory: 0
+        },
+        id: {
+          [Op.lte]: offset > 0 ? offset : 1
+        }
+      }
+    })
+    if (offset - unPublishedProducts >= 0) {
+      offset = offset - unPublishedProducts
+    } else {
+      offset = 0
+    }
+    if (lastRecordNum >= limit) {
+      offset += 1
+    }
+    return {
+      offset: offset,
+      limit: limit
+    }
+  }
+
   async list(req, res, next) {
     try {
       const ownShop = req.query.shop && req.isAuthenticated() ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: req.user.id } }) : false
@@ -305,8 +333,7 @@ module.exports = class ProductController {
         uri: req.query.shopName
       }}) : false
       const where = await this.buildWhereClause(req)
-      let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
-      let limit = 6
+      const { offset, limit } = await this.calculatePaginationOffsetAndLimit(req.query.lastId)
       console.log('WHERE: ', where)
       const products = await db.Product.findAll({
           where: where,
@@ -355,7 +382,6 @@ module.exports = class ProductController {
               }
           ]
       });
-      console.log(JSON.stringify(products))
       return products
     }
     
