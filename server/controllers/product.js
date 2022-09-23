@@ -321,14 +321,14 @@ module.exports = class ProductController {
           where: where,
           offset: offset,
           limit: (ownShop || shopPage) ? 100 : limit,
+          attributes: [
+            'id', 'name', 'published', 'category', 'custom', 'description',
+            'processingTime', 'automaticRenewal', 'inventory', 'personalizationPrompt',
+            'weight', 'ShopId',
+            [sequelize.literal('(SELECT COUNT(*) FROM Orders WHERE Orders.ProductId = Product.id AND OrderStatusId = 2)'), 'OrderCount']
+          ],
           include: [
               { model: db.Ingredient, as: 'ingredients' },
-              {
-                model: db.Order,
-                attributes: ['id'],
-                where: { OrderStatusId: 2 },
-                required: false
-              },
               {
                 model: db.Variety,
                 where: {
@@ -369,9 +369,7 @@ module.exports = class ProductController {
                 attributes: ['id', 'name', 'uri', 'allowPickups']
               }
           ],
-          order: [
-            [{model: db.Order, as: 'Orders'}, 'id', 'DESC']
-          ]
+          order: [[sequelize.literal('OrderCount'), 'DESC']]
       });
       return products
     }

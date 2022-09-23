@@ -43,7 +43,7 @@ export default function Home(props) {
   const [category, setCategory] = useState(props.product.filterCategory)
 
   useEffect(() => {
-    setLastId(Math.max(props.product.products.map(product => product.id)))
+    setLastId(Math.max(...props.product.products.map(product => product.id)))
   }, [props.product.products])
 
   useEffect(() => {
