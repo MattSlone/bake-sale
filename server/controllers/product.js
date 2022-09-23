@@ -308,6 +308,18 @@ module.exports = class ProductController {
     return numOrders
   }
 
+  async calculateOffsetAndLimit(page) {
+    try {
+      const itemsPerPage = 6
+      return {
+        offset: (page-1)*itemsPerPage,
+        limit: itemsPerPage
+      }
+    } catch(err) {
+      console.log(err.message)
+    }
+  }
+
   async list(req, res, next) {
     try {
       const ownShop = req.query.shop && req.isAuthenticated() ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: req.user.id } }) : false
@@ -315,8 +327,8 @@ module.exports = class ProductController {
         uri: req.query.shopName
       }}) : false
       const where = await this.buildWhereClause(req)
-      let offset = Number(req.query.lastId) ? Number(req.query.lastId) : 0
-      const limit = 6
+      const page = req.query.page ? Number(req.query.page) : 1
+      const { offset, limit } = await this.calculateOffsetAndLimit(page)
       const products = await db.Product.findAll({
           where: where,
           offset: offset,
@@ -371,6 +383,7 @@ module.exports = class ProductController {
           ],
           order: [[sequelize.literal('OrderCount'), 'DESC']]
       });
+      console.log('PRODUCTS: ', products)
       return products
     }
     

@@ -244,13 +244,15 @@ export default function PrimarySearchAppBar(props) {
   function handleHomeClick() {
     if (location.pathname == "/") {
       props.setCategory('')
-      props.getProducts()
+      props.getProducts({
+        page: 1
+      })
       props.getProductsCount()
     }
   }
 
   useEffect(() => {
-    props.getProducts({ search: search })
+    props.getProducts({ search: search, page: 1 })
     props.getProductsCount({ search: search })
   }, [search])
 

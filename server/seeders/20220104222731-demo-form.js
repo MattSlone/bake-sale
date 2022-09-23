@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Forms', [{
       name: null,
-      ProductId: 2,
+      ProductId: 8,
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

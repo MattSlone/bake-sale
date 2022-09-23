@@ -15,7 +15,6 @@ import Pagination from '@mui/material/Pagination'
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useIsMount } from '../hooks/useIsMount';
 import { useAuth } from '../hooks/use-auth'
-import { setCategory } from '../redux';
 
 function Copyright() {
   return (
@@ -35,7 +34,6 @@ export default function Home(props) {
   const [count, setCount] = useState(props.product.count)
   const isMount = useIsMount()
   const history = useHistory()
-  const [lastId, setLastId] = useState(1)
   const [page, setPage] = useState(1)
   const [distance, setDistance] = useState('')
   const [fulfillment, setFulfillment] = useState('')
@@ -43,18 +41,17 @@ export default function Home(props) {
   const [category, setCategory] = useState(props.product.filterCategory)
 
   useEffect(() => {
-    setLastId(Math.max(...props.product.products.map(product => product.id)))
-  }, [props.product.products])
-
-  useEffect(() => {
-    props.getProducts()
+    props.getProducts({
+      page: 1
+    })
     props.getProductsCount()
+    setPage(1)
   }, [])
 
   useEffect(() => {
     if (!isMount || history.location.state?.from === 'drawer') {
       props.getProducts({
-        lastId: lastId,
+        page: 1,
         fulfillment: fulfillment,
         distance: distance,
         ...category && { category: category }
@@ -66,6 +63,7 @@ export default function Home(props) {
       })
       window.history.replaceState({}, document.title)
     }
+    setPage(1)
   }, [fulfillment, distance])
 
   useEffect(() => {
@@ -83,7 +81,7 @@ export default function Home(props) {
   const handleChangePage = function(event, value) {
     const page = value
     props.getProducts({
-      lastId: lastId,
+      page: page,
       fulfillment: fulfillment,
       distance: distance,
       ...category && { category: category }
@@ -164,35 +162,6 @@ export default function Home(props) {
       textDecoration: 'none',
     }
   }));
-
-  const WelcomeHeader = () => (
-    <>
-    {/*<Typography variant="h5" align="center" color="textSecondary" paragraph>
-      Buy and sell baked goods and other food from the comfort of your home!
-      Did you know 49 out of the 50 states
-      have <Link href="https://foodpreneurinstitute.com/cottage-food-law/">cottage food laws</Link> governing
-      the sale of homemade food? We streamlined the process to make it easy
-      for home chefs. All that's left to do is order what looks good!
-    </Typography>
-  */}
-    <div className={classes.heroButtons}>
-      <Grid container spacing={2} justifyContent="center">
-        <Grid item>
-          <RouterLink to='/signin' className={classes.routerLinkButton}>
-              <Button variant="contained" color="primary">
-              Sign In
-            </Button>
-          </RouterLink>
-        </Grid>
-        <Grid item>
-          <Button variant="outlined" color="primary">
-            How it works
-          </Button>
-        </Grid>
-      </Grid>
-    </div>
-    </>
-  )
 
   return ( 
     <Root>

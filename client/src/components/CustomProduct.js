@@ -128,7 +128,7 @@ export default function CustomProduct(props)
 
   useEffect(() => {
     props.getProducts({ products: [id] })
-    props.getQuotes({ forUser: true, id: auth.userData.user.success.id })
+    props.getQuotes({ forUser: true, id: auth.userData.user?.success?.id })
   }, [])
 
   useEffect(() => {
