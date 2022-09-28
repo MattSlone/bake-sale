@@ -30,7 +30,7 @@ module.exports = class OrderController {
 
       for (const shop of shopAmounts) {
         const stripeFee = this.calculateStripeFee(shop.amount)
-        const ourFee = this.calculateOurFee(shop.amount)
+        const ourFee = await this.calculateOurFee(shop.amount, shop.id)
         const payout = Number.parseFloat(shop.amount - stripeFee - ourFee).toFixed(2)
         const transfer = await db.Transfer.create({
           orderTotal: shop.amount,
@@ -106,7 +106,14 @@ module.exports = class OrderController {
     return fulfillmentAddress
   }
 
-  calculateOurFee(amount) {
+  async calculateOurFee(amount, shopId) {
+    const shop = await db.Shop.findOne({ where: { id: shopId } })
+    const createdAt = Date.parse(shop.createdAt)
+    const sixMonthsLater = Date.parse(shop.createdAt).addMonths(6)
+    const createdLessThanSixMonthsAgo = Date.today().between(createdAt, sixMonthsLater)
+    if (shop.id <= 100 && createdLessThanSixMonthsAgo) {
+      return Number(0).toFixed(2)
+    }
     return Number(amount * OUR_FEE_MULTIPLE).toFixed(2)
   }
 
