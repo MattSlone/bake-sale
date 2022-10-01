@@ -150,11 +150,11 @@ module.exports = (app) => {
   MakeProductController.validateCreateOrEditProduct,
   async (req, res, next) => {
     try {
-        let product = await ProductController.update(req, res, next)
-        res.send({
-            error: req.flash('error'),
-            success: product
-        })
+      let product = await ProductController.update(req, res, next)
+      res.send({
+        error: req.flash('error'),
+        success: product
+      })
     }
     catch (err) {
       next(err)
@@ -172,14 +172,10 @@ module.exports = (app) => {
         }
       }
       var fileName = req.params.name
-      res.sendFile(fileName, options, function (err) {
-        if (err) {
-          res.sendStatus(404)
-        } else {
-          console.log('Sent:', fileName)
-        }
-      })
+      res.sendFile(fileName, options)
     } catch(err) {
+      req.flash('error', err.message)
+      res.redirect('/api/product/error')
       console.log(err)
     }
   })
