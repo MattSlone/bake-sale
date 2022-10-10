@@ -257,7 +257,9 @@ module.exports = class ProductController {
 
   async getProductIdsByFulfillmentDate(fulfillmentDate) {
     fulfillmentDate = Date.parse(fulfillmentDate).clearTime()
+    console.log('FULFILLMENT DATE: ', fulfillmentDate)
     const processingDays = Date.today().clearTime().getElapsed(fulfillmentDate) / (1000 * 60 * 60 * 24)
+    console.log('PROCESSING DAYS: ', processingDays)
     const checkPickupAndDeliveryScheds = processingDays <= 8
     let days = []
     if (checkPickupAndDeliveryScheds) {
@@ -266,6 +268,7 @@ module.exports = class ProductController {
         days.push(day)
       }
     }
+    console.log('DAYS: ', days)
     const products = await db.Product.findAll({
       attributes: ['id'],
       where: {
@@ -308,6 +311,7 @@ module.exports = class ProductController {
         }
       ]}
     })
+    console.log('PRODUCT IDs: ', products.map(product => product.id))
     return products.map(product => product.id)
   }
 
