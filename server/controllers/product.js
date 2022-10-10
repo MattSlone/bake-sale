@@ -277,7 +277,7 @@ module.exports = class ProductController {
         },
         ...checkPickupAndDeliveryScheds && { [Op.or]: {
           [Op.and]: {
-            '$Shop.allowPickups': 1,
+            '$Shop.allowPickups$': 1,
             '$Shop.PickupSchedules.day$': {
               [Op.in]: days
             },
