@@ -196,7 +196,11 @@ export const userSignUp = (formData) => {
       dispatch(userSignUpRequest())
       const res = await axios.post('/api/signup', formData)
       if(res.data.error) {
-        dispatch(userSignUpFailure(res.data.error))
+        if (res.data.error[0]) {
+          dispatch(userSignUpFailure(res.data.error[0]))
+        } else {
+          dispatch(userSignUpFailure('There was an error signing up. Please try again.'))
+        }
       }
       else {
         // dispatch(getShop({ UserId: res.data.success.id }))

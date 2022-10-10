@@ -18,7 +18,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
-import { Redirect, Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation, useHistory } from "react-router-dom";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -178,6 +178,7 @@ const Root = styled('div')((
 
 export default function PrimarySearchAppBar(props) {
   const location = useLocation()
+  const history = useHistory()
   const [anchorEl, setAnchorEl] = useState(null);
   const [search, setSearch] = useState('')
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
@@ -242,6 +243,7 @@ export default function PrimarySearchAppBar(props) {
   }
 
   function handleHomeClick() {
+    history.push('/', { from: 'appbar' })
     if (location.pathname == "/") {
       props.setCategory('')
       props.getProducts({
@@ -347,10 +349,10 @@ export default function PrimarySearchAppBar(props) {
             size="large">
             <MenuIcon />
           </IconButton>
-          <RouterLink  onClick={handleHomeClick} to='/' className={`${classes.routerLinkButton} ${classes.white} ${classes.logo}`}>
+          <div onClick={handleHomeClick} className={`${classes.routerLinkButton} ${classes.white} ${classes.logo}`}>
             <img height="45px" src="/assets/images/logow.svg"
             />
-          </RouterLink>
+          </div>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />

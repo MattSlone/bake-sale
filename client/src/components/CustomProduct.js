@@ -94,7 +94,7 @@ export default function CustomProduct(props)
 {
   let { id } = useParams()
   const auth = useAuth()
-  const [quote, setQuote] = useState(props.quote.quotes.filter(quote => quote.ProductId == id)[props.quote.quotes.length-1])
+  const [quote, setQuote] = useState(props.quote.quotes?.filter(quote => quote.ProductId == id)[props.quote.quotes?.length-1])
   const [fields, setFields] = useState([])
   const [requested, setRequested] = useState(quote && quote.QuoteStatusId == '1')
   const [product, setProduct] = useState('')
@@ -132,7 +132,7 @@ export default function CustomProduct(props)
   }, [])
 
   useEffect(() => {
-    setQuote(props.quote.quotes.filter(quote => quote.ProductId == id)[props.quote.quotes.length-1])
+    setQuote(props.quote.quotes?.filter(quote => quote.ProductId == id)[props.quote.quotes?.length-1])
   }, [props.quote.quotes])
 
   useEffect(() => {

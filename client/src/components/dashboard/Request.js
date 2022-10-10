@@ -57,7 +57,7 @@ export default function Request(props)
   let { id } = useParams()
   const [quote, setQuote] = useState(props.quote.quotes.find(quote => quote.id == id))
   const [price, setPrice] = useState(quote.price ? Number(quote.price).toFixed(2) : '')
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   const [quoted, setQuoted] = useState(quote.QuoteStatusId != 1)
 
   useEffect(() => {

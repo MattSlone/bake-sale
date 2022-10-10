@@ -98,7 +98,9 @@ module.exports = (app) => {
     } catch (err) {
       console.log(err)
       req.flash('error', 'There was an error toggling the publish state')
-      res.redirect('/api/product/error')
+      req.session.save(err => {
+        res.redirect('/api/product/error')
+      })
     }
   })
 

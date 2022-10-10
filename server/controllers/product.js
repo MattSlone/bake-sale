@@ -7,6 +7,7 @@ const fsAsync = require('fs').promises
 const fs = require("fs")
 const validator = require('validator');
 const { sequelize } = require('../models/index');
+require('datejs')
 
 module.exports = class ProductController {
   async create (req, res, next) {
@@ -254,6 +255,62 @@ module.exports = class ProductController {
       }
   }
 
+  async getProductIdsByFulfillmentDate(fulfillmentDate) {
+    fulfillmentDate = Date.parse(fulfillmentDate).clearTime()
+    const processingDays = Date.today().clearTime().getElapsed(fulfillmentDate) / (1000 * 60 * 60 * 24)
+    const checkPickupAndDeliveryScheds = processingDays <= 8
+    let days = []
+    if (checkPickupAndDeliveryScheds) {
+      for (let i = 1; i <= processingDays; i++) {
+        const day = Date.today().clearTime().addDays(i).toString('dddd')
+        days.push(day)
+      }
+    }
+    const products = await db.Product.findAll({
+      attributes: ['id'],
+      where: {
+        processingTime: {
+          [Op.lt]: processingDays
+        },
+        ...checkPickupAndDeliveryScheds && { [Op.or]: {
+          [Op.and]: {
+            '$Shop.allowPickups': 1,
+            '$Shop.PickupSchedules.day$': {
+              [Op.in]: days
+            },
+            '$Shop.PickupSchedules.start$': {
+              [Op.ne]: col('`Shop->PickupSchedules`.`end`')
+            }
+          },
+          [Op.and]: {
+            '$Varieties.delivery$': {
+              [Op.gt]: 0
+            },
+            [Op.or]: {
+              ...days.includes('Sunday') && { '$Shop.DeliverySchedule.Sunday$': 1 },
+              ...days.includes('Monday') && { '$Shop.DeliverySchedule.Monday$': 1 },
+              ...days.includes('Tuesday') && { '$Shop.DeliverySchedule.Tuesday$': 1 },
+              ...days.includes('Wednesday') && { '$Shop.DeliverySchedule.Wednesday$': 1 },
+              ...days.includes('Thursday') && { '$Shop.DeliverySchedule.Thursday$': 1 },
+              ...days.includes('Friday') && { '$Shop.DeliverySchedule.Friday$': 1 },
+              ...days.includes('Saturday') && { '$Shop.DeliverySchedule.Saturday$': 1 },
+            },
+          }
+        } }
+      },
+      ...checkPickupAndDeliveryScheds && { include: [
+        {
+          model: db.Variety
+        },
+        {
+          model: db.Shop,
+          include: [db.PickupSchedule, db.DeliverySchedule]
+        }
+      ]}
+    })
+    return products.map(product => product.id)
+  }
+
   async buildWhereClause(req) {
     const user = req.user ? await db.User.findByPk(req.user.id) : null
     const ownShop = req.query.shop && user ? await db.Shop.findOne({ where: { id: req.query.shop, UserId: user.id } }) : false
@@ -263,6 +320,9 @@ module.exports = class ProductController {
     const shopIds = (!req.query.shop && !req.query.shopName)
       ? await this.getLocalShopIds(user, req.query.distance, req.query.fulfillment)
       : []
+    const productIdsBeforeFulfillmentdate = req.query.byFulfillmentDate ?
+      await this.getProductIdsByFulfillmentDate(req.query.byFulfillmentDate)
+      : null
     const where = {
       /*** for shop owner: ***/
       // show their own products
@@ -293,19 +353,30 @@ module.exports = class ProductController {
           ShopId: shopIds
         }
       ),
+      ...(req.query.byFulfillmentDate && { id: productIdsBeforeFulfillmentdate })
     }
     console.log(where)
     return where
   }
 
-  async sortByPopular(id) {
-    const numOrders = await db.Orders.count({
-      where: {
-        ProductId: id,
-        OrderStatusId: 2 // completed
+  async buildOrderBy(req) {
+    if (req.query.sortBy) {
+      if (req.query.sortBy === 'popular') {
+        return [
+          [sequelize.literal('OrderCount'), 'DESC'],
+          ['id', 'ASC']
+        ]
+      } else if (req.query.sortBy === 'new') {
+        return [
+          ['id', 'DESC'],
+          [sequelize.literal('OrderCount'), 'DESC']
+        ]
       }
-    })
-    return numOrders
+    }
+    return [
+      [sequelize.literal('OrderCount'), 'DESC'],
+      ['id', 'ASC']
+    ]
   }
 
   async calculateOffsetAndLimit(page) {
@@ -381,7 +452,7 @@ module.exports = class ProductController {
                 attributes: ['id', 'name', 'uri', 'allowPickups']
               }
           ],
-          order: [[sequelize.literal('OrderCount'), 'DESC']]
+          order: await this.buildOrderBy(req)
       });
       console.log('PRODUCTS: ', products)
       return products
@@ -444,12 +515,15 @@ module.exports = class ProductController {
         }
       })
       if (product) {
+        if (!product.published && product.inventory == 0) {
+          throw Error('Product has no inventory.')
+        }
         product.published = !product.published
         await product.save()
       }
     } catch (err) {
-      console.log(err)
-      throw Error(err)
+      console.log(err.message)
+      throw Error(err.message)
     }
   }
 
