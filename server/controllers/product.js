@@ -275,17 +275,17 @@ module.exports = class ProductController {
         processingTime: {
           [Op.lt]: processingDays
         },
-        ...checkPickupAndDeliveryScheds && { [Op.or]: {
-          [Op.and]: {
+        ...checkPickupAndDeliveryScheds && { [Op.or]: [
+          {[Op.and]: {
             '$Shop.allowPickups$': 1,
             '$Shop.PickupSchedules.day$': {
               [Op.in]: days
             },
             '$Shop.PickupSchedules.start$': {
-              [Op.ne]: col('`Shop->PickupSchedules`.`end`')
+              [Op.ne]: col('Shop.PickupSchedules.end')
             }
-          },
-          [Op.and]: {
+          }},
+          {[Op.and]: {
             '$Varieties.delivery$': {
               [Op.gt]: 0
             },
@@ -298,8 +298,8 @@ module.exports = class ProductController {
               ...days.includes('Friday') && { '$Shop.DeliverySchedule.Friday$': 1 },
               ...days.includes('Saturday') && { '$Shop.DeliverySchedule.Saturday$': 1 },
             },
-          }
-        } }
+          }}
+        ] }
       },
       ...checkPickupAndDeliveryScheds && { include: [
         {
