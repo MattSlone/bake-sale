@@ -26,7 +26,10 @@ const classes = {
   menuButton: `${PREFIX}-menuButton`,
   toolbar: `${PREFIX}-toolbar`,
   drawerPaper: `${PREFIX}-drawerPaper`,
-  content: `${PREFIX}-content`
+  content: `${PREFIX}-content`,
+  routerLinkButton: `${PREFIX}-routerLinkButton`,
+  white: `${PREFIX}-white`,
+  logo: `${PREFIX}-logo`,
 };
 
 const Root = styled('div')((
@@ -64,7 +67,13 @@ const Root = styled('div')((
   },
 
   // necessary for content to be below app bar
-  [`& .${classes.toolbar}`]: theme.mixins.toolbar,
+  [`& .${classes.toolbar}`]: { 
+    ...theme.mixins.toolbar,
+    backgroundColor: theme.palette.primary.main,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
 
   [`& .${classes.drawerPaper}`]: {
     width: drawerWidth,
@@ -73,6 +82,22 @@ const Root = styled('div')((
   [`& .${classes.content}`]: {
     flexGrow: 1,
     padding: theme.spacing(3),
+  },
+
+  [`& .${classes.routerLinkButton}`]: {
+    color: 'black',
+    textDecoration: 'none',
+    [`:visited`]: {
+      color: 'white'
+    }
+  },
+
+  [`& .${classes.white}`]: {
+    color: 'white'
+  },
+
+  [`& .${classes.logo}`]: {
+    display: 'flex'
   }
 }));
 
@@ -148,9 +173,36 @@ function ResponsiveDrawer(props) {
     </>
   )
 
+  function handleHomeClick() {
+    const parts = hostname.split('.')
+    console.log(parts)
+    if (parts.length > 2 || (parts.length > 1 && parts[1] == 'localhost')) {
+      // subdomain is present
+      const [, ...newParts] = parts
+      const newPath = newParts.join('.')
+      const port = parts[1] == 'localhost' ? 3000 : 443
+      window.location.replace(`${window.location.protocol}//${newPath}:${port}`)
+      history.push('/', { from: 'appbar' })
+    }
+    history.push('/', { from: 'appbar' })
+    if (location.pathname == "/") {
+      props.setCategory('')
+      props.getProducts({
+        page: 1
+      })
+      props.getProductsCount()
+    }
+  }
+
   const drawer = (
     <Root>
-      <div className={classes.toolbar} />
+      <div className={classes.toolbar}>
+        <div onClick={handleHomeClick} className={`${classes.routerLinkButton} ${classes.white} ${classes.logo}`}>
+            <img height="55px" src="/assets/images/logow.svg"
+            />
+          </div>
+      </div>
+      
       <Divider />
       {location.pathname.includes('/dashboard') ? DashboardListItems : DefaultListItems}
     </Root>
