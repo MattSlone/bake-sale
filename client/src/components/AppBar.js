@@ -363,8 +363,7 @@ export default function PrimarySearchAppBar(props) {
             <MenuIcon />
           </IconButton>
           <div onClick={handleHomeClick} className={`${classes.routerLinkButton} ${classes.white} ${classes.logo}`}>
-            <img height="45px" src="/assets/images/logow.svg"
-            />
+            {/* <img height="45px" src="/assets/images/logow.svg" />*/}
           </div>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
