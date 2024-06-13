@@ -266,6 +266,15 @@ export default function Product(props)
     }
   })
 
+  const handleShopNameClick = () => {
+    const parts = window.location.hostname.split('.')
+    if (parts[0] == 'localhost') {
+      window.location.replace(`http://${product.Shop.uri}.localhost:3000`)
+    } else {
+      window.location.replace(`http://${product.Shop.uri}.${parts[0]}`)
+    }
+  }
+
   return product ? (product.custom ? <CustomProductContainer /> :
     <StyledPaper className={classes.product}>
       <Grid container spacing={3}>
@@ -282,7 +291,7 @@ export default function Product(props)
         <Grid item xs={12} md={4}>
           <Grid container direction="column" className={classes.productAttributes}>
             <Grid item>
-              <Link to={`/s/${product.Shop.uri}`}>
+              <Link onClick={handleShopNameClick}>
                 <Typography gutterBottom variant="h6" component="h4">
                   {product.Shop.name}
                 </Typography>
