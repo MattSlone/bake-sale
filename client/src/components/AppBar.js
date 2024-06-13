@@ -187,6 +187,9 @@ export default function PrimarySearchAppBar(props) {
   const [cartAnchorEl, setCartAnchorEl] = useState(null);
   let cartAnchorRef = useRef('')
 
+  const hostname = window.location.hostname;
+  const subdomain = hostname.split('.')[0]; // Assumes subdomain is the first part of the hostname
+
   const fulfillment = ['pickup', 'delivery', 'shipping']
   const handleCartPopoverOpen = (event) => {
     if (props.cart.products.length > 0) {
@@ -243,6 +246,16 @@ export default function PrimarySearchAppBar(props) {
   }
 
   function handleHomeClick() {
+    const parts = hostname.split('.')
+    console.log(parts)
+    if (parts.length > 2 || (parts.length > 1 && parts[1] == 'localhost')) {
+      // subdomain is present
+      const [, ...newParts] = parts
+      const newPath = newParts.join('.')
+      const port = parts[1] == 'localhost' ? 3000 : 443
+      window.location.replace(`${window.location.protocol}//${newPath}:${port}`)
+      history.push('/', { from: 'appbar' })
+    }
     history.push('/', { from: 'appbar' })
     if (location.pathname == "/") {
       props.setCategory('')

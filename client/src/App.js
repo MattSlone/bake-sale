@@ -52,6 +52,9 @@ export default function App({ setAttemptedRoute }) {
   
   const url = useLocation()
   const [location, setLocation] = useState('')
+  const [hostname, setHostname] = useState(window.location.hostname)
+  const [subdomain, setSubdomain] = useState('')
+
   history.listen((newLocation, action) => {
     if (newLocation.pathname != location)
     setLocation(newLocation.pathname)
@@ -61,50 +64,91 @@ export default function App({ setAttemptedRoute }) {
     auth.isLoggedIn()
   }, [location])
 
+  useEffect(() => {
+    setSubdomain(window.location.hostname.split('.')[0]) // Assumes subdomain is the first part of the hostname
+  }, [window.location.hostname])
+
+
+
   return (
         <StyledBox>
           <div className={classes.root}>
             <DrawerContainer />
             <main className={classes.content}>
               <Box sx={{height: 64}} />
-              <Switch>
-                
-                <Route path='/' exact component={
-                  HomeContainer
-                  // auth.userData.loggedIn ? HomeContainer : Maintenance
-                } key='/'/>
-                <Route path='/signin' component={SignInContainer} key='/signin'/>
-                <Route path='/signup' component={SignUpContainer}/>
-                <Route path='/forgotpassword' component={ForgotPasswordContainer}/>
-                <Route path='/resetpassword' component={ResetPassword}/>
-                <Route path='/signout' component={HomeContainer} key='/' beforeEnter/>
-                <Route path='/products/custom/:id' children={<CustomProductContainer />} />
-                <Route path='/products/:id' children={<ProductContainer />} />
-                <Route path='/s/:id' children={<ShopContainer />} />
-                <Route path={["/dashboard", "/checkout", "/user"]
-                  // .concat(["/products", "/s/"])
-                }>
-                  {auth.userData.loggedIn ?
-                    <Switch>
-                      <Route path='/dashboard' component={DashboardContainer} />
-                      <Route path='/checkout' component={CheckoutContainer} />
-                      <Route path='/user/quotes/:id' component={QuoteContainer} />
-                      <Route path='/user/orders' component={OrdersContainer} />
-                      <Route path='/user/profile' component={ProfileContainer}/>
-                      <Route path='/user/account' component={AccountContainer}/>
-                    </Switch>
-                  : (![
-                      /\/$/,
-                      /\/signin/,
-                      /\/signup/,
-                      /\/forgotpassword/,
-                      /\/resetpassword/,
-                      /\/s\//,
-                      /\/products\//
-                    ].some(regex => url.pathname.match(regex)) ? setAttemptedRoute(url.pathname) : true)
-                   && <Redirect to="/signin" />}
-                </Route>
-              </Switch>
+                {subdomain !== 'www' && subdomain !== 'localhost' ? (
+                  <Switch>
+                    <Route path='/' exact component={ShopContainer} key='/' match={{ params: { id: subdomain } }} />
+                    <Route path='/signin' component={SignInContainer} key='/signin'/>
+                    <Route path='/signin' component={SignInContainer} key='/signin'/>
+                    <Route path='/signup' component={SignUpContainer}/>
+                    <Route path='/forgotpassword' component={ForgotPasswordContainer}/>
+                    <Route path='/resetpassword' component={ResetPassword}/>
+                    <Route path='/signout' component={HomeContainer} key='/' beforeEnter/>
+                    <Route path='/products/custom/:id' children={<CustomProductContainer />} />
+                    <Route path='/products/:id' children={<ProductContainer />} />
+                    <Route path={["/dashboard", "/checkout", "/user"]
+                      // .concat(["/products", "/s/"])
+                    }>
+                      {auth.userData.loggedIn ?
+                        <Switch>
+                          <Route path='/dashboard' component={DashboardContainer} />
+                          <Route path='/checkout' component={CheckoutContainer} />
+                          <Route path='/user/quotes/:id' component={QuoteContainer} />
+                          <Route path='/user/orders' component={OrdersContainer} />
+                          <Route path='/user/profile' component={ProfileContainer}/>
+                          <Route path='/user/account' component={AccountContainer}/>
+                        </Switch>
+                      : (![
+                          /\/$/,
+                          /\/signin/,
+                          /\/signup/,
+                          /\/forgotpassword/,
+                          /\/resetpassword/,
+                          /\/s\//,
+                          /\/products\//
+                        ].some(regex => url.pathname.match(regex)) ? setAttemptedRoute(url.pathname) : true)
+                      && <Redirect to="/signin" />}
+                    </Route>
+                  </Switch>
+                ) : (
+                  <Switch>
+                    <Route path='/' exact component={
+                      HomeContainer
+                      // auth.userData.loggedIn ? HomeContainer : Maintenance
+                    } key='/'/>
+                    <Route path='/signin' component={SignInContainer} key='/signin'/>
+                    <Route path='/signup' component={SignUpContainer}/>
+                    <Route path='/forgotpassword' component={ForgotPasswordContainer}/>
+                    <Route path='/resetpassword' component={ResetPassword}/>
+                    <Route path='/signout' component={HomeContainer} key='/' beforeEnter/>
+                    <Route path='/products/custom/:id' children={<CustomProductContainer />} />
+                    <Route path='/products/:id' children={<ProductContainer />} />
+                    <Route path={["/dashboard", "/checkout", "/user"]
+                      // .concat(["/products", "/s/"])
+                    }>
+                      {auth.userData.loggedIn ?
+                        <Switch>
+                          <Route path='/dashboard' component={DashboardContainer} />
+                          <Route path='/checkout' component={CheckoutContainer} />
+                          <Route path='/user/quotes/:id' component={QuoteContainer} />
+                          <Route path='/user/orders' component={OrdersContainer} />
+                          <Route path='/user/profile' component={ProfileContainer}/>
+                          <Route path='/user/account' component={AccountContainer}/>
+                        </Switch>
+                      : (![
+                          /\/$/,
+                          /\/signin/,
+                          /\/signup/,
+                          /\/forgotpassword/,
+                          /\/resetpassword/,
+                          /\/s\//,
+                          /\/products\//
+                        ].some(regex => url.pathname.match(regex)) ? setAttemptedRoute(url.pathname) : true)
+                      && <Redirect to="/signin" />}
+                    </Route>
+                  </Switch>
+                )}
             </main>
           </div>
         </StyledBox>
