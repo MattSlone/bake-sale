@@ -1,5 +1,7 @@
 This was a personal project I worked on a couple years ago. It's a two sided marketplace for home cooks to sell their food.
 
+Front end is React / Material UI. Backend is ExpressJS / Sequelize (mySQL)
+
 # SETUP
 
 1) Install Docker
