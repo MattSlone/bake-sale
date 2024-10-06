@@ -1,3 +1,5 @@
+This was a personal project I worked on a couple years ago. It's a two sided marketplace for home cooks to sell their food.
+
 # SETUP
 
 1) Install Docker
